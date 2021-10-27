@@ -1,3 +1,3 @@
 module.exports = {
-	outputDir : "../backend/wwwroot/"
-}
+  outputDir: "../backend/wwwroot/",
+};
