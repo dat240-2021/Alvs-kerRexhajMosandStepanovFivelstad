@@ -8,6 +8,7 @@
 *.sln.docstates
 
 # Build results
+[Pp]roject_images/
 [Bb]in/
 [Oo]bj/
 [Dd]ebug/
