@@ -25,5 +25,5 @@ npm run test:unit
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+# Page Map
+![Test Image 1](/report/assets/page_map.jpg)
