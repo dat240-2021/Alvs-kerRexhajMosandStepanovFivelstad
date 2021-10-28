@@ -144,7 +144,7 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
-
+*.db
 *.swp
 *.*~
 project.lock.json
