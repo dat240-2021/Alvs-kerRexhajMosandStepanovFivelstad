@@ -34,7 +34,5 @@
     "eslint-plugin-vue": "^7.0.0",
     "prettier": "^2.2.1",
     "typescript": "~4.1.5"
-  },
-  "_id": "frontend@0.1.0",
-  "readme": "ERROR: No README data found!"
+  }
 }
