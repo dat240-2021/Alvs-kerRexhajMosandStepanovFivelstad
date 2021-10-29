@@ -57,10 +57,10 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public string Post(string uname, string password){
-            Console.WriteLine(uname);
-            Console.WriteLine(password);
-            return _authServ.RegisterUser(uname,password).Result;
+        public string Post(UserLogin user){
+            Console.WriteLine(user.Username);
+            Console.WriteLine(user.Password);
+            return _authServ.RegisterUser(user.Username,user.Password).Result;
         }
     }
 
@@ -82,6 +82,7 @@ namespace backend.Controllers
 
         [HttpGet]
         public string Get(){
+
             return "Success";
         }
     }
