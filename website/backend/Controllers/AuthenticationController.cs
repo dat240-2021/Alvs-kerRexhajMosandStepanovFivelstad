@@ -1,8 +1,10 @@
 
 using System;
+using Domain.Authentication.Models;
 using Domain.Authentication.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+// using Microsoft.AspNetCore.Http.StatusCode;
 using Microsoft.Extensions.Logging;
 
 namespace backend.Controllers
@@ -14,20 +16,27 @@ namespace backend.Controllers
     public class LoginController : ControllerBase
     {
         private readonly ILogger<LoginController> _logger;
-        private readonly AuthenticationService _authServ;
+        private readonly IAuthenticationService _authServ;
 
-        public LoginController(ILogger<LoginController> logger, AuthenticationService authServ)
+        public LoginController(ILogger<LoginController> logger, IAuthenticationService authServ)
         {
             _logger = logger;
             _authServ = authServ;
         }
 
         [HttpPost]
-        public bool Post(string uname, string password){
-            Console.WriteLine(uname);
-            Console.WriteLine(password);
+        public UserLogin Post(UserLogin user){
 
-            return true;
+
+            if (_authServ.LoginUser(user.Username,user.Password).Result){
+                user.Password = "";
+                return user;
+            }
+
+            //
+            Response.StatusCode = Unauthorized().StatusCode;
+            return null;
+
         }
     }
 
@@ -38,9 +47,9 @@ namespace backend.Controllers
     public class RegistrationController : ControllerBase
     {
         private readonly ILogger<RegistrationController> _logger;
-        private readonly AuthenticationService _authServ;
+        private readonly IAuthenticationService _authServ;
 
-        public RegistrationController(ILogger<RegistrationController> logger,AuthenticationService authServ)
+        public RegistrationController(ILogger<RegistrationController> logger, IAuthenticationService authServ)
         {
             _logger = logger;
             _authServ = authServ;

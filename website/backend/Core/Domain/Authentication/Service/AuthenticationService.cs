@@ -14,7 +14,7 @@ namespace Domain.Authentication.Services
     public interface IAuthenticationService
     {
         Task<string> RegisterUser(string username,string password);
-        Task<string> LoginUser(UserLogin userLogin);
+        Task<bool> LoginUser(string username,string password);
         Task<Unit> LogoutUser();
     }
 
@@ -45,21 +45,23 @@ namespace Domain.Authentication.Services
 
             return username;
         }
-        public async Task<string> LoginUser(UserLogin userLogin){
+        public async Task<bool> LoginUser(string username,string password){
 
             User user;
             Microsoft.AspNetCore.Identity.SignInResult result;
+            // try {
+            user = await userManager.FindByNameAsync(username);
 
-            user = await userManager.FindByNameAsync(userLogin.Username);
+            if (user!=null){
 
-            result = await signInManager.PasswordSignInAsync(user, userLogin.Password, false, false);
-
-            if (user!=null || result.Succeeded){
-                return user.UserName;
+                result = await signInManager.PasswordSignInAsync(user, password, false, false);
+                return result.Succeeded;
             }
-
-            //return username
-            return "";
+            return false;
+            // }
+            // catch (Exception e) {
+            //     return e;
+            // }
         }
 
 
