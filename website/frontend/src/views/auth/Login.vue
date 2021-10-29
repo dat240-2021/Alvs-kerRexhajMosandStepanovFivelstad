@@ -44,6 +44,7 @@ export default {
       const { userName, password } = this.form;
       auth.authUser(userName, password)
         .then(setAuthUser)
+        .then(() => this.$router.push({ name: "home" }))
         .catch((e) => {
           //error handling
         })
