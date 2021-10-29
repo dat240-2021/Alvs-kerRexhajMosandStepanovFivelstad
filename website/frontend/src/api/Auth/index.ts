@@ -8,10 +8,11 @@ import { isUserAuth } from "@/utils";
 /*
 temp for testing
  */
-// not auth
+
+// not auth user
 const getAuthUser = async (): Promise<User | null> => null;
 
-// auth
+// auth user
 // const getAuthUser = async (): Promise<User | null> =>
 //   ({ isAuth: true } as User);
 
