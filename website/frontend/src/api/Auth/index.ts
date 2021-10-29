@@ -5,6 +5,21 @@ import { isUserAuth } from "@/utils";
 // const getAuthUser = async (): Promise<User | null> =>
 //   (await axios.get("/me")) as User;
 
+const authUser = async (userName: string, password: string): Promise<User> =>
+  await axios.post("/api/login", {
+    userName,
+    password,
+  });
+
+const registrateUser = async (
+  userName: string,
+  password: string
+): Promise<User> =>
+  await axios.post("/api/register", {
+    userName,
+    password,
+  });
+
 /*
 temp for testing
  */
@@ -18,4 +33,6 @@ const getAuthUser = async (): Promise<User | null> => null;
 
 export default {
   getAuthUser,
+  authUser,
+  registrateUser,
 };

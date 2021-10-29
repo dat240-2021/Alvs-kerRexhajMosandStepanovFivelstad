@@ -6,7 +6,6 @@ export const isUserAuthenticated = (
   from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) => {
-  console.log(isUserAuth());
   if (isUserAuth()) {
     next("/home");
     return;
