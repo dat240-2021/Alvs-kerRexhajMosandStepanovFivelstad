@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Authentication.Services;
+// using Authentication.Services;
 using Domain.Authentication;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 // using Microsoft.OpenApi.Models;
+// using Microsoft.AspNetCore.Identity;
+// using Microsoft.AspNetCore.Mvc;
+// using Microsoft.EntityFrameworkCore;
+// using Microsoft.Extensions.Configuration;
+// using Microsoft.Extensions.DependencyInjection;
+using Domain.Authentication.Services;
 
 namespace backend
 {
@@ -40,11 +47,19 @@ namespace backend
                 options.UseSqlite($"Data Source={Path.Combine("Infrastructure","Data", "game.db")}");
             });
 
+            services.AddScoped<IAuthenticationService,AuthenticationService>();
+            // services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddIdentity<User,IdentityRole<Guid>>()
+            .AddEntityFrameworkStores<GameContext>()
+            .AddUserManager<UserManager<User>>();
+            // .AddRoleManager<RoleManager<IdentityRole<Guid>>>();
+
+            services.AddAuthentication();
+
             services.AddMediatR(typeof(Startup));
 
             services.AddControllers();
 
-            services.AddScoped<IAuthenticationService,AuthenticationService>();
         }
 
 

@@ -1,13 +1,16 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Domain.Authentication;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
-	public class GameContext : DbContext
+	public class GameContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 	{
 		private readonly IMediator _mediator;
 
@@ -16,7 +19,7 @@ namespace Infrastructure.Data
 			_mediator = mediator;
 		}
 
-		public DbSet<User> Users {get;set;}
+		// public DbSet<User> Users {get;set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
