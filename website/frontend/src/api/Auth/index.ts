@@ -1,6 +1,6 @@
 import axios from "axios";
 import { User } from "@/typings";
-import { isUserAuth } from "@/utils";
+import { isUserAuth } from "@/utils/auth";
 
 // const getAuthUser = async (): Promise<User | null> =>
 //   (await axios.get("/me")) as User;
