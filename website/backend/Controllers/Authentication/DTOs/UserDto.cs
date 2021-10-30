@@ -8,10 +8,10 @@ namespace Controllers.Authentication.Models
     public record UserReceiveDto
     {
         [Required]
-        public string Username { get; }
+        public string Username { get; set;}
 
         [Required]
-        public string Password { get; }
+        public string Password { get; set;}
     }
 
 
