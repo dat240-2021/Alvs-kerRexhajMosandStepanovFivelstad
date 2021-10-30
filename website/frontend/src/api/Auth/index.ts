@@ -5,11 +5,13 @@ import { isUserAuth } from "@/utils/auth";
 // const getAuthUser = async (): Promise<User | null> =>
 //   (await axios.get("/me")) as User;
 
-const authUser = async (userName: string, password: string): Promise<User> =>
-  await axios.post("/api/login", {
+const authUser = async (userName: string, password: string): Promise<User> => {
+  const { data }: { data: User } = await axios.post("/api/login", {
     userName,
     password,
   });
+  return { ...data, isAuth: true };
+};
 
 const registrateUser = async (
   userName: string,

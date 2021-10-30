@@ -66,9 +66,10 @@ export default defineComponent({
 
       this.submitting = true;
       const { userName, password } = this.form;
+
       auth.authUser(userName, password)
         .then(setAuthUser)
-        .then(() => this.$router.push({ name: "home" }))
+        .then(() => this.$router.push({ name: 'Home' }))
         .catch((e) => {
           const status = e.response.status as string;
           this.responseError = ERROR_LABEL_BY_CODE[status] ?? ERROR_LABEL_BY_CODE.default;
