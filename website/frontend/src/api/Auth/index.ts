@@ -16,12 +16,13 @@ const authUser = async (userName: string, password: string): Promise<User> => {
 const registrateUser = async (
   userName: string,
   password: string
-): Promise<User> =>
-  await axios.post("/api/register", {
+): Promise<User> => {
+  const { data }: { data: User } = await axios.post("/api/register", {
     userName,
     password,
   });
-
+  return { ...data, isAuth: true };
+};
 /*
 temp for testing
  */

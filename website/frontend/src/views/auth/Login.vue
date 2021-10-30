@@ -3,7 +3,7 @@
     <form @submit="handleSubmit">
       <div class="form-group mb-2 has-validation">
         <label for="loginUsername">Username</label>
-        <input v-model="form.userName" type="text" :class="{ 'form-control': true, 'is-invalid': validatorErrors.userName.length }" id="loginUsername" placeholder="Enter username">
+        <input v-model="form.userName" type="text" :class="{ 'form-control': true, 'is-invalid': validatorErrors.userName.length }" id="loginUsername" placeholder="Username">
         <div class="invalid-feedback">{{ validatorErrors.userName }}</div>
       </div>
       <div class="form-group mb-2">
@@ -24,9 +24,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
 import auth from "@/api/Auth";
 import { setAuthUser } from "@/utils/auth";
+import validators from "@/utils/validators";
 
 const ERROR_LABEL_BY_CODE: {[index: string]:any} = {
   401: "Username or password is wrong.",
@@ -78,12 +78,13 @@ export default defineComponent({
     },
     validateForm() {
       let hasErrors = false;
+      const { userName, password } = this.form;
 
-      if (!this.form.userName.trim().length) {
+      if (validators.isEmpty(userName)) {
         hasErrors = true;
         this.validatorErrors.userName = VALIDATION_ERRORS.emptyUsername;
       }
-      if (!this.form.password.trim().length) {
+      if (validators.isEmpty(password)) {
         hasErrors = true;
         this.validatorErrors.password = VALIDATION_ERRORS.emptyPassword;
       }
