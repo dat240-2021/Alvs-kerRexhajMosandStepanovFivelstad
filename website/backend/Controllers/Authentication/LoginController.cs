@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Controllers.Authentication.Models;
 using Domain.Authentication.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +24,13 @@ namespace Controllers.Authentication
         }
 
         [HttpPost]
-        public UserSendDto Post(UserReceiveDto user){
+        public async Task<IActionResult> Post(UserRequestDto user){
 
-            if (_authServ.LoginUser(user.Username,user.Password).Result){
-
-                return new UserSendDto{Username = user.Username};
+            if (await _authServ.LoginUser(user.Username,user.Password)){
+                return Ok(new UserResponseDto{Username = user.Username});
             }
 
-            Response.StatusCode = Unauthorized().StatusCode;
-            return null;
-
+            return Unauthorized();
         }
     }
     }

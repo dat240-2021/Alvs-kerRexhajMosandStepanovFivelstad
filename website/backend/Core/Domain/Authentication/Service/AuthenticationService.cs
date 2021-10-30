@@ -12,7 +12,7 @@ namespace Domain.Authentication.Services
 {
     public interface IAuthenticationService
     {
-        Task<string> RegisterUser(string username,string password);
+        Task<bool> RegisterUser(string username,string password);
         Task<bool> LoginUser(string username,string password);
         Task<Unit> LogoutUser();
     }
@@ -38,11 +38,13 @@ namespace Domain.Authentication.Services
         }
 
 
-        public async Task<string> RegisterUser(string username,string password){
-            var user = new User { UserName = username };
-            await userManager.CreateAsync(user, password);
-
-            return username;
+        public async Task<bool> RegisterUser(string username,string password){
+            var user = await userManager.FindByNameAsync(username);
+            if (user != null) return false;
+            
+            var newUser = new User { UserName = username };
+            await userManager.CreateAsync(newUser, password);
+            return true;
         }
         public async Task<bool> LoginUser(string username,string password){
 

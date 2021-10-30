@@ -5,7 +5,7 @@ using SharedKernel;
 
 namespace Controllers.Authentication.Models
 {
-    public record UserReceiveDto
+    public record UserRequestDto
     {
         [Required]
         public string Username { get; set;}
@@ -15,7 +15,7 @@ namespace Controllers.Authentication.Models
     }
 
 
-    public record UserSendDto
+    public record UserResponseDto
     {
         [Required]
         public string Username { get; set; }

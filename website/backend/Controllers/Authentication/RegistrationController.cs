@@ -1,5 +1,6 @@
 
 using System;
+using System.Threading.Tasks;
 using Domain.Authentication.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,11 +23,12 @@ namespace Controllers.Authentication
         }
 
         [HttpPost]
-        public string Post(UserReceiveDto user){
-            Console.WriteLine(user.Username);
-            Console.WriteLine(user.Password);
-            //TODO return meaningfull error
-            return _authServ.RegisterUser(user.Username,user.Password).Result;
+        public async Task<IActionResult> Post(UserRequestDto user){
+            if (await _authServ.RegisterUser(user.Username,user.Password)){
+                return Ok(new UserResponseDto{Username = user.Username});
+            }
+
+            return UnprocessableEntity();
         }
     }
 
