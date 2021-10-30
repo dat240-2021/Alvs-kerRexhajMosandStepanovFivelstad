@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Authentication.Models;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
