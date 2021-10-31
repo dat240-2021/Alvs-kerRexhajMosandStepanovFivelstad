@@ -28,20 +28,14 @@ namespace Domain.Authentication.Services
         public AuthenticationService(GameContext db, UserManager<User> user, SignInManager<User> signIn){
             Db = db;
             userManager = user;
-            // roleManager = role; //technically not needed... leaving it here for now just in case
             signInManager = signIn;
-
-            // if (!roleManager.Roles.Any())
-            // {
-            //     _ = roleManager.CreateAsync(new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "User" }).Result;
-            // }
         }
 
 
         public async Task<bool> RegisterUser(string username,string password){
             var user = await userManager.FindByNameAsync(username);
             if (user != null) return false;
-            
+
             var newUser = new User { UserName = username };
             await userManager.CreateAsync(newUser, password);
             return true;
@@ -50,7 +44,7 @@ namespace Domain.Authentication.Services
 
             User user;
             Microsoft.AspNetCore.Identity.SignInResult result;
-            // try {
+
             user = await userManager.FindByNameAsync(username);
 
             if (user!=null){
@@ -59,10 +53,7 @@ namespace Domain.Authentication.Services
                 return result.Succeeded;
             }
             return false;
-            // }
-            // catch (Exception e) {
-            //     return e;
-            // }
+
         }
 
 
