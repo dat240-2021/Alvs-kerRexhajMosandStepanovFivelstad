@@ -1,67 +1,49 @@
 <template>
   <div class="d-flex vh-100 justify-content-center align-items-center">
-    <form @submit="handleSubmit">
-      <div class="form-group mb-2">
-        <label for="loginInputUsername">Username</label>
-        <input
-          v-model="form.userName"
-          type="text"
-          :class="{
-            'form-control': true,
-            'is-invalid': validatorErrors.userName.length,
-          }"
-          id="loginInputUsername"
-          placeholder="Username"
-        />
-        <div class="invalid-feedback">{{ validatorErrors.userName }}</div>
-      </div>
-      <div class="form-group mb-2">
-        <label for="loginInputPassword">Password</label>
-        <input
-          v-model="form.password"
-          type="password"
-          :class="{
-            'form-control': true,
-            'is-invalid': validatorErrors.password.length,
-          }"
-          id="loginInputPassword"
-          placeholder="Password"
-        />
-        <div class="invalid-feedback">{{ validatorErrors.password }}</div>
-      </div>
-      <div class="form-group mb-2">
-        <label for="loginInputPassword2">Repeat password</label>
-        <input
-          v-model="form.passwordRepeat"
-          type="password"
-          :class="{
-            'form-control': true,
-            'is-invalid': validatorErrors.passwordRepeat.length,
-          }"
-          id="loginInputPassword2"
-          placeholder="Password"
-        />
-        <div class="invalid-feedback">{{ validatorErrors.passwordRepeat }}</div>
-      </div>
+    <form @submit.prevent="handleSubmit">
+      <Input
+        v-model="form.userName"
+        id="registerUsername"
+        label="Username"
+        placeholder="Username"
+        :error="validatorErrors.userName"
+        @update:error="validatorErrors.userName = $event"
+      />
+      <Input
+        v-model="form.password"
+        id="registerPassword"
+        label="Password"
+        placeholder="Password"
+        type="password"
+        :error="validatorErrors.password"
+        @update:error="validatorErrors.password = $event"
+      />
+      <Input
+        v-model="form.passwordRepeat"
+        id="registerRepeatPassword"
+        label="Password"
+        placeholder="Password"
+        type="password"
+        :error="validatorErrors.passwordRepeat"
+        @update:error="validatorErrors.passwordRepeat = $event"
+      />
       <div v-show="responseError" class="alert alert-danger" role="alert">
         {{ responseError }}
       </div>
-      <div class="form-group d-flex justify-content-around">
-        <router-link type="submit" class="btn btn-secondary" to="/"
-          >Go back</router-link
-        >
-        <button type="submit" class="btn btn-primary" :disabled="submitting">
-          Login
-        </button>
+      <div class="form-group d-flex justify-content-around mt-2">
+        <Submit :has-go-back-button="true" :disabled="submitting">Register</Submit>
       </div>
     </form>
   </div>
 </template>
 
 <script lang="ts">
-import auth from "@/api/Auth";
-import { setAuthUser } from "@/utils/auth";
 import { defineComponent } from "vue";
+import auth from "@/api/Auth";
+import Input from "@/components/Form/Input.vue";
+import Submit from "@/components/Form/Submit.vue";
+import { setAuthUser } from "@/utils/auth";
+
 import validators from "@/utils/validators";
 
 const ERROR_LABEL_BY_CODE: { [index: string]: any } = {
@@ -78,6 +60,10 @@ const VALIDATION_ERRORS = {
 
 export default defineComponent({
   name: "Registration",
+  components: {
+    Input,
+    Submit
+  },
   data() {
     return {
       form: {
@@ -94,17 +80,8 @@ export default defineComponent({
       submitting: false,
     };
   },
-  computed: {
-    formHasErrors(): boolean {
-      return (
-        this.responseError.length !== 0 ||
-        Object.values(this.validatorErrors).some((v) => v !== "")
-      );
-    },
-  },
   methods: {
     handleSubmit(e: Event) {
-      e.preventDefault();
       if (!this.validateForm()) return;
 
       this.submitting = true;
@@ -149,20 +126,17 @@ export default defineComponent({
   },
   watch: {
     "form.userName": function () {
-      if (this.formHasErrors) {
-        this.validatorErrors.userName = "";
+      if (this.responseError) {
         this.responseError = "";
       }
     },
     "form.password": function () {
-      if (this.formHasErrors) {
-        this.validatorErrors.password = "";
+      if (this.responseError) {
         this.responseError = "";
       }
     },
     "form.passwordRepeat": function () {
-      if (this.formHasErrors) {
-        this.validatorErrors.passwordRepeat = "";
+      if (this.responseError) {
         this.responseError = "";
       }
     },
