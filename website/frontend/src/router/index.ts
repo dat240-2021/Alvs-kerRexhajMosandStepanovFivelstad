@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import {
   isUserAuthenticated,
   isUserNotAuthenticated,
@@ -6,6 +6,8 @@ import {
 
 import Home from "@/views/Home.vue";
 import Index from "@/views/Index.vue";
+import Login from "@/views/auth/Login.vue";
+import Registration from "@/views/auth/Registration.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -20,10 +22,22 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
     beforeEnter: isUserNotAuthenticated,
   },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
+    beforeEnter: isUserAuthenticated,
+  },
+  {
+    path: "/registration",
+    name: "Registration",
+    component: Registration,
+    beforeEnter: isUserAuthenticated,
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(process.env.BASE_URL),
   routes,
 });
 

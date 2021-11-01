@@ -4,8 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-
-import { fetchAuthUser, isUserAuth, setAuthUser } from "@/utils";
+import { fetchAuthUser, isUserAuth, setAuthUser } from "@/utils/auth";
 
 const initApp = async () => {
   if (!isUserAuth()) {
@@ -17,4 +16,3 @@ const initApp = async () => {
 };
 
 initApp();
-

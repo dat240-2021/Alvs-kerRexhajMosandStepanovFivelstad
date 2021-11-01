@@ -5,7 +5,7 @@
     </div>
     <div class="d-flex justify-content-start flex-column align-items-center h-75">
       <router-link class="btn btn-primary mb-5" to="/login">Login</router-link>
-      <router-link class="btn btn-primary" to="/register">Register</router-link>
+      <router-link class="btn btn-primary" to="/registration">Register</router-link>
     </div>
   </div>
 </template>

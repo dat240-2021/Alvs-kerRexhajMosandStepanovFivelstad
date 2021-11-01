@@ -1,24 +1,12 @@
+using Microsoft.AspNetCore.Identity;
 using System;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-using SharedKernel;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Domain.Authentication
 {
-    public class User : BaseEntity{
-        public int Id {get; protected set;}
-        public string Name {get; protected set;}
-        public string Password {get; protected set;}
-
-        public User(){}
-        public User(string n ,string p )
-        {
-            Name = n;
-            Password = p;
-
-        }
-
+    public class User : IdentityUser<Guid>
+    {
     }
-
 }
-

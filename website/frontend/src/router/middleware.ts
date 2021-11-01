@@ -1,12 +1,11 @@
 import { NavigationGuardNext, RouteLocationNormalized } from "vue-router";
-import { isUserAuth } from "@/utils";
+import { isUserAuth } from "@/utils/auth";
 
 export const isUserAuthenticated = (
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) => {
-  console.log(isUserAuth());
   if (isUserAuth()) {
     next("/home");
     return;

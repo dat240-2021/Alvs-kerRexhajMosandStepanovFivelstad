@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Authentication.Services;
-using Domain.Authentication;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-// using Microsoft.OpenApi.Models;
+using Domain.Authentication;
+using Domain.Authentication.Services;
 
 namespace backend
 {
@@ -40,11 +37,21 @@ namespace backend
                 options.UseSqlite($"Data Source={Path.Combine("Infrastructure","Data", "game.db")}");
             });
 
+            services.AddScoped<IAuthenticationService,AuthenticationService>();
+
+
+
+            // services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddIdentity<User,IdentityRole<Guid>>()
+            .AddEntityFrameworkStores<GameContext>()
+            .AddUserManager<UserManager<User>>();
+
+            // services.AddAuthentication().AddIdentityServerJwt();
+
             services.AddMediatR(typeof(Startup));
 
             services.AddControllers();
 
-            services.AddScoped<IAuthenticationService,AuthenticationService>();
         }
 
 
@@ -63,7 +70,15 @@ namespace backend
 
             app.UseRouting();
 
+
+            //Needed for login
+            app.UseCookiePolicy();
+
+            app.UseAuthentication();
+
             app.UseAuthorization();
+
+
 
             app.UseDefaultFiles();
 
