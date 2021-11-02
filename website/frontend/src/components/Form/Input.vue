@@ -1,17 +1,18 @@
 <template>
-  <div class="form-group has-validation">
+  <div class="form-group has-validation" :class="this.class">
     <label v-if="label" :for="id">{{ label }}</label>
     <input
       :value="this.modelValue"
       @input="handleInputChange"
       :type="this.type"
       :class="{
-        'is-invalid': this.error !== ''
+        'is-invalid': this.error !== '',
+        [this.inputClass]: true,
       }"
       class="form-control"
       :id="id"
       :placeholder="this.placeholder"
-     />
+    />
     <div class="invalid-feedback">{{ error }}</div>
   </div>
 </template>
@@ -21,18 +22,23 @@ export default {
   name: "Input",
   methods: {
     handleInputChange(e) {
-      this.$emit('update:modelValue', e.target.value);
+      this.$emit("update:modelValue", e.target.value);
 
-      if(this.error) {
-        this.$emit('update:error', '');
+      if (this.error) {
+        this.$emit("update:error", "");
       }
-    }
+    },
   },
   props: {
     id: {
       required: true,
     },
     class: {
+      required: false,
+      type: String,
+      default: "",
+    },
+    inputClass: {
       required: false,
       type: String,
       default: "",
@@ -56,10 +62,10 @@ export default {
     },
     error: {
       required: true,
-      type: String
-    }
+      type: String,
+    },
   },
-  emits: ['update:modelValue', 'update:error'],
+  emits: ["update:modelValue", "update:error"],
 };
 </script>
 
