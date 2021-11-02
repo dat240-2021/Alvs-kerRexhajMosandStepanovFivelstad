@@ -8,11 +8,17 @@ on:
 jobs:
   unit_test-lint:
     runs-on: ubuntu-latest
-    working-directory: website/frontend
     steps:
       - uses: actions/checkout@v2
-      - run: |
-              npm ci
-              npm run build
-              npm run test:unit
-              npm run lint
+      - name: setup
+        working-directory: website/frontend
+        run: npm ci
+      - name: build
+        working-directory: website/frontend
+        run: npm run build
+      - name: test
+        working-directory: website/frontend
+        run: npm run test:unit
+      - name: lint
+        working-directory: website/frontend
+        run: npm run lint
