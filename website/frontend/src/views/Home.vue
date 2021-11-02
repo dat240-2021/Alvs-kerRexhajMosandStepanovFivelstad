@@ -40,67 +40,111 @@
                 <th scope="row">1</th>
                 <td>Mark</td>
                 <td>Otto</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">2</th>
                 <td>Jacob</td>
                 <td>Thornton</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
               <tr>
                 <th scope="row">3</th>
                 <td>Larry the Bird</td>
                 <td>@twitter</td>
-                <td><button class="btn">Join</button></td>
+                <td>
+                  <router-link class="btn" to="/game/id">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                  </router-link>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -115,11 +159,35 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Home",
+  created() {
+    //TODO subscribe for rooms
+    console.log("get rooms");
+
+    //TODO get leaderboard
+    console.log("get leaderboard");
+  },
+  data() {
+    return {
+      leaderBoard: [],
+      gameRooms: [],
+    };
+  },
+  methods: {
+    getLeaderBoard() {
+      // fetchLeaderBoard().then((leaderBoard: string[]) => {
+      //   this.leaderBoard = leaderBoard;
+      // });
+    },
+    // fetchGameRooms() {
+    //
+    // },
+  },
 });
 </script>
 
 <style scoped>
-.leaderboard, .games-list {
+.leaderboard,
+.games-list {
   background: #e7efbd;
 }
 </style>
