@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Controllers.Authentication.Models;
+using Controllers.Authentication.Dto;
+using Controllers.Generics;
 using Domain.Authentication.Pipelines;
 using Domain.Authentication.Services;
 using MediatR;
@@ -29,7 +30,9 @@ namespace Controllers.Authentication
         public async Task<IActionResult> Post(UserRequestDto user){
 
             if ( (await _mediator.Send(new LoginUser.Request(user.Username,user.Password))).Success ){
-                return Ok(new UserResponseDto{Username = user.Username});
+                return Ok(new GenericResponseObject<UserResponseDto>{
+                    Data = new UserResponseDto{Username = user.Username}
+                });
             }
 
             return Unauthorized();

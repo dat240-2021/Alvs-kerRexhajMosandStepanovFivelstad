@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Controllers.Authentication.Models;
+using Controllers.Authentication.Dto;
 using Domain.Authentication.Pipelines;
 using Domain.Authentication.Services;
 using MediatR;

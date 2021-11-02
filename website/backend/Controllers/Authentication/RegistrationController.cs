@@ -1,12 +1,12 @@
 
 using System;
 using System.Threading.Tasks;
-using Domain.Authentication.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Controllers.Authentication.Models;
 using MediatR;
 using Domain.Authentication.Pipelines;
+using Controllers.Authentication.Dto;
+using Controllers.Generics;
 
 namespace Controllers.Authentication
 {
@@ -29,10 +29,14 @@ namespace Controllers.Authentication
             var result = await _mediator.Send(new RegisterUser.Request(user.Username,user.Password));
 
             if (result.Success){
-                return Ok(new UserResponseDto{Username = user.Username});
+                return Ok(new GenericResponseObject<UserResponseDto>{
+                    Data = new UserResponseDto{
+                        Username = user.Username
+                        }
+                    });
             }
 
-            return UnprocessableEntity(result.errors);
+            return UnprocessableEntity(new GenericResponseObject<UserResponseDto>{Errors = result.errors});
         }
     }
 

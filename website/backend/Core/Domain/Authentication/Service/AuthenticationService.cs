@@ -40,7 +40,7 @@ namespace Domain.Authentication.Services
             var errors = new List<string>();
 
             foreach(var err in result.Errors){
-                errors.Add(err.ToString());
+                errors.Add(err.Description);
             }
 
             return (result.Succeeded,errors.ToArray());
@@ -59,7 +59,6 @@ namespace Domain.Authentication.Services
                 return result.Succeeded;
             }
             return false;
-
         }
 
 
