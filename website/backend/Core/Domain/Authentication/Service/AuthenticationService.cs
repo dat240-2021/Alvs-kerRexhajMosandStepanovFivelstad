@@ -12,7 +12,7 @@ namespace Domain.Authentication.Services
 {
     public interface IAuthenticationService
     {
-        Task<bool> RegisterUser(string username,string password);
+        Task<(bool Success,string[] errors)> RegisterUser(string username,string password);
         Task<bool> LoginUser(string username,string password);
         Task<Unit> LogoutUser();
     }
@@ -22,7 +22,6 @@ namespace Domain.Authentication.Services
         GameContext Db;
 
         private UserManager<User> userManager;
-        // private RoleManager<IdentityRole<Guid>> roleManager;
         private SignInManager<User> signInManager;
 
         public AuthenticationService(GameContext db, UserManager<User> user, SignInManager<User> signIn){
@@ -32,14 +31,21 @@ namespace Domain.Authentication.Services
         }
 
 
-        public async Task<bool> RegisterUser(string username,string password){
-            var user = await userManager.FindByNameAsync(username);
-            if (user != null) return false;
+        public async Task<(bool Success,string[] errors)> RegisterUser(string username,string password){
+            // var user = await userManager.FindByNameAsync(username);
+            // if (user != null) return (false,new string[]{"Username allready exists"});
 
-            var newUser = new User { UserName = username };
-            await userManager.CreateAsync(newUser, password);
-            return true;
+            var result = await userManager.CreateAsync(new User { UserName = username }, password);
+
+            var errors = new List<string>();
+
+            foreach(var err in result.Errors){
+                errors.Add(err.Description);
+            }
+
+            return (result.Succeeded,errors.ToArray());
         }
+
         public async Task<bool> LoginUser(string username,string password){
 
             User user;
@@ -53,7 +59,6 @@ namespace Domain.Authentication.Services
                 return result.Succeeded;
             }
             return false;
-
         }
 
 

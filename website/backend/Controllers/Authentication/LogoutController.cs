@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Controllers.Authentication.Dto;
-using Controllers.Generics;
 using Domain.Authentication.Pipelines;
 using Domain.Authentication.Services;
 using MediatR;
@@ -14,13 +13,13 @@ namespace Controllers.Authentication
 
     [ApiController]
     // [Route("[controller]")]
-    [Route("/api/login")]
-    public class LoginController : ControllerBase
+    [Route("/api/logout")]
+    public class LogoutController : ControllerBase
     {
         private readonly ILogger<LoginController> _logger;
 		private readonly IMediator _mediator;
 
-        public LoginController(ILogger<LoginController> logger, IMediator mediator)
+        public LogoutController(ILogger<LoginController> logger, IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;
@@ -28,14 +27,9 @@ namespace Controllers.Authentication
 
         [HttpPost]
         public async Task<IActionResult> Post(UserRequestDto user){
+            await _mediator.Send(new LogoutUser.Request());
+            return Ok();
 
-            if ( (await _mediator.Send(new LoginUser.Request(user.Username,user.Password))).Success ){
-                return Ok(new GenericResponseObject<UserResponseDto>{
-                    Data = new UserResponseDto{Username = user.Username}
-                });
-            }
-
-            return Unauthorized();
         }
     }
     }
