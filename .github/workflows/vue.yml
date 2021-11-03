@@ -1,0 +1,24 @@
+name: Frontend/Vue
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  unit_test-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup
+        working-directory: website/frontend
+        run: npm install
+      - name: build
+        working-directory: website/frontend
+        run: npm run build
+      - name: test
+        working-directory: website/frontend
+        run: npm run test:unit
+      - name: lint
+        working-directory: website/frontend
+        run: npm run lint
