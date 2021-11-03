@@ -8,6 +8,7 @@ import Home from "@/views/Home.vue";
 import Index from "@/views/Index.vue";
 import Login from "@/views/auth/Login.vue";
 import Registration from "@/views/auth/Registration.vue";
+import NewGame from "@/views/NewGame.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -33,6 +34,12 @@ const routes: Array<RouteRecordRaw> = [
     name: "Registration",
     component: Registration,
     beforeEnter: isUserAuthenticated,
+  },
+  {
+    path: "/game",
+    name: "NewGame",
+    component: NewGame,
+    beforeEnter: isUserNotAuthenticated,
   },
 ];
 
