@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Data;
@@ -66,7 +67,6 @@ namespace Domain.Authentication.Services
             await signInManager.SignOutAsync();
             return Unit.Value;
         }
-
     }
 
 
