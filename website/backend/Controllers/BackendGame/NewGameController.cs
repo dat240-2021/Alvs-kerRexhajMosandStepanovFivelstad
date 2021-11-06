@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using backend.Controllers.BackendGame.Dto;
 using backend.Core.Domain.BackendGame.Pipelines;
+using Controllers.Generics;
 using Domain.Authentication;
 using Domain.Authentication.Services;
 using MediatR;
@@ -27,18 +28,21 @@ namespace backend.Controllers.BackendGame
         [HttpPost]
         public async Task<IActionResult> Post(GameSettingsDto settings)
         {
-            var id = _userManager.GetUserId(HttpContext.User);
+            var userId = _userManager.GetUserId(HttpContext.User);
 
-            await _mediator.Send(new CreateGame.Request(new GameSettings
+            var gameId = await _mediator.Send(new CreateGame.Request(new GameSettings
             {
                 Duration = settings.Duration,
                 ImagesCount = settings.ImagesCount,
                 PlayersCount = settings.PlayersCount,
             },
-                new Guid(id)
+                new Guid(userId)
                 ));
             
-            return Ok();
+            return Ok(new GenericResponseObject<Guid>
+            {
+                Data = gameId
+            });
         }
     }
 }

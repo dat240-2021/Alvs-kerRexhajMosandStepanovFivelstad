@@ -8,7 +8,7 @@ namespace backend.Hubs
     {
         public async Task SendMessage(Game game)
         {
-            await Clients.All.SendAsync("ReceiveMessage", game);
+            await Clients.All.SendAsync("GameCreated", game);
         }
     }
 }

@@ -4,12 +4,14 @@
       <div class="col">
         <div class="row">
           <div class="col">
-            <form>
+            <form @submit.prevent="handleSubmit">
               <Input
                 class="mb-2"
                 error=""
                 type="number"
                 model-value="1"
+                min="1"
+                max="10"
                 id="picturesCountInput"
                 label="Number of pictures"
               />
@@ -18,6 +20,8 @@
                 error=""
                 type="number"
                 model-value="1"
+                min="1"
+                max="6"
                 id="playersCountInput"
                 label="Number of players"
               />
@@ -26,8 +30,10 @@
                 error=""
                 type="number"
                 model-value="1"
+                min="10"
+                max="120"
                 id="rounndLengthInput"
-                label="Round length in minutes"
+                label="Round length in seconds"
               />
               <div class="form-group d-flex justify-content-around mt-2">
                 <Submit>Start game</Submit>
@@ -86,12 +92,28 @@
 <script>
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
+import { createGame } from "@/api/BackendGame";
 
 export default {
   name: "NewGame",
   components: {
     Input,
     Submit,
+  },
+  methods: {
+    handleSubmit() {
+      const settings = {
+        "PlayersCount": 2,
+        "ImagesCount": 1,
+        "Duration": 30,
+        // "Categories": ["Animals", "Cars"]
+      };
+
+      createGame(settings)
+        .then((id) => {
+        this.$router.push({ name: "Game", params: { id } });
+        });
+    },
   },
 };
 </script>

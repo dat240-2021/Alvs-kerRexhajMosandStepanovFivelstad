@@ -11,15 +11,16 @@ namespace backend.Controllers.BackendGame
     {
         private readonly IMediator _mediator;
 
-        public ActiveGamesController(IMediator _mediator)
+        public ActiveGamesController(IMediator mediator)
         {
-            this._mediator = _mediator;
+            _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return null;
+            var games = await _mediator.Send(new GetWaitingGames.Request());
+            return Ok(games);
         }
     }
 }

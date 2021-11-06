@@ -36,112 +36,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
+              <tr v-for="(room, id) in gameRooms" :key="room.id">
+                <td>{{ id + 1 }}</td>
+                <td>Some type here</td>
+                <td>Some capacity here </td>
                 <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
+                  <router-link class="btn" :to="'/game/' + room.id">
                     <i class="bi bi-box-arrow-in-right"></i>
                   </router-link>
                 </td>
@@ -156,31 +56,32 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { fetchWaitingRooms, subscribeToGameRooms } from "@/api/BackendGame";
 
 export default defineComponent({
   name: "Home",
   created() {
-    //TODO subscribe for rooms
-    console.log("get rooms");
-
-    //TODO get leaderboard
-    console.log("get leaderboard");
+    this.fetchGameRooms();
+    this.subscribeToGames();
   },
   data() {
     return {
       leaderBoard: [],
-      gameRooms: [],
+      gameRooms: [] as any[],
     };
   },
   methods: {
-    getLeaderBoard() {
-      // fetchLeaderBoard().then((leaderBoard: string[]) => {
-      //   this.leaderBoard = leaderBoard;
-      // });
+    fetchGameRooms() {
+      fetchWaitingRooms()
+        .then(rooms => this.gameRooms = rooms);
     },
-    // fetchGameRooms() {
-    //
-    // },
+    addGameRoom(room: any) {
+      console.log(room);
+      this.gameRooms = [...this.gameRooms, room];
+    },
+    subscribeToGames() {
+      subscribeToGameRooms(this.addGameRoom);
+    }
   },
 });
 </script>

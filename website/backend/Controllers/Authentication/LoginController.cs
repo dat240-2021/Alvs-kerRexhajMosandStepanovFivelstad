@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using backend.Core.Domain.BackendGame.Pipelines;
 using backend.Hubs;
 using Controllers.Authentication.Dto;
 using Controllers.Generics;

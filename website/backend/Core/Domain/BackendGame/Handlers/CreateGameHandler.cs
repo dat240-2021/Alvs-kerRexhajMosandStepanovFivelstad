@@ -22,7 +22,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines.Handlers
         public async Task Handle(GameCreated notification, CancellationToken cancellationToken)
         {
             var game = await _db.Games.FirstAsync(g => g.Id == notification.Id);
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", game, cancellationToken: cancellationToken);
+            await _hubContext.Clients.All.SendAsync("GameCreated", game, cancellationToken: cancellationToken);
         }
     }
 }

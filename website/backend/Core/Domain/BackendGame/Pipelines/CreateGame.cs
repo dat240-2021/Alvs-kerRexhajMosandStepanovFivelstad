@@ -12,9 +12,9 @@ namespace backend.Core.Domain.BackendGame.Pipelines
 {
     public class CreateGame
     {
-        public record Request(GameSettings GameSettings, Guid UserId): IRequest<Unit> {}
+        public record Request(GameSettings GameSettings, Guid UserId): IRequest<Guid> {}
 
-        public class Handler: IRequestHandler<Request, Unit>
+        public class Handler: IRequestHandler<Request, Guid>
         {
 
             private GameContext _db;
@@ -25,7 +25,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
             }
 
             
-            public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
+            public async Task<Guid> Handle(Request request, CancellationToken cancellationToken)
             {
                 var user = await _db.Users.FirstAsync(u => u.Id == request.UserId, cancellationToken: cancellationToken);
 
@@ -33,7 +33,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
                 _db.Games.Add(game);
                 
                 await _db.SaveChangesAsync(cancellationToken);
-                return Unit.Value;
+                return game.Id;
             }
         }
     }
