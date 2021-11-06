@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SharedKernel;
 
@@ -5,10 +6,11 @@ namespace backend.Core.Domain.Image
 {
     public class Image : BaseEntity
     {
-        public Image(string imageName, ImageCategories categories)
+        public Image(string imageName, ImageCategory category, Guid? userId)
         {
             ImageName = imageName;
-            Categories = categories;
+            Category = category;
+            UserId = userId;
         }
 
         public Image()
@@ -17,14 +19,15 @@ namespace backend.Core.Domain.Image
         }
         
         public int Id { get; protected set; }
-        public string ImageName { get; protected set; }
-        public ImageCategories Categories { get; protected set; }
-        private List<ImagePieces> imageList = new();
-        public IEnumerable<ImagePieces> ImageList => imageList.AsReadOnly();
+        public string ImageName { get; set; }
+        public Guid? UserId { get; set; }
+        public ImageCategory Category { get; protected set; }
+        private List<ImagePiece> imageList = new();
+        public IEnumerable<ImagePiece> ImageList => imageList.AsReadOnly();
 
-        public void AddImagePieces(ImagePieces item)
+        public void AddImagePieces(ImagePiece item)
         {
-            ImagePieces tempImagePiece = new(item.ImageData, item.SequenceNumber);
+            ImagePiece tempImagePiece = new(item.ImageData, item.SequenceNumber);
             imageList.Add(tempImagePiece);
         }
         

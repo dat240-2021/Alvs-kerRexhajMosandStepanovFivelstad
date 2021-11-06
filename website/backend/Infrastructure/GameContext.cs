@@ -21,9 +21,9 @@ namespace Infrastructure.Data
 		}
 
 		// public DbSet<User> Users {get;set;}
-		public DbSet<ImagePieces> ImagePieces { get; set; } = null!;
+		public DbSet<ImagePiece> ImagePiece { get; set; } = null!;
 		public DbSet<Image> Image { get; set; } = null!;
-		public DbSet<ImageCategories> ImageCategories { get; set; } = null!;
+		public DbSet<ImageCategory> ImageCategory { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

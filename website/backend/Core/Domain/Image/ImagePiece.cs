@@ -2,15 +2,15 @@ using SharedKernel;
 
 namespace backend.Core.Domain.Image
 {
-    public class ImagePieces : BaseEntity
+    public class ImagePiece : BaseEntity
     {
-        public ImagePieces(byte[] imagedata, int sequenceNumber)
+        public ImagePiece(byte[] imagedata, int sequenceNumber)
         {
             ImageData = imagedata;
             SequenceNumber = sequenceNumber;
         }
 
-        public ImagePieces()
+        public ImagePiece()
         {
             
         }

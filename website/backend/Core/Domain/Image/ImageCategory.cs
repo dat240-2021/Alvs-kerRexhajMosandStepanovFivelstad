@@ -2,19 +2,19 @@ using SharedKernel;
 
 namespace backend.Core.Domain.Image
 {
-    public class ImageCategories : BaseEntity
+    public class ImageCategory : BaseEntity
     {
-        public ImageCategories(string category)
+        public ImageCategory(string category)
         {
             Category = category;
         }
 
-        public ImageCategories()
+        public ImageCategory()
         {
             
         }
         
         public int Id { get; protected set; }
-        public string Category { get; protected set; }
+        public string Category { get; set; }
     }
 }
