@@ -22,6 +22,6 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Deploy
-        run: curl http://rexhaj.tech/deploy/groupProjectDat240
+        run: curl --silent http://rexhaj.tech/deploy/groupProjectDat240
         
 
