@@ -24,8 +24,8 @@ namespace backend.Core.Domain.BackendGame.Pipelines
 
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
-                var entry = await _db.WaitingPool.Where(p => p.GameId == request.GameId && p.User.Id == request.UserId).FirstAsync(cancellationToken: cancellationToken);
-                _db.WaitingPool.Remove(entry);
+                var game = await _db.Games.Include(g => g.WaitingPool).FirstAsync(g => g.Id == request.GameId);
+                game.RemoveUserByIdFromWaitingPool(request.UserId);
                 await _db.SaveChangesAsync(cancellationToken);
                 return Unit.Value;
             }

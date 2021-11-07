@@ -29,7 +29,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
 
                 var user = await _db.Users.FirstAsync(u => u.Id == request.UserId, cancellationToken: cancellationToken);
 
-                var entry = new WaitingEntry(user, request.GameId);
+                var entry = new WaitingEntry(user.Id, request.GameId);
                 _db.WaitingPool.Add(entry);
 
                 await _db.SaveChangesAsync(cancellationToken);

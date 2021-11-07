@@ -13,7 +13,6 @@ connection.on("GameCreated", (game: Game) => {
 });
 
 connection.on("GameRoomUpdated", (game: Game) => {
-  console.log(game);
   handlers.forEach((handler) => handler(game));
 });
 
@@ -33,6 +32,10 @@ export const fetchWaitingRooms = async (): Promise<Game[]> => {
 
 export const joinGameRoom = async (id: string) => {
   await axios.post(`api/games/${id}/join`);
+};
+
+export const leaveGameRoom = async (id: string) => {
+  await axios.post(`api/games/${id}/leave`);
 };
 
 export const subscribeToGameRooms = (cb: any) => {
