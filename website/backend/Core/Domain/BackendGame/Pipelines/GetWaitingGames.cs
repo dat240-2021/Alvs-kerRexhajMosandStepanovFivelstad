@@ -27,6 +27,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
             public async Task<List<Game>> Handle(Request request, CancellationToken cancellationToken)
             {
                 return await _db.Games
+                    .Include(g => g.WaitingPool)
                     .Where(g => g.State == GameState.Created)
                     .ToListAsync(cancellationToken: cancellationToken);
             }

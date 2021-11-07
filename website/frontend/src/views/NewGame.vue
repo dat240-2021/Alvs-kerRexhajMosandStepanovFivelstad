@@ -109,10 +109,9 @@ export default {
         // "Categories": ["Animals", "Cars"]
       };
 
-      createGame(settings)
-        .then((id) => {
+      createGame(settings).then((id) => {
         this.$router.push({ name: "Game", params: { id } });
-        });
+      });
     },
   },
 };

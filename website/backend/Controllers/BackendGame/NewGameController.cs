@@ -19,9 +19,9 @@ namespace backend.Controllers.BackendGame
         private readonly UserManager<User> _userManager;
         private readonly IAuthenticationService _authenticationService;
 
-        public NewGameController(IMediator _mediator, UserManager<User> userManager)
+        public NewGameController(IMediator mediator, UserManager<User> userManager)
         {
-            this._mediator = _mediator;
+            _mediator = mediator;
             _userManager = userManager;
         }
 

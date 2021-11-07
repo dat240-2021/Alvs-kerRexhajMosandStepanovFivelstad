@@ -29,21 +29,19 @@
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">#</th>
                 <th scope="col">Game Type</th>
                 <th scope="col">Capacity</th>
                 <th scope="col">Join</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(room, id) in gameRooms" :key="room.id">
-                <td>{{ id + 1 }}</td>
+              <tr v-for="game in gameRooms" :key="game.id">
                 <td>Some type here</td>
-                <td>Some capacity here </td>
+                <td>{{ game.waitingPool.length }} / {{ game.settings.playersCount }}</td>
                 <td>
-                  <router-link class="btn" :to="'/game/' + room.id">
+                  <button class="btn" @click="joinGame(game.id)">
                     <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -57,6 +55,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { fetchWaitingRooms, subscribeToGameRooms } from "@/api/BackendGame";
+import { joinGameRoom } from "@/api/BackendGame";
+import { Game } from "@/typings";
 
 export default defineComponent({
   name: "Home",
@@ -67,7 +67,7 @@ export default defineComponent({
   data() {
     return {
       leaderBoard: [],
-      gameRooms: [] as any[],
+      gameRooms: [] as Game[],
     };
   },
   methods: {
@@ -75,13 +75,23 @@ export default defineComponent({
       fetchWaitingRooms()
         .then(rooms => this.gameRooms = rooms);
     },
-    addGameRoom(room: any) {
-      console.log(room);
-      this.gameRooms = [...this.gameRooms, room];
+    addGameRoom(game: Game) {
+      const index = this.gameRooms.findIndex((g: Game) => g.id === game.id);
+      if (index == -1) {
+        this.gameRooms = [...this.gameRooms, game];
+        return;
+      }
+
+      this.gameRooms[index] = game;
+
     },
     subscribeToGames() {
       subscribeToGameRooms(this.addGameRoom);
-    }
+    },
+    joinGame(id: string) {
+      joinGameRoom(id)
+        .then(() => this.$router.push({ name: "Game", params: { id } }));
+    },
   },
 });
 </script>

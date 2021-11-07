@@ -31,8 +31,12 @@ namespace backend.Core.Domain.BackendGame.Pipelines
 
                 var game = new Game(Guid.NewGuid(), request.GameSettings);
                 _db.Games.Add(game);
+
+                var waitingEntry = new WaitingEntry(user, game.Id);
+                _db.WaitingPool.Add(waitingEntry);
                 
                 await _db.SaveChangesAsync(cancellationToken);
+                
                 return game.Id;
             }
         }

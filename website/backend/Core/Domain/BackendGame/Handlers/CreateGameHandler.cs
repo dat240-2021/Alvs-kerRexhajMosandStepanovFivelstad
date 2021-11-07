@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Core.Domain.BackendGame.Pipelines.Handlers
+namespace backend.Core.Domain.BackendGame.Handlers
 {
     public class CreateGameHandler: INotificationHandler<GameCreated>
     {
@@ -21,7 +21,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines.Handlers
         }
         public async Task Handle(GameCreated notification, CancellationToken cancellationToken)
         {
-            var game = await _db.Games.FirstAsync(g => g.Id == notification.Id);
+            var game = await _db.Games.Include(g => g.WaitingPool).FirstAsync(g => g.Id == notification.Id);
             await _hubContext.Clients.All.SendAsync("GameCreated", game, cancellationToken: cancellationToken);
         }
     }

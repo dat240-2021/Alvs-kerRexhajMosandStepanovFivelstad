@@ -22,13 +22,11 @@ namespace Controllers.Authentication
     {
         private readonly ILogger<LoginController> _logger;
 		private readonly IMediator _mediator;
-        private readonly IHubContext<GamesHub> _hubContext;
 
-        public LoginController(ILogger<LoginController> logger, IMediator mediator, IHubContext<GamesHub> hubContext)
+        public LoginController(ILogger<LoginController> logger, IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _hubContext = hubContext;
         }
 
         [HttpPost]
