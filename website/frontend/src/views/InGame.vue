@@ -17,14 +17,14 @@
                     <form>
                         <div class="col d-flex justify-content-around">
                             <Submit>Show one more</Submit> 
-                            <Input                                
+                            <Input
+                                v-model="newGuess"
                                 error=""
                                 type="text"
                                 model-value="Guesser Input"
                                 id="guessing"                               
-                            />       
-                            <Submit>Check</Submit>
-
+                            />
+                            <Submit v-on:click="NewGuess()">Check</Submit>
                         </div>                          
                     </form> 
                 </div>                         
@@ -44,6 +44,9 @@
                                     <tr v-for="g in guesses" :key="g.guess">
                                         <td>{{g.guess}}</td>
                                     </tr>
+                                    <!--tr>
+                                        <td>{{newGuess}}</td>
+                                    </tr-->
                                 </table>
                             </div>
                         </div> 
@@ -108,9 +111,9 @@ export default {
         return {
             //imagesegments: [],
             players: [
-                {playerName: "Jamie Lannister", score: 10, playerId: 1},
-                {playerName: "The Hound", score: 11, playerId: 2},
-                {playerName: "Rob Stark", score: 9, playerId: 3},
+                {playerName: "Jamie Lannister", score: 10, proposer:false, playerId: 1},
+                {playerName: "The Hound", score: 11, proposer:false, playerId: 2},
+                {playerName: "Rob Stark", score: 9, proposer:false, playerId: 3},
             ],
             guesses: [
                 {guess: "monkey"},
@@ -120,18 +123,21 @@ export default {
             ],
             proposer: '',
             image: '',
-            creator: '',
             incorrect: true,
+            correct: "Fish",
+            newGuess: '',
+            player: '',
        
         };
     },
     methods:{
         makePropser: function(creatorId){
-            //if (this.players.length == 2) {
-            //    this.TwoPlayerModeFindProposer(creatorId)
-            //}	
+            if (this.players.length == 2) {
+                this.TwoPlayerModeFindProposer(creatorId)
+            }	
 			const idx = Math.floor(Math.random() * this.players.length);
             this.proposer = this.players[idx]
+            this.players[idx].proposer = true
 		},
 
         TwoPlayerModeFindProposer: function(creatorId){
@@ -139,8 +145,33 @@ export default {
                 this.proposer = this.players[0]
             } 
             this.proposer = this.players[1]
+            this.players[1].proposer = true
             
         },
+        // I think we have to store newGuess in the database and retreave it from database to make this work. 
+        NewGuess: function() {
+            console.log(this.newGuess)
+            if (this.newGuess != ""){
+                console.log(this.newGuess)
+                if (this.newGuess != this.correct) {
+                    this.guesses.push({guess: this.newGuess})
+                }
+               
+            }
+           
+        },
+        sortByScore: function() {
+            var sortedPLayersByScore = []
+            var highestScore = this.players[0].score
+            for (let i= 0; i<this.players.length; i++) {
+                if (this.players[i].score > highestScore) {
+                    highestScore = this.players[i].score 
+                    sortedPLayersByScore.push(this.players[i])
+                }
+            }
+            this.players = sortedPLayersByScore
+        }
+        
     }
 };
 
