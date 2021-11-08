@@ -1,7 +1,11 @@
 <template>
     <div class="container vh-100 py-5">
-         <div class="col d-flex justify-content-end">
-            <Submit>Leave Game</Submit>
+        
+        <div class="col d-flex justify-content-end">
+            <!--Submit>Leave Game</Submit-->
+            <router-link class="btn btn-primary" to="/home">
+                Leave Game
+            </router-link>
         </div>
         <div class="col d-flex justify-content-center">
             <h1>In Game</h1>
@@ -73,7 +77,16 @@
                                     <th>Player:</th>
                                     <th>Score:</th>
                                 </tr>
-                                <tr>
+                                <tr v-for="p in players" :key="p.playerName">
+                                    <td >
+                                        {{ p.playerName }}
+                                    </td>
+                                    <td >
+                                        {{p.score}}
+                                    </td>
+                                </tr>
+                                    
+                                <!--tr>
                                     <td>Jamie Lannister</td>
                                     <td>10</td>
                                 </tr>
@@ -84,8 +97,9 @@
                                 <tr>
                                     <td>Rob Stark</td>
                                     <td>9</td>
-                                </tr>
+                                </tr-->
                             </table>
+                            
                         </div> 
                     </div>                                      
                 </div>                         
@@ -103,12 +117,44 @@ import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
 
 export default {
-  name: "InGame",
-  components: {
-    Input,
-    Submit,
-  },
+    name: "InGame",
+    components: {
+        Input,
+        Submit,
+    },
+    data() {
+        return {
+            //imagesegments: [],
+            players: [
+                {playerName: "Jamie Lannister", score: 10, playerId: 1},
+                {playerName: "The Hound", score: 11, playerId: 2},
+                {playerName: "Rob Stark", score: 9, playerId: 3},
+            ],
+            guess: "",
+            proposer: '',
+            image: '',
+            creator: '',
+       
+        };
+    },
+    methods:{
+        makePropser: function(){	
+			//const idx = Math.floor(Math.random() * this.players.length);
+            //this.proposer = this.players[idx]
+		},
+
+        TwoPlayerModeFindProposer: function(creatorId){
+            //if (this.players.length==2) {
+            //    if (this.player[2] == creatorId) {
+            //        this.creator = this.player[2]
+            //    }
+//
+            //}
+        },//
+    }
 };
+
+
 </script>
 
 <style scoped>
