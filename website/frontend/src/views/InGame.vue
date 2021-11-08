@@ -41,14 +41,8 @@
                                     <tr>
                                         <th>Guesses:</th>
                                     </tr>
-                                    <tr>
-                                        <td>Monkey</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Donkey</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Cat</td>
+                                    <tr v-for="g in guesses" :key="g.guess">
+                                        <td>{{g.guess}}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -86,18 +80,6 @@
                                     </td>
                                 </tr>
                                     
-                                <!--tr>
-                                    <td>Jamie Lannister</td>
-                                    <td>10</td>
-                                </tr>
-                                <tr>
-                                    <td>The Hound</td>
-                                    <td>11</td>
-                                </tr>
-                                <tr>
-                                    <td>Rob Stark</td>
-                                    <td>9</td>
-                                </tr-->
                             </table>
                             
                         </div> 
@@ -130,27 +112,35 @@ export default {
                 {playerName: "The Hound", score: 11, playerId: 2},
                 {playerName: "Rob Stark", score: 9, playerId: 3},
             ],
-            guess: "",
+            guesses: [
+                {guess: "monkey"},
+                {guess: "donkey"},
+                {guess: "cat"},
+
+            ],
             proposer: '',
             image: '',
             creator: '',
+            incorrect: true,
        
         };
     },
     methods:{
-        makePropser: function(){	
-			//const idx = Math.floor(Math.random() * this.players.length);
-            //this.proposer = this.players[idx]
+        makePropser: function(creatorId){
+            //if (this.players.length == 2) {
+            //    this.TwoPlayerModeFindProposer(creatorId)
+            //}	
+			const idx = Math.floor(Math.random() * this.players.length);
+            this.proposer = this.players[idx]
 		},
 
         TwoPlayerModeFindProposer: function(creatorId){
-            //if (this.players.length==2) {
-            //    if (this.player[2] == creatorId) {
-            //        this.creator = this.player[2]
-            //    }
-//
-            //}
-        },//
+            if (this.players[0].playerId == creatorId) {
+                this.proposer = this.players[0]
+            } 
+            this.proposer = this.players[1]
+            
+        },
     }
 };
 
