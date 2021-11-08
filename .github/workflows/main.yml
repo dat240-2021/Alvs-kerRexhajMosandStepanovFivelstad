@@ -1,4 +1,4 @@
-name: Test Container Run
+name: CI Docker Container Run
 on:
   push:
     branches: [ main ]
