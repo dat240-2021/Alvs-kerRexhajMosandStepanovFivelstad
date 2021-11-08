@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using backend.Core.Domain.Image;
 using Domain.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,9 @@ namespace Infrastructure.Data
 		}
 
 		// public DbSet<User> Users {get;set;}
+		public DbSet<ImagePiece> ImagePiece { get; set; } = null!;
+		public DbSet<Image> Image { get; set; } = null!;
+		public DbSet<ImageCategory> ImageCategory { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
