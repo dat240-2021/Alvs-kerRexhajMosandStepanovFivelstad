@@ -16,9 +16,9 @@ RUN dotnet dev-certs https
 RUN dotnet tool install --global dotnet-ef
 ENV PATH $PATH:/root/.dotnet/tools
 RUN dotnet restore
-RUN dotnet build 
+RUN dotnet build
 RUN dotnet ef migrations add init
-RUN mkdir ./Infrastructure/Data
+RUN mkdir -p ./Infrastructure/Data
 RUN dotnet ef database update 
 
 ENTRYPOINT ["dotnet","run","--launch-profile","deployment"]
