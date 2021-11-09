@@ -56,7 +56,10 @@
 import { defineComponent } from "vue";
 import { fetchWaitingRooms, subscribeToGameRoomsCreation, subscribeToGameRoomsUpdates } from "@/api/BackendGame";
 import { joinGameRoom } from "@/api/BackendGame";
-import { Game, GameSlotUpdateNotification } from "@/typings";
+import {
+  Game,
+  GameSlotUpdateNotification
+} from "@/typings";
 
 export default defineComponent({
   name: "Home",

@@ -1,9 +1,14 @@
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
-import { Game, GameSlotUpdateNotification } from "@/typings";
+import {
+  Game,
+  GameSlotUpdateNotification,
+  subscribeToGameRoomsCreationCb,
+  subscribeToGameRoomsUpdateCb,
+} from "@/typings";
 
-let createGameHandlers: any[] = [];
-let updateSlotsHandlers: any[] = [];
+let createGameHandlers: subscribeToGameRoomsCreationCb[] = [];
+let updateSlotsHandlers: subscribeToGameRoomsUpdateCb[] = [];
 
 const connection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/games")
@@ -39,10 +44,14 @@ export const leaveGameRoom = async (id: string) => {
   await axios.post(`api/games/${id}/leave`);
 };
 
-export const subscribeToGameRoomsCreation = (cb: any) => {
+export const subscribeToGameRoomsCreation = (
+  cb: subscribeToGameRoomsCreationCb
+) => {
   createGameHandlers = [...createGameHandlers, cb];
 };
 
-export const subscribeToGameRoomsUpdates = (cb: any) => {
+export const subscribeToGameRoomsUpdates = (
+  cb: subscribeToGameRoomsUpdateCb
+) => {
   updateSlotsHandlers = [...updateSlotsHandlers, cb];
 };
