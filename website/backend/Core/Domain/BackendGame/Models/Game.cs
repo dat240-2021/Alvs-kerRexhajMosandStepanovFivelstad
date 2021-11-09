@@ -9,7 +9,7 @@ namespace backend.Core.Domain.BackendGame.Models
         public Guid Id { get; protected set; }
         public GameSettings Settings { get; protected set; }
 
-        public GameState State { get; protected set; } = GameState.Created;
+        public GameState State { get; set; } = GameState.Created;
         
         public Game()
         {

@@ -8,7 +8,7 @@ namespace backend.Core.Domain.BackendGame.Services
     {
         Task JoinGame(Game game, Guid userId);
         Task LeaveGame(Guid gameId, Guid userId);
-        GameSlotInfo GetSlotInfo(Guid gameId);
+        GameSlotInfo GetSlotInfo(Game game);
         bool HasAvailableSlots(Guid gameId);
 
     }

@@ -36,8 +36,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
                     .Where(g => statesToInclude.Contains(g.State))
                     .ToListAsync(cancellationToken);
 
-                return games.Select(g => 
-                    new GameWithSlotInfo(g, _backendGameService.GetSlotInfo(g.Id))
+                return games.Select(game => new GameWithSlotInfo(game, _backendGameService.GetSlotInfo(game))
                 ).ToList();
             }
         }

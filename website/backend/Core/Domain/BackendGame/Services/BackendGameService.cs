@@ -16,9 +16,16 @@ namespace backend.Core.Domain.BackendGame.Services
             _mediator = mediator;
         }
 
-        public GameSlotInfo GetSlotInfo(Guid gameId)
+        public GameSlotInfo GetSlotInfo(Game game)
         {
-            return _games.TryGetValue(gameId, out var gameSlotInfo) ? gameSlotInfo : throw new Exception($"Game with id {gameId} not found");
+            if (_games.TryGetValue(game.Id, out var gameSlotInfo))
+            {
+                return gameSlotInfo;
+            }
+
+            var slotInfo = new GameSlotInfo {MaxSlotsCount = game.Settings.PlayersCount};
+            _games.Add(game.Id, slotInfo);
+            return slotInfo;
         }
         
         public bool HasAvailableSlots(Guid gameId)
@@ -35,12 +42,17 @@ namespace backend.Core.Domain.BackendGame.Services
                 
                 _games.Add(game.Id, new GameSlotInfo{ MaxSlotsCount = game.Settings.PlayersCount });
             }
-            
+
             if (_games.TryGetValue(game.Id, out var gameSlotInfo))
             {
                 if (gameSlotInfo.MaxSlotsCount.Equals(gameSlotInfo.Players.Count))
                 {
-                    throw new Exception($"Room with id { game.Id } is full!");
+                    throw new Exception($"Room with id { game.Id } is full");
+                }
+
+                if (gameSlotInfo.Players.Contains(userId))
+                {
+                    throw new Exception($"User with id { userId } is already in room with id { game.Id }");
                 }
                 
                 gameSlotInfo.Players.Add(userId);
@@ -58,7 +70,7 @@ namespace backend.Core.Domain.BackendGame.Services
             {
                 if (!gameSlotInfo.Players.Contains(userId))
                 {
-                    throw new Exception($"User with id { userId } is not found in room { gameId }!");
+                    throw new Exception($"User with id { userId } is not found in room { gameId }");
                 }
                 
                 gameSlotInfo.Players.Remove(userId);

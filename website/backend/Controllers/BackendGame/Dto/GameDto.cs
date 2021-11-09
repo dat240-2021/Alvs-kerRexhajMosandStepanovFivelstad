@@ -9,14 +9,8 @@ namespace backend.Controllers.BackendGame.Dto
         public Guid Id { get; protected set; }
         public GameSettings Settings { get; protected set; }
         public GameState State { get; protected set; }
-        public int OccupiedSlotsCount { get; set; } = 0;
-
-        public GameDto(Game game)
-        {
-            Id = game.Id;
-            Settings = game.Settings;
-            State = game.State;
-        }
+        public int OccupiedSlotsCount { get; set; }
+        
         public GameDto(GameWithSlotInfo data)
         {
             Id = data.Game.Id;

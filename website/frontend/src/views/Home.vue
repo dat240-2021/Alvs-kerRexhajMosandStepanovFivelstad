@@ -35,7 +35,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="game in gameRooms" :key="game.id">
+              <tr v-for="game in visibleGameRooms" :key="game.id">
                 <td>Some type here</td>
                 <td>{{ game.occupiedSlotsCount }} / {{ game.settings.playersCount }}</td>
                 <td>
@@ -96,6 +96,11 @@ export default defineComponent({
       joinGameRoom(id)
         .then(() => this.$router.push({ name: "Game", params: { id } }));
     },
+  },
+  computed: {
+    visibleGameRooms(): Game[] {
+      return this.gameRooms.filter((game: Game) => game.occupiedSlotsCount < game.settings.playersCount);
+    }
   },
 });
 </script>

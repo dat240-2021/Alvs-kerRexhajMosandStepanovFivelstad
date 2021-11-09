@@ -19,14 +19,10 @@ namespace backend.Core.Domain.BackendGame.Handlers
             _db = db ?? throw new System.ArgumentException(nameof(db));
             _hubContext = hubContext;
         }
-        public async Task Handle(UserJoinGame domainEvent, CancellationToken cancellationToken)
-        {
-            await _hubContext.Clients.All.SendAsync("GameRoomUpdated", domainEvent.Notification, cancellationToken);
-        }
 
         public async Task Handle(GameCreated domainEvent, CancellationToken cancellationToken)
         {
-            await _hubContext.Clients.All.SendAsync("GameCreated", new GameDto(domainEvent.Game), cancellationToken);
+            await _hubContext.Clients.All.SendAsync("GameCreated", (domainEvent), cancellationToken);
         }
     }
 }
