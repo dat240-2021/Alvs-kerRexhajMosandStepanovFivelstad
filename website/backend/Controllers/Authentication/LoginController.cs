@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using backend.Controllers.Authentication.Dto;
 using backend.Core.Domain.BackendGame.Pipelines;
 using backend.Hubs;
 using Controllers.Authentication.Dto;
@@ -32,7 +33,7 @@ namespace Controllers.Authentication
         public async Task<IActionResult> Post(UserRequestDto user)
         {
             if ( (await _mediator.Send(new LoginUser.Request(user.Username,user.Password))).Success ){
-                return Ok<UserResponseDto>(user.Username);
+                return Ok(new UserResponseDto(user.Username));
             }
 
             return Unauthorized();

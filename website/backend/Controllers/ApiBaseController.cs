@@ -9,5 +9,10 @@ namespace Controllers.Generics
         {
             return base.Ok(new GenericResponseObject<T>(data));
         }
+        
+        public IActionResult UnprocessableEntity<T>(T data)
+        {
+            return base.UnprocessableEntity(new GenericResponseObject<T>(data));
+        }
     }
 }

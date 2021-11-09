@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Pipelines;
+using Controllers.Generics;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,13 +8,13 @@ namespace backend.Controllers.BackendGame
 {
     [ApiController]
     [Route("/api/leaderboard")]
-    public class LeaderBoardController : ControllerBase
+    public class LeaderBoardController : ApiBaseController
     {
         private readonly IMediator _mediator;
 
-        public LeaderBoardController(IMediator _mediator)
+        public LeaderBoardController(IMediator mediator)
         {
-            this._mediator = _mediator;
+            _mediator = mediator;
         }
 
         [HttpGet]
