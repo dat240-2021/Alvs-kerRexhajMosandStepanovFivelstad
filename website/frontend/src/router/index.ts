@@ -9,6 +9,7 @@ import Index from "@/views/Index.vue";
 import Login from "@/views/auth/Login.vue";
 import Registration from "@/views/auth/Registration.vue";
 import NewGame from "@/views/NewGame.vue";
+import UploadImages from "@/views/UploadImages.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -39,6 +40,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/game",
     name: "NewGame",
     component: NewGame,
+    beforeEnter: isUserNotAuthenticated,
+  },
+  {
+    path: "/uploadimage",
+    name: "UploadImage",
+    component: UploadImages,
     beforeEnter: isUserNotAuthenticated,
   },
 ];
