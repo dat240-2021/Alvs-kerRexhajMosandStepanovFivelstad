@@ -7,8 +7,12 @@ namespace Controllers.Authentication.Dto
 {
     public record UserResponseDto
     {
-        [Required]
-        public string Username { get; set; }
+        [Required] public string Username { get; set; }
+
+        public static implicit operator UserResponseDto(string username)
+        {
+            return new (){ Username = username };
+        }
 
     }
 

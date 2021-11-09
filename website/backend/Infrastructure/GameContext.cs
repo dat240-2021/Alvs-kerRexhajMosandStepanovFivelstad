@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame;
+using backend.Core.Domain.BackendGame.Models;
 using backend.Core.Domain.BackendGame.Pipelines;
 using Domain.Authentication;
 using MediatR;
@@ -26,10 +27,8 @@ namespace Infrastructure.Data
 		// public DbSet<User> Users {get;set;}
 		public DbSet<Score> Scores { get; set; } = null!;
 		public DbSet<Game> Games { get; set; } = null!;
-		
-		public DbSet<WaitingEntry> WaitingPool { get; set; } = null!;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 			base.OnModelCreating(modelBuilder);
         }

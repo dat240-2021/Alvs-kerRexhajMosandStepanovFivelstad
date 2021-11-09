@@ -1,14 +1,16 @@
+using backend.Core.Domain.BackendGame.Models;
+using MediatR;
 using SharedKernel;
 
 namespace backend.Core.Domain.BackendGame.Events
 {
-    public record UserJoinGame : BaseDomainEvent
+    public record UserJoinGame : INotification
     {
-        public UserJoinGame(WaitingEntry entry)
+        public UserJoinGame(GameSlotNotification notification)
         {
-            Entry = entry;
+            Notification = notification;
         }
 
-        public WaitingEntry Entry { get; }
+        public GameSlotNotification Notification { get; }
     }
 }

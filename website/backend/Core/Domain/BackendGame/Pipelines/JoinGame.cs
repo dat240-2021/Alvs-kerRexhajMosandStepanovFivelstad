@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using backend.Core.Domain.BackendGame.Events;
+using backend.Core.Domain.BackendGame.Models;
+using backend.Core.Domain.BackendGame.Services;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,22 +20,24 @@ namespace backend.Core.Domain.BackendGame.Pipelines
         {
 
             private readonly GameContext _db;
+            private readonly IBackendGameService _backendGameService;
+            private readonly IMediator _mediator;
 
-            public Handler(GameContext db)
+            public Handler(GameContext db, IBackendGameService backendGameService, IMediator mediator)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
+                _backendGameService = backendGameService;
+                _mediator = mediator;
             }
 
             
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
-
-                var user = await _db.Users.FirstAsync(u => u.Id == request.UserId, cancellationToken: cancellationToken);
-
-                var entry = new WaitingEntry(user.Id, request.GameId);
-                _db.WaitingPool.Add(entry);
-
-                await _db.SaveChangesAsync(cancellationToken);
+                var game = await _db.Games.FirstOrDefaultAsync(g => g.Id.Equals(request.GameId), cancellationToken: cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
+                await _backendGameService.JoinGame(game, request.UserId);
+                var gameSlotInfo = _backendGameService.GetSlotInfo(game.Id);
+                
+                await _mediator.Publish(new UserJoinGame(new GameSlotNotification(game.Id, gameSlotInfo.Players.Count)), cancellationToken);
                 return Unit.Value;
             }
         }

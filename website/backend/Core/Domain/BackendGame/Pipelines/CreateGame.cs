@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using backend.Core.Domain.BackendGame.Events;
+using backend.Core.Domain.BackendGame.Models;
 using Domain.Authentication;
 using Infrastructure.Data;
 using MediatR;
@@ -18,25 +20,23 @@ namespace backend.Core.Domain.BackendGame.Pipelines
         {
 
             private GameContext _db;
+            private readonly IMediator _mediator;
 
-            public Handler(GameContext db)
+            public Handler(GameContext db, IMediator mediator)
             {
                 _db = db ?? throw new System.ArgumentNullException(nameof(db));
+                _mediator = mediator;
             }
 
             
             public async Task<Guid> Handle(Request request, CancellationToken cancellationToken)
             {
-                var user = await _db.Users.FirstAsync(u => u.Id == request.UserId, cancellationToken: cancellationToken);
-
                 var game = new Game(Guid.NewGuid(), request.GameSettings);
                 _db.Games.Add(game);
-
-                var waitingEntry = new WaitingEntry(user.Id, game.Id);
-                _db.WaitingPool.Add(waitingEntry);
-                
                 await _db.SaveChangesAsync(cancellationToken);
+                await _mediator.Publish(new GameCreated(game), cancellationToken);
                 
+                await _mediator.Send(new JoinGame.Request(request.UserId, game.Id), cancellationToken);
                 return game.Id;
             }
         }

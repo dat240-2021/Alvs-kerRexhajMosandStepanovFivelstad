@@ -37,7 +37,7 @@
             <tbody>
               <tr v-for="game in gameRooms" :key="game.id">
                 <td>Some type here</td>
-                <td>{{ game.waitingPool.length }} / {{ game.settings.playersCount }}</td>
+                <td>{{ game.occupiedSlotsCount }} / {{ game.settings.playersCount }}</td>
                 <td>
                   <button class="btn" @click="joinGame(game.id)">
                     <i class="bi bi-box-arrow-in-right"></i>
@@ -54,9 +54,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { fetchWaitingRooms, subscribeToGameRooms } from "@/api/BackendGame";
+import { fetchWaitingRooms, subscribeToGameRoomsCreation, subscribeToGameRoomsUpdates } from "@/api/BackendGame";
 import { joinGameRoom } from "@/api/BackendGame";
-import { Game } from "@/typings";
+import { Game, GameSlotUpdateNotification } from "@/typings";
 
 export default defineComponent({
   name: "Home",
@@ -75,18 +75,19 @@ export default defineComponent({
       fetchWaitingRooms()
         .then(rooms => this.gameRooms = rooms);
     },
-    addGameRoom(game: Game) {
-      const index = this.gameRooms.findIndex((g: Game) => g.id === game.id);
-      if (index == -1) {
-        this.gameRooms = [...this.gameRooms, game];
-        return;
+    updateGameRoom(data: GameSlotUpdateNotification) {
+      const game = this.gameRooms.find((g: Game) => g.id === data.gameId);
+      if (!game) {
+        throw new Error(`Game with id ${data.gameId} is not found`);
       }
-
-      this.gameRooms[index] = game;
-
+      game.occupiedSlotsCount = data.occupiedSlotsCount;
+    },
+    storeGameRoom(game: Game) {
+      this.gameRooms = [...this.gameRooms, game];
     },
     subscribeToGames() {
-      subscribeToGameRooms(this.addGameRoom);
+      subscribeToGameRoomsUpdates(this.updateGameRoom);
+      subscribeToGameRoomsCreation(this.storeGameRoom);
     },
     joinGame(id: string) {
       joinGameRoom(id)

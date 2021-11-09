@@ -14,11 +14,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Controllers.Authentication
 {
-
-    [ApiController]
+    
     // [Route("[controller]")]
     [Route("/api/login")]
-    public class LoginController : ControllerBase
+    public class LoginController : ApiBaseController
     {
         private readonly ILogger<LoginController> _logger;
 		private readonly IMediator _mediator;
@@ -33,9 +32,7 @@ namespace Controllers.Authentication
         public async Task<IActionResult> Post(UserRequestDto user)
         {
             if ( (await _mediator.Send(new LoginUser.Request(user.Username,user.Password))).Success ){
-                return Ok(new GenericResponseObject<UserResponseDto>{
-                    Data = new UserResponseDto{Username = user.Username}
-                });
+                return Ok<UserResponseDto>(user.Username);
             }
 
             return Unauthorized();

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using backend.Controllers.BackendGame.Dto;
+using backend.Core.Domain.BackendGame.Models;
 using backend.Core.Domain.BackendGame.Pipelines;
 using Controllers.Generics;
 using Domain.Authentication;
@@ -11,9 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers.BackendGame
 {
-    [ApiController]
     [Route("/api/game")]
-    public class NewGameController : ControllerBase
+    public class NewGameController : ApiBaseController
     {
         private readonly IMediator _mediator;
         private readonly UserManager<User> _userManager;
@@ -28,7 +28,7 @@ namespace backend.Controllers.BackendGame
         [HttpPost]
         public async Task<IActionResult> Post(GameSettingsDto settings)
         {
-            var userId = _userManager.GetUserId(HttpContext.User);
+            var userId = Guid.Parse(_userManager.GetUserId(HttpContext.User));
 
             var gameId = await _mediator.Send(new CreateGame.Request(new GameSettings
             {
@@ -36,13 +36,10 @@ namespace backend.Controllers.BackendGame
                 ImagesCount = settings.ImagesCount,
                 PlayersCount = settings.PlayersCount,
             },
-                new Guid(userId)
+                userId
                 ));
             
-            return Ok(new GenericResponseObject<Guid>
-            {
-                Data = gameId
-            });
+            return Ok(gameId);
         }
     }
 }

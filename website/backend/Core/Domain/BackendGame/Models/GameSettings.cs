@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Core.Domain.BackendGame.Pipelines
+namespace backend.Core.Domain.BackendGame.Models
 {
     [Owned]
     public record GameSettings

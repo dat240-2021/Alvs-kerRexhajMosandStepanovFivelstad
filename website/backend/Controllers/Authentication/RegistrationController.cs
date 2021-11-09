@@ -29,14 +29,10 @@ namespace Controllers.Authentication
             var result = await _mediator.Send(new RegisterUser.Request(user.Username,user.Password));
 
             if (result.Success){
-                return Ok(new GenericResponseObject<UserResponseDto>{
-                    Data = new UserResponseDto{
-                        Username = user.Username
-                        }
-                    });
+                return Ok(new GenericResponseObject<UserResponseDto>(user.Username));
             }
 
-            return UnprocessableEntity(new GenericResponseObject<UserResponseDto>{Errors = result.errors});
+            return UnprocessableEntity(new GenericResponseObject<UserResponseDto>(result.errors));
         }
     }
 

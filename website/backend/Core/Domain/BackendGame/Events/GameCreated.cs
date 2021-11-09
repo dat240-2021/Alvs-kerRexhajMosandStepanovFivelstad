@@ -1,15 +1,16 @@
 using System;
+using backend.Core.Domain.BackendGame.Models;
 using SharedKernel;
 
 namespace backend.Core.Domain.BackendGame.Events
 {
     public record GameCreated : BaseDomainEvent
     {
-        public Guid Id { get; }
+        public Game Game { get; }
 
-        public GameCreated(Guid id)
+        public GameCreated(Game game)
         {
-            Id = id;
+            Game = game;
         }
     }
 }

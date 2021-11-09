@@ -1,7 +1,7 @@
 using System;
 using Domain.Authentication;
 
-namespace backend.Core.Domain.BackendGame.Pipelines
+namespace backend.Core.Domain.BackendGame.Models
 {
     public class Score
     {

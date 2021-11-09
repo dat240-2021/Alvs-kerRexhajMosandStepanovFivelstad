@@ -16,16 +16,16 @@ enum GameStates {
   Finished,
 }
 
-interface WaitingEntry {
-  id: string;
-  gameId: string;
-}
-
 export interface Game {
   id: string;
   settings: GameSettings;
   state: GameStates;
-  waitingPool: WaitingEntry[];
+  occupiedSlotsCount: number;
+}
+
+export interface GameSlotUpdateNotification {
+  gameId: string;
+  occupiedSlotsCount: number;
 }
 
 export enum HttpStatus {
