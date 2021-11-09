@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using backend.Controllers.NewGame.Dto;
-using backend.Core.Domain.Image.Pipelines;
 using Controllers.Authentication;
 using Controllers.Generics;
+using Domain.Image.Pipelines;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging; // using Microsoft.AspNetCore.Http.StatusCode;

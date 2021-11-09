@@ -24,7 +24,7 @@ namespace backend
             Configuration = configuration;
         }
 
-		public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; }
 
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -64,6 +64,24 @@ namespace backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
+            //Initialize db with data if nessairy.
+            if (!db.Images.Any())
+            {
+                var ImagePreprocessor = new ImagePreprocessor();
+                ImagePreprocessor.Parse();
+                db.Images.AddRange(ImagePreprocessor.Images);
+                db.ImageCategories.AddRange(ImagePreprocessor.Categories);
+
+                db.SaveChanges(); // Save before mapping
+                foreach ((string image,int category ) in ImagePreprocessor.CategoryMapping){
+                    foreach(var i in db.Images.Where(x => x.ImageName == image)) {
+                            i.SetCategory(db.ImageCategories.Where(x => x.Id==category).SingleOrDefault());
+                    }
+                }
+
+                db.SaveChanges();
             }
 
             app.UseHttpsRedirection();

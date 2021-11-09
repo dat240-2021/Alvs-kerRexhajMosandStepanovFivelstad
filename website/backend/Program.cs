@@ -16,7 +16,7 @@ namespace backend
     {
         public static void Main(string[] args)
         {
-            ImportDefaultImages();
+            // ImportDefaultImages();
             CreateHostBuilder(args).Build().Run();
         }
 

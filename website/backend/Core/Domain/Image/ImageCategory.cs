@@ -1,20 +1,22 @@
+using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
-namespace backend.Core.Domain.Image
+namespace Domain.Image
 {
+
     public class ImageCategory : BaseEntity
     {
-        public ImageCategory(string category)
+        public int Id {get; protected set;}
+
+        public string Category { get; protected set; }
+
+        public ImageCategory(string category) => Category=category;
+
+        public ImageCategory(int id, string category)
         {
+            Id = id;
             Category = category;
         }
 
-        public ImageCategory()
-        {
-            
-        }
-        
-        public int Id { get; protected set; }
-        public string Category { get; set; }
     }
 }

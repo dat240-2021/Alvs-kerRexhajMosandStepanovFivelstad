@@ -8,7 +8,7 @@ using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Core.Domain.Image.Pipelines
+namespace Domain.Image.Pipelines
 {
 	public class GetImageById
 	{
@@ -22,7 +22,7 @@ namespace backend.Core.Domain.Image.Pipelines
 
 			public async Task<Image> Handle(Request request, CancellationToken cancellationToken)
 			{
-				var image = await _db.Image.Include(i => i.ImageList).Where(i => i.Id == request.Id).SingleOrDefaultAsync();
+				var image = await _db.Images.Include(i => i.Slices).Where(i => i.Id == request.Id).SingleOrDefaultAsync();
 				return image;
 			}
 		}

@@ -10,13 +10,13 @@ using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Core.Domain.Image.Pipelines
+namespace Domain.Image.Pipelines
 {
 	public class AddUserImage
 	{
 		public record Request(List<(byte[],int)> ImageList, Guid UserId, string ImageName) : IRequest<Response>;
 
-		public record Response(bool Success); 
+		public record Response(bool Success);
 
 		public class Handler : IRequestHandler<Request,Response>
 		{
@@ -26,17 +26,17 @@ namespace backend.Core.Domain.Image.Pipelines
 
 			public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
 			{
-				var tempCategory = _db.ImageCategory.SingleOrDefault(i => i.Category == "My Images");
+				var tempCategory = _db.ImageCategories.SingleOrDefault(i => i.Category == "My Images");
 				if (tempCategory is null)
 				{
 					tempCategory = new ImageCategory("My Images");
-					_db.ImageCategory.Add(tempCategory);
+					_db.ImageCategories.Add(tempCategory);
 				}
 				var image = new Image(request.ImageName,tempCategory,request.UserId);
 				foreach (var item in request.ImageList)
 				{
-					var tempPiece = new ImagePiece(item.Item1, item.Item2);
-					image.AddImagePieces(tempPiece);
+					var tempPiece = new ImageSlice(item.Item1, item.Item2);
+					image.Slices.Add(tempPiece);
 				}
 
 				_db.Add(image);

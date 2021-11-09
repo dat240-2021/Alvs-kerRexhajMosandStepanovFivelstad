@@ -7,12 +7,11 @@ using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Core.Domain.Image.Pipelines
+namespace Domain.Image.Pipelines
 {
 	public class GetCategoryList
 	{
 		public record Request() : IRequest<List<string>>;
-		
 
 		public class Handler : IRequestHandler<Request, List<string>>
 		{
@@ -22,7 +21,7 @@ namespace backend.Core.Domain.Image.Pipelines
 
 			public async Task<List<string>> Handle(Request request, CancellationToken cancellationToken)
 			{
-				var categoryList = await _db.ImageCategory.Select(i => i.Category).ToListAsync(cancellationToken);
+				var categoryList = await _db.ImageCategories.Select(i => i.Category).ToListAsync(cancellationToken);
 				return categoryList;
 			}
 		}

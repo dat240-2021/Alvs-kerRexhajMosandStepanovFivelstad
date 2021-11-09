@@ -7,11 +7,10 @@ using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Core.Domain.Image.Pipelines
+namespace Domain.Image.Pipelines
 {
 	public class GetImageIdListByCategory
 	{
-	
 		public record Request(List<string> Categories, Guid? UserId) : IRequest<List<int>>;
 
 		public class Handler : IRequestHandler<Request, List<int>>
@@ -28,13 +27,13 @@ namespace backend.Core.Domain.Image.Pipelines
 				{
 					if (request.UserId != null && category == "My Images")
 					{
-						var userList = await _db.Image.Include(ic => ic.Category.Category).Where(i => i.Category.Category == "My Images").Where(i => i.UserId == request.UserId).Select(i => i.Id).ToListAsync(cancellationToken);
+						var userList = await _db.Images.Include(ic => ic.Category.Category).Where(i => i.Category.Category == "My Images").Where(i => i.UserId == request.UserId).Select(i => i.Id).ToListAsync(cancellationToken);
 						categoryImageIdList.AddRange(userList);
 					}
 
 					if (category != "My Images")
 					{
-						var tempList = await _db.Image.Include(ic => ic.Category.Category).Where(i => i.Category.Category == category).Select(i => i.Id).ToListAsync(cancellationToken);
+						var tempList = await _db.Images.Include(ic => ic.Category.Category).Where(i => i.Category.Category == category).Select(i => i.Id).ToListAsync(cancellationToken);
 						categoryImageIdList.AddRange(tempList);
 					}
 				}
