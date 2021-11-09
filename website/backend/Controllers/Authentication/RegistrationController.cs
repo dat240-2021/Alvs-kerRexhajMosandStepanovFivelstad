@@ -10,6 +10,7 @@ using Controllers.Generics;
 
 namespace Controllers.Authentication
 {
+    [Authorize]
     [ApiController]
     [Route("/api/register")]
     public class RegistrationController : ControllerBase

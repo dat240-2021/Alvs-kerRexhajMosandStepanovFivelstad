@@ -62,6 +62,10 @@ namespace Domain.Authentication.Services
         }
 
 
+        public async Task<bool> LoginState(){
+            
+        }
+
         public async Task<Unit> LogoutUser(){
             await signInManager.SignOutAsync();
             return Unit.Value;
