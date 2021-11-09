@@ -14,7 +14,7 @@ namespace Domain.Image.Pipelines
 {
 	public class AddUserImage
 	{
-		public record Request(List<(byte[],int)> ImageList, Guid UserId, string ImageName) : IRequest<Response>;
+		public record Request(List<(byte[],int)> ImageList, Guid UserId, string ImageLabel, string Category) : IRequest<Response>;
 
 		public record Response(bool Success);
 
@@ -26,13 +26,14 @@ namespace Domain.Image.Pipelines
 
 			public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
 			{
-				var tempCategory = _db.ImageCategories.SingleOrDefault(i => i.Category == "My Images");
+				var tempCategory = _db.ImageCategories.SingleOrDefault(i => i.Name == request.Category);
 				if (tempCategory is null)
 				{
-					tempCategory = new ImageCategory("My Images");
+					// tempCategory = new ImageCategory("My Images");
 					_db.ImageCategories.Add(tempCategory);
 				}
-				var image = new Image(request.ImageName,tempCategory,request.UserId);
+
+				var image = new Image(request.UserId,new ImageLabel(request.ImageLabel,tempCategory));
 				foreach (var item in request.ImageList)
 				{
 					var tempPiece = new ImageSlice(item.Item1, item.Item2);

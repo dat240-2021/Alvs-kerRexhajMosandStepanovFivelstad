@@ -8,14 +8,15 @@ namespace Domain.Image
     {
         public int Id {get; protected set;}
 
-        public string Category { get; protected set; }
+        public string Name { get; protected set; }
 
-        public ImageCategory(string category) => Category=category;
+        public ImageCategory() {}
+        public ImageCategory(string category) => Name=category;
 
         public ImageCategory(int id, string category)
         {
             Id = id;
-            Category = category;
+            Name = category;
         }
 
     }

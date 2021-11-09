@@ -11,7 +11,8 @@ namespace backend.Controllers.NewGame.Dto
         [Required]
         public Guid UserId { get; set; }
         [Required]
-        public string ImageName { get; set; }
+        public string Label { get; set; }
+        public string Category { get; set; }
         
     }
 

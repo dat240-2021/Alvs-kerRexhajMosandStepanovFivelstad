@@ -72,16 +72,8 @@ namespace backend
                 var ImagePreprocessor = new ImagePreprocessor();
                 ImagePreprocessor.Parse();
                 db.Images.AddRange(ImagePreprocessor.Images);
-                db.ImageCategories.AddRange(ImagePreprocessor.Categories);
 
                 db.SaveChanges(); // Save before mapping
-                foreach ((string image,int category ) in ImagePreprocessor.CategoryMapping){
-                    foreach(var i in db.Images.Where(x => x.ImageName == image)) {
-                            i.SetCategory(db.ImageCategories.Where(x => x.Id==category).SingleOrDefault());
-                    }
-                }
-
-                db.SaveChanges();
             }
 
             app.UseHttpsRedirection();

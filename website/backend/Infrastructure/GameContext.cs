@@ -40,7 +40,8 @@ namespace Infrastructure.Data
             public List<Image> Images = new List<Image>();
 
             public List<ImageCategory> Categories = new List<ImageCategory>();
-            public List<(string,int)> CategoryMapping = new List<(string,int)>();
+            public List<ImageLabel> Labels = new List<ImageLabel>();
+            public List<(string, int)> LabelMapping = new List<(string,int)>();
             private List<String> Path = new List<string>{Directory.GetCurrentDirectory(),"Infrastructure","ImageFetch","DownloadedFiles","Images"};
 
             public void Parse(){
@@ -62,19 +63,35 @@ namespace Infrastructure.Data
                     Images.Add(newImage);
                 };
 
+                foreach (string line in System.IO.File.ReadLines( ModifyPath("Categories.csv",2) ))
+                {
+                    var categoryLine = line.Split(":");
+                    Categories.Add(new ImageCategory(Int32.Parse(categoryLine[0]),categoryLine[1]));
+                }
+
+                //check each line in the label mapping file create a category and add it to the categories list
+                foreach (string line in System.IO.File.ReadLines( ModifyPath("label_mapping_with_categories.csv",2) ))
+                {
+                    var labelLine = line.Split(":");
+                    Labels.Add(
+                        new ImageLabel(Int32.Parse(labelLine[0]),labelLine[1], Categories.Find(x => x.Id==Int32.Parse(labelLine[2]))));
+                }
+
+
                 //check each line in the image mapping file, add it to the mapping list
                 foreach (string line in System.IO.File.ReadLines( ModifyPath("image_mapping.csv",1) ))
                 {
                     var mappingLine = line.Split(" ");
-                    CategoryMapping.Add(( mappingLine[0], Int32.Parse(mappingLine[1]) ) );
+                    string image = mappingLine[0];
+                    int labelid = Int32.Parse(mappingLine[1]);
+                    var img = Images.Find(x=> x.ImportId==image);
+
+                    if (img!=null){
+                        img.SetLabel(Labels.Find( x=> x.Id == labelid));
+                    }
                 }
 
-                //check each line in the label mapping file create a category and add it to the categories list
-                foreach (string line in System.IO.File.ReadLines( ModifyPath("label_mapping.csv",1) ))
-                {
-                    var categoryLine = line.Split(" ");
-                    Categories.Add(new ImageCategory(Int32.Parse(categoryLine[0]),categoryLine[1]) );
-                }
+
             }
 
         //Checks if all folders exist if so it uses them, otherwise starts a download using shellscript.

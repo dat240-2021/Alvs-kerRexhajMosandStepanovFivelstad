@@ -21,7 +21,7 @@ namespace Domain.Image.Pipelines
 
 			public async Task<List<string>> Handle(Request request, CancellationToken cancellationToken)
 			{
-				var categoryList = await _db.ImageCategories.Select(i => i.Category).ToListAsync(cancellationToken);
+				var categoryList = await _db.ImageCategories.Select(i => i.Name).ToListAsync(cancellationToken);
 				return categoryList;
 			}
 		}

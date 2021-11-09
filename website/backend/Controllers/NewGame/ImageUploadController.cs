@@ -26,7 +26,7 @@ namespace backend.Controllers.NewGame
 
         [HttpPost]
         public async Task<IActionResult> Post(ImageUploadDto image){
-            var result = await _mediator.Send(new AddUserImage.Request(image.ImageList, image.UserId, image.ImageName));
+            var result = await _mediator.Send(new AddUserImage.Request(image.ImageList, image.UserId, image.Label,image.Category));
 
             if (result.Success)
             {
