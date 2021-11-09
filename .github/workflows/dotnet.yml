@@ -28,7 +28,7 @@ jobs:
 
     - name: Create Data folder
       working-directory: website/backend
-      run: mkdir ./Infrastructure/Data
+      run: mkdir -p ./Infrastructure/Data
 
     - name: Database Migrations
       working-directory: website/backend
