@@ -24,38 +24,36 @@
                                 model-value="Guesser Input"
                                 id="guessing"                               
                             />
-                            <Submit v-on:click="NewGuess()">Check</Submit>
+                            <Submit v-on:click="Check">Check</Submit>
                         </div>                          
                     </form> 
                 </div>                         
             </div>               
         </div>
         <div class="row -flex justify-content-sm-between">
-            <div class="col Incorrectguess ">
-                    <div class="row ">                 
-                        <div class="col">                         
-                        </div>
-                        <div class="sm-2">
+            <div class="col-sm">
+                    <div class="row">                 
+                        <div class="border border-success">                         
+                        
+                        <div class="col-sm">
                             <div>
                                 <table>
                                     <tr>
                                         <th>Guesses:</th>
                                     </tr>
-                                    <tr v-for="g in guesses" :key="g.guess">
-                                        <td>{{g.guess}}</td>
+                                    <tr v-for="g in guesses" :key="g">
+                                        <td>{{g.Guess}}</td>
                                     </tr>
-                                    <!--tr>
-                                        <td>{{newGuess}}</td>
-                                    </tr-->
                                 </table>
+                                {{newGuess}}
                             </div>
                         </div> 
-
+                    </div>
                     </div>                         
             </div>
         
-            <div class="col image">
-                <div class="row ">                 
+            <div class="col-md">
+                <div class="row">                 
                     <div class="col">                         
                         Here comes an image
                     </div> 
@@ -63,10 +61,10 @@
                 </div>                         
             </div>     
            
-            <div class="col Players">
-                <div class="row ">                 
-                    <div class="col">                         
-                    </div>
+            <div class="col-md">
+                <div class="row">                 
+                    <div class="border border-success">                         
+                    
                      <div class="sm-2">
                         <div>
                             <table>
@@ -74,18 +72,19 @@
                                     <th>Player:</th>
                                     <th>Score:</th>
                                 </tr>
-                                <tr v-for="p in players" :key="p.playerName">
+                                <tr v-for="p in players.sort((a, b) => b.Score-a.Score )" :key="p.Name">
                                     <td >
-                                        {{ p.playerName }}
+                                        {{ p.Name }}
                                     </td>
                                     <td >
-                                        {{p.score}}
+                                        {{p.Score}}
                                     </td>
                                 </tr>
                                     
                             </table>
                             
-                        </div> 
+                        </div>
+                    </div> 
                     </div>                                      
                 </div>                         
             </div>       
@@ -97,98 +96,102 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
+
+export class Player {
+    Name: string;
+    Score: number;
+    PlayerId: string;
+
+    constructor(Name: string, Score: number, PlayerId: string) {
+        this.Name = Name;
+        this.Score = Score;
+        this.PlayerId =PlayerId;
+    }
+
+}
+export class Guess {
+    Guess: string;
+
+    constructor(guess: string) {
+        this.Guess = guess;
+    }
+}
+
+//export class NewGuess {
+//    newGuess: string;
+//
+//    constructor(newguess: string) {
+//        this.newGuess = newguess;
+//    }
+//}
+
+declare interface BaseComponentData{
+    players : Player[],
+    guesses : Guess[],
+    imageSlices: string[],
+    newGuess: string,
+    correct: string,
+}
+
+
 
 export default {
     name: "InGame",
     components: {
         Input,
         Submit,
-    },
-    data() {
-        return {
-            //imagesegments: [],
-            players: [
-                {playerName: "Jamie Lannister", score: 10, proposer:false, playerId: 1},
-                {playerName: "The Hound", score: 11, proposer:false, playerId: 2},
-                {playerName: "Rob Stark", score: 9, proposer:false, playerId: 3},
-            ],
-            guesses: [
-                {guess: "monkey"},
-                {guess: "donkey"},
-                {guess: "cat"},
 
-            ],
-            proposer: '',
-            image: '',
-            incorrect: true,
+    },
+    data() : BaseComponentData {
+        return {
+            
+            players: [
+                new Player("Jamie Lannister", 10, "1"), 
+                new Player("The Hound", 11, "2"),
+                new Player("Rob Stark", 9, "3"),
+                new Player("Elvis", 12, "4"),
+                new Player("Santa Claus", 4, "5"),
+                new Player("Madonna", 2, "6"),
+                new Player("Lady Gaga", 0, "7")
+                
+            ] as Player[],
+
+            guesses: [
+                new Guess("Monkey"),
+                new Guess("Donkey"),
+                new Guess("Cat"),
+
+            ] as Guess[],
+                
+            imageSlices: [],
+            //incorrect: true,
             correct: "Fish",
-            newGuess: '',
-            player: '',
+            newGuess: "",
+            //player: '',
        
         };
     },
     methods:{
-        makePropser: function(creatorId){
-            if (this.players.length == 2) {
-                this.TwoPlayerModeFindProposer(creatorId)
-            }	
-			const idx = Math.floor(Math.random() * this.players.length);
-            this.proposer = this.players[idx]
-            this.players[idx].proposer = true
-		},
-
-        TwoPlayerModeFindProposer: function(creatorId){
-            if (this.players[0].playerId == creatorId) {
-                this.proposer = this.players[0]
-            } 
-            this.proposer = this.players[1]
-            this.players[1].proposer = true
+        Check() {
+            //this.guesses.push(new Guess(this.newGuess))
+            //console.log(this.guesses)
+            //if (this.newGuess != this.correct) {
+            //    this.guesses.push(new Guess(this.newGuess))
+            //}
             
-        },
-        // I think we have to store newGuess in the database and retreave it from database to make this work. 
-        NewGuess: function() {
-            console.log(this.newGuess)
-            if (this.newGuess != ""){
-                console.log(this.newGuess)
-                if (this.newGuess != this.correct) {
-                    this.guesses.push({guess: this.newGuess})
-                }
-               
-            }
-           
-        },
-        sortByScore: function() {
-            var sortedPLayersByScore = []
-            var highestScore = this.players[0].score
-            for (let i= 0; i<this.players.length; i++) {
-                if (this.players[i].score > highestScore) {
-                    highestScore = this.players[i].score 
-                    sortedPLayersByScore.push(this.players[i])
-                }
-            }
-            this.players = sortedPLayersByScore
         }
-        
     }
+
 };
 
 
 </script>
 
 <style scoped>
-.Incorrectguess {
-  background: #e7efbd;
-}
 
-.image {
-    background: #efbde4;
-}
-.Players {
-    background: #e7efbd
-}
 
 .row {
     margin: 1em;
