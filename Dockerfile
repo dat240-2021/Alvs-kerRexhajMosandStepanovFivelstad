@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/sdk
+FROM mcr.microsoft.com/dotnet/sdk:5.0
 
 
 COPY website/ /data/
 
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -  
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get -y update && apt-get -y upgrade && apt-get install nodejs
 
 WORKDIR /data/frontend
@@ -19,6 +19,6 @@ RUN dotnet restore
 RUN dotnet build
 RUN dotnet ef migrations add init
 RUN mkdir -p ./Infrastructure/Data
-RUN dotnet ef database update 
+RUN dotnet ef database update
 
 ENTRYPOINT ["dotnet","run","--launch-profile","deployment"]

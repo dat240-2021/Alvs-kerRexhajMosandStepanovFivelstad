@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Controllers.Home
 {
+    [Authorize]
     [Route("/api/home")]
     public class HomeController : ControllerBase
     {

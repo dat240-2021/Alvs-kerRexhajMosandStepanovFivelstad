@@ -116,7 +116,6 @@ export default {
 </script>
 
 <style scoped>
-/* I just let this stay for now */
 .col {
     margin: 1em;
 }
