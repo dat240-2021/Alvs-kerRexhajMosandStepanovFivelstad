@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Core.Domain.BackendGame;
+using backend.Core.Domain.BackendGame.Services;
+using backend.Hubs;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +41,7 @@ namespace backend
             });
 
             services.AddScoped<IAuthenticationService,AuthenticationService>();
+            services.AddSingleton<IBackendGameService, BackendGameService>();
 
 
 
@@ -45,13 +49,14 @@ namespace backend
             services.AddIdentity<User,IdentityRole<Guid>>()
             .AddEntityFrameworkStores<GameContext>()
             .AddUserManager<UserManager<User>>();
+            
 
             // services.AddAuthentication().AddIdentityServerJwt();
 
             services.AddMediatR(typeof(Startup));
 
             services.AddControllers();
-
+            services.AddSignalR();
         }
 
 
@@ -97,6 +102,7 @@ namespace backend
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<GamesHub>("/hub/games");
             });
         }
     }

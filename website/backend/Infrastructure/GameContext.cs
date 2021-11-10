@@ -5,12 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
+using backend.Core.Domain.BackendGame;
+using backend.Core.Domain.BackendGame.Models;
+using backend.Core.Domain.BackendGame.Pipelines;
 using Domain.Authentication;
 using Domain.Image;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 
 namespace Infrastructure.Data
@@ -24,15 +29,16 @@ namespace Infrastructure.Data
             _mediator = mediator;
         }
 
-        // public DbSet<User> Users {get;set;}
         public DbSet<Image> Images { get; set; } = null!;
         public DbSet<ImageCategory> ImageCategories { get; set; } = null!;
+		public DbSet<Score> Scores { get; set; } = null!;
+		public DbSet<Game> Games { get; set; } = null!;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
         }
-    }
+	}
 
         internal class  ImagePreprocessor{
 

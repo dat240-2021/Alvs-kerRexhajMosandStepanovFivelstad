@@ -12,6 +12,8 @@
       class="form-control"
       :id="id"
       :placeholder="this.placeholder"
+      :max="max"
+      :min="min"
     />
     <div class="invalid-feedback">{{ error }}</div>
   </div>
@@ -62,6 +64,14 @@ export default {
     },
     error: {
       required: true,
+      type: String,
+    },
+    max: {
+      required: false,
+      type: String,
+    },
+    min: {
+      required: false,
       type: String,
     },
   },

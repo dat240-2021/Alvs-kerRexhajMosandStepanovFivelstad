@@ -1,18 +1,17 @@
-
-using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using MediatR;
-using Domain.Authentication.Pipelines;
+using backend.Controllers.Authentication.Dto;
 using Controllers.Authentication.Dto;
 using Controllers.Generics;
+using Domain.Authentication.Pipelines;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-namespace Controllers.Authentication
+namespace backend.Controllers.Authentication
 {
     [ApiController]
     [Route("/api/register")]
-    public class RegistrationController : ControllerBase
+    public class RegistrationController : ApiBaseController
     {
         private readonly ILogger<RegistrationController> _logger;
         private readonly IMediator _mediator;
@@ -29,14 +28,10 @@ namespace Controllers.Authentication
             var result = await _mediator.Send(new RegisterUser.Request(user.Username,user.Password));
 
             if (result.Success){
-                return Ok(new GenericResponseObject<UserResponseDto>{
-                    Data = new UserResponseDto{
-                        Username = user.Username
-                        }
-                    });
+                return Ok(new UserResponseDto(user.Username));
             }
 
-            return UnprocessableEntity(new GenericResponseObject<UserResponseDto>{Errors = result.errors});
+            return UnprocessableEntity(result.errors);
         }
     }
 
