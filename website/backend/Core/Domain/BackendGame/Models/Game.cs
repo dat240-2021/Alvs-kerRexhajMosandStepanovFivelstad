@@ -4,7 +4,7 @@ using SharedKernel;
 
 namespace backend.Core.Domain.BackendGame.Models
 {
-    public class Game : BaseEntity
+    public class Game
     {
         public Guid Id { get; protected set; }
         public GameSettings Settings { get; protected set; }
