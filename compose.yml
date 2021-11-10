@@ -1,0 +1,11 @@
+services:
+  dat240:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - dat240_db:/data/backend/Infrastructure/db
+
+volumes:
+  dat240_db:
+    driver: local
