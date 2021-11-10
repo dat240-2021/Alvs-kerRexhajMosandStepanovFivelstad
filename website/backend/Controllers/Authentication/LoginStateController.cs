@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using backend.Controllers.Authentication.Dto;
 using Controllers.Authentication.Dto;
 using Controllers.Generics;
 using Domain.Authentication.Pipelines;
@@ -15,7 +16,7 @@ namespace Controllers.Authentication
     [Authorize]
     [ApiController]
     [Route("/api/me")]
-    public class LoginStateController : ControllerBase
+    public class LoginStateController : ApiBaseController
     {
         private readonly ILogger<LoginStateController> _logger;
 		private readonly IMediator _mediator;
@@ -27,12 +28,9 @@ namespace Controllers.Authentication
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(){
-            return Ok(new GenericResponseObject<UserResponseDto>{
-                    Data = new UserResponseDto{
-                        Username = User.Identity.Name
-                        }
-                    });
-            }
+        public async Task<IActionResult> Post()
+        { 
+            return Ok(new UserResponseDto(User.Identity.Name));
         }
     }
+}
