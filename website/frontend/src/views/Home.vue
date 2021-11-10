@@ -29,121 +29,19 @@
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">#</th>
                 <th scope="col">Game Type</th>
                 <th scope="col">Capacity</th>
                 <th scope="col">Join</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
+              <tr v-for="game in visibleGameRooms" :key="game.id">
+                <td>Some type here</td>
+                <td>{{ game.occupiedSlotsCount }} / {{ game.settings.playersCount }}</td>
                 <td>
-                  <router-link class="btn" to="/game/id">
+                  <button class="btn" @click="joinGame(game.id)">
                     <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry the Bird</td>
-                <td>@twitter</td>
-                <td>
-                  <router-link class="btn" to="/game/id">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </router-link>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -156,31 +54,53 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { fetchWaitingRooms, subscribeToGameRoomsCreation, subscribeToGameRoomsUpdates } from "@/api/BackendGame";
+import { joinGameRoom } from "@/api/BackendGame";
+import {
+  Game,
+  GameSlotUpdateNotification
+} from "@/typings";
 
 export default defineComponent({
   name: "Home",
   created() {
-    //TODO subscribe for rooms
-    console.log("get rooms");
-
-    //TODO get leaderboard
-    console.log("get leaderboard");
+    this.fetchGameRooms();
+    this.subscribeToGames();
   },
   data() {
     return {
       leaderBoard: [],
-      gameRooms: [],
+      gameRooms: [] as Game[],
     };
   },
   methods: {
-    getLeaderBoard() {
-      // fetchLeaderBoard().then((leaderBoard: string[]) => {
-      //   this.leaderBoard = leaderBoard;
-      // });
+    fetchGameRooms() {
+      fetchWaitingRooms()
+        .then(rooms => this.gameRooms = rooms);
     },
-    // fetchGameRooms() {
-    //
-    // },
+    updateGameRoom(data: GameSlotUpdateNotification) {
+      const game = this.gameRooms.find((g: Game) => g.id === data.gameId);
+      if (!game) {
+        throw new Error(`Game with id ${data.gameId} is not found`);
+      }
+      game.occupiedSlotsCount = data.occupiedSlotsCount;
+    },
+    storeGameRoom(game: Game) {
+      this.gameRooms = [...this.gameRooms, game];
+    },
+    subscribeToGames() {
+      subscribeToGameRoomsUpdates(this.updateGameRoom);
+      subscribeToGameRoomsCreation(this.storeGameRoom);
+    },
+    joinGame(id: string) {
+      joinGameRoom(id)
+        .then(() => this.$router.push({ name: "Game", params: { id } }));
+    },
+  },
+  computed: {
+    visibleGameRooms(): Game[] {
+      return this.gameRooms.filter((game: Game) => game.occupiedSlotsCount < game.settings.playersCount);
+    }
   },
 });
 </script>
