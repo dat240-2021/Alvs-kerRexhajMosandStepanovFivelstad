@@ -27,7 +27,7 @@ namespace backend
             Configuration = configuration;
         }
 
-		public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; }
 
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -69,6 +69,16 @@ namespace backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
+            //Initialize db with data if nessairy.
+            if (!db.Images.Any())
+            {
+                var ImagePreprocessor = new ImagePreprocessor();
+                ImagePreprocessor.Parse();
+                db.Images.AddRange(ImagePreprocessor.Images);
+
+                db.SaveChanges(); // Save before mapping
             }
 
             app.UseHttpsRedirection();

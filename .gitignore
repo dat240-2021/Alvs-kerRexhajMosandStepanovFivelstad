@@ -8,7 +8,9 @@
 *.sln.docstates
 
 # Build results
+[Tt]emp/
 [Ww]wwroot/
+[Dd]ownloadedFiles/
 [Pp]roject_images/
 [Bb]in/
 [Oo]bj/
