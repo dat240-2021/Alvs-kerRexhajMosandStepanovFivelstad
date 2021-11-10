@@ -8,7 +8,6 @@ using Domain.Authentication.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-// using Microsoft.AspNetCore.Http.StatusCode;
 using Microsoft.Extensions.Logging;
 
 namespace Controllers.Authentication
