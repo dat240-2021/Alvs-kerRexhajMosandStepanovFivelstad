@@ -32,7 +32,7 @@ namespace backend.Tests.Core.Domain.Image
             var ImageList = new List<(byte[], int)>();
 
 
-            foreach (string file in Directory.GetFiles(("C:\\Testing\\Alvs-kerRexhajMosandStepanovFivelstad\\website\\backend.Tests\\Infrastructure\\Data\\Images")) )
+            foreach (string file in Directory.GetFiles(("..\\..\\..\\Infrastructure\\Data\\Images")) )
             {
                 int number;
                 if (int.TryParse(file.Split("\\").Last().Replace(".png", ""), out number)){
