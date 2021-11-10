@@ -48,7 +48,6 @@ namespace Domain.Authentication.Services
         }
 
         public async Task<bool> LoginUser(string username,string password){
-
             User user;
             Microsoft.AspNetCore.Identity.SignInResult result;
 
@@ -61,7 +60,6 @@ namespace Domain.Authentication.Services
             }
             return false;
         }
-
 
         public async Task<Unit> LogoutUser(){
             await signInManager.SignOutAsync();

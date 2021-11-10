@@ -4,12 +4,14 @@ using Controllers.Authentication.Dto;
 using Controllers.Generics;
 using Domain.Authentication.Pipelines;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging; // using Microsoft.AspNetCore.Http.StatusCode;
 
 namespace backend.Controllers.Authentication
 {
 
+    [Authorize]
     [ApiController]
     // [Route("[controller]")]
     [Route("/api/logout")]
