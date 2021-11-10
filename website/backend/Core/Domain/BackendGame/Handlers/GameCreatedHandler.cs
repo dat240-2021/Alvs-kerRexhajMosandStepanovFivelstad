@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using backend.Controllers.BackendGame.Dto;
 using backend.Core.Domain.BackendGame.Events;
 using backend.Hubs;
 using Infrastructure.Data;

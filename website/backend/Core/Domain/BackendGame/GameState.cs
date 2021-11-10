@@ -1,4 +1,4 @@
-namespace backend.Core.Domain.BackendGame.Pipelines
+namespace backend.Core.Domain.BackendGame
 {
     public enum GameState
     {

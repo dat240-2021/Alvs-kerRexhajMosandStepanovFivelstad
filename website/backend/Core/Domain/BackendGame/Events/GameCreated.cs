@@ -1,4 +1,3 @@
-using System;
 using backend.Core.Domain.BackendGame.Models;
 using SharedKernel;
 

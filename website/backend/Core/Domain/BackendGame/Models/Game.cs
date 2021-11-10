@@ -1,6 +1,4 @@
 using System;
-using backend.Core.Domain.BackendGame.Pipelines;
-using SharedKernel;
 
 namespace backend.Core.Domain.BackendGame.Models
 {

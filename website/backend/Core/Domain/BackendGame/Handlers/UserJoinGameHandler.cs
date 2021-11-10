@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Events;
@@ -6,7 +5,6 @@ using backend.Hubs;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 
 namespace backend.Core.Domain.BackendGame.Handlers
 {

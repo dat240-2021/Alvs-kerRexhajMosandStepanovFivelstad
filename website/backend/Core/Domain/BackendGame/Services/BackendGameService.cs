@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Models;
 using MediatR;
@@ -9,7 +9,7 @@ namespace backend.Core.Domain.BackendGame.Services
     public class BackendGameService : IBackendGameService
     {
         private readonly IMediator _mediator;
-        private readonly Dictionary<Guid, GameSlotInfo> _games = new ();
+        private readonly ConcurrentDictionary<Guid, GameSlotInfo> _games = new ();
 
         public BackendGameService(IMediator mediator)
         {
@@ -24,7 +24,7 @@ namespace backend.Core.Domain.BackendGame.Services
             }
 
             var slotInfo = new GameSlotInfo {MaxSlotsCount = game.Settings.PlayersCount};
-            _games.Add(game.Id, slotInfo);
+            _games.TryAdd(game.Id, slotInfo);
             return slotInfo;
         }
         
@@ -40,7 +40,7 @@ namespace backend.Core.Domain.BackendGame.Services
             if (!_games.ContainsKey(game.Id))
             {
                 
-                _games.Add(game.Id, new GameSlotInfo{ MaxSlotsCount = game.Settings.PlayersCount });
+                _games.TryAdd(game.Id, new GameSlotInfo{ MaxSlotsCount = game.Settings.PlayersCount });
             }
 
             if (_games.TryGetValue(game.Id, out var gameSlotInfo))
