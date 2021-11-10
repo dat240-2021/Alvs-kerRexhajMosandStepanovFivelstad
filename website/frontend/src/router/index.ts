@@ -9,11 +9,7 @@ import Index from "@/views/Index.vue";
 import Login from "@/views/auth/Login.vue";
 import Registration from "@/views/auth/Registration.vue";
 import NewGame from "@/views/NewGame.vue";
-<<<<<<< HEAD
 import InGame from "@/views/InGame.vue";
-=======
-import Game from "@/views/Game.vue";
->>>>>>> main
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -47,15 +43,9 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isUserNotAuthenticated,
   },
   {
-<<<<<<< HEAD
     path: "/ingame",
     name: "InGame",
     component: InGame,
-=======
-    path: "/game/:id",
-    name: "Game",
-    component: Game,
->>>>>>> main
     beforeEnter: isUserNotAuthenticated,
   },
 ];
