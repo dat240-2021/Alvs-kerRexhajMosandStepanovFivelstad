@@ -3,27 +3,27 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Core.Domain.ActiveGame{
+namespace Core.Domain.Game{
     public interface IActiveGameService {
 
     }
 
     public class ActiveGameService : IActiveGameService{
-        private ConcurrentDictionary<Guid,ActiveGame> Games;
+        private ConcurrentDictionary<Guid,Game> Games;
 
 
 
 
         //This is run when an event for a new game is handled...
-        public ActiveGame Get(Guid gameId){
-            ActiveGame active_game = null;
+        public Game Get(Guid gameId){
+            Game active_game = null;
 
             Games.TryGetValue(gameId, out active_game);
             return active_game;
         }
 
 
-        public bool Add(ActiveGame game){
+        public bool Add(Game game){
             return Games.TryAdd(game.Id,game);
         }
 

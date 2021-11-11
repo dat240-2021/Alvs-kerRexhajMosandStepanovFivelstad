@@ -1,26 +1,26 @@
 using System;
 using System.Linq;
-using backend.Core.Domain.BackendGame.Models;
+using backend.Core.Domain.Lobby.Models;
 using Domain.Image;
 
-namespace Core.Domain.ActiveGame{
-    internal enum ActiveGameState
+namespace Core.Domain.Game{
+    internal enum GameState
     {
         Propose,
         Guess,
     }
-    public class ActiveGame {
+    public class Game {
         public Guid Id { get; protected set; }
         public GameSettings Settings { get; protected set; }
-        private ActiveGameState State { get; set; }
+        private GameState State { get; set; }
 
         private int _currentImage { get; set; }
         public Image CurrentImage { get => Settings.Images.ElementAtOrDefault(_currentImage); }
         public DateTime StartTime;
         public TimeSpan RoundTime;
 
-        public ActiveGame() {
-            State = ActiveGameState.Propose;
+        public Game() {
+            State = GameState.Propose;
         }
 
         private void ValidateRoundTime()
@@ -28,7 +28,7 @@ namespace Core.Domain.ActiveGame{
             /// Allow propositions if round time has elapsed.
             if ((StartTime + RoundTime) >= DateTime.Now)
             {
-                State = ActiveGameState.Propose;
+                State = GameState.Propose;
             }
         }
 
@@ -39,7 +39,7 @@ namespace Core.Domain.ActiveGame{
             Guesser guesser = Settings.Guessers.Find(g => g.Id == guess.User);
             guesser.Guessed = true;
 
-            if (State == ActiveGameState.Guess)
+            if (State == GameState.Guess)
             {
                 /// Check valid guess
                 /// If valid, add score to user and move to next image
@@ -66,10 +66,10 @@ namespace Core.Domain.ActiveGame{
         {
             ValidateRoundTime();
 
-            if (State == ActiveGameState.Propose)
+            if (State == GameState.Propose)
             {
                 // Propose
-                State = ActiveGameState.Guess;
+                State = GameState.Guess;
             }
         }
 
