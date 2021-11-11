@@ -44,7 +44,7 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isUserNotAuthenticated,
   },
   {
-    path: "/uploadimage",
+    path: "/uploadimage/:id",
     name: "UploadImage",
     component: UploadImages,
   },
