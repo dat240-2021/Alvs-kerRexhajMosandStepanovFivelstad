@@ -34,7 +34,7 @@ namespace backend.Controllers.BackendGame
             var gameId = await _mediator.Send(new CreateGame.Request(new GameSettings
                 {
                     Duration = settings.Duration,
-                    ImagesCount = settings.ImagesCount,
+                    ImageCount = settings.ImagesCount,
                     PlayersCount = settings.PlayersCount,
                 },
                 userId

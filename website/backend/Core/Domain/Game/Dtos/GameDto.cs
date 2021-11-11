@@ -1,11 +1,12 @@
 //This is placed here temporarily, will be moved if needed. 
 using System;
+using System.Collections.Generic;
 using Domain.Image;
 
-namespace backend.Core.Domain.Game {
-    public record Game {
+namespace backend.Core.Domain.GameSpace {
+    public record GameDto {
         public int GameId { get; protected set; }
-        public IProposer Proposer { get; protected set; }
+        public Proposer Proposer { get; protected set; }
 
         public List<Guesser> Guessers { get; protected set; }
 
@@ -13,6 +14,5 @@ namespace backend.Core.Domain.Game {
 
         public TimeSpan RoundTime { get; protected set; }
 
-        public Game() {}
     }
 }

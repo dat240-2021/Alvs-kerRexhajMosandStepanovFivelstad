@@ -9,9 +9,9 @@ using backend.Hubs;
 
 namespace backend.Core.Domain.GameSpace.Pipelines
 {
-    public class Propose
+    public class Guess
     {
-        public record Request(Guid User, int SliceNumber): IRequest<Unit> {}
+        public record Request(Guid User, string Guess): IRequest<Unit> {}
 
         public class Handler: IRequestHandler<Request,Unit>
         {
@@ -32,10 +32,11 @@ namespace backend.Core.Domain.GameSpace.Pipelines
 
                 if (game is not null)
                 {
-                    var result = game.Propose(new ProposeDto() { ProposerId = request.User, SliceNumber = request.SliceNumber });
-                    if (result is not null)
+                    var result = game.Guess(new GuessDto(){User = request.User, Guess = request.Guess});
+
+                    if (result)
                     {
-                        _hub.Clients.Clients(game.Guessers.Select(g => g.Id.ToString())).SendAsync("Tile", result); 
+                        _hub.Clients.Clients(game.Guessers.Select(g => g.Id.ToString())).SendAsync("Guess", request.Guess);
                     }
                 }
 

@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
-using backend.Core.Domain.Game.Models;
-using backend.Core.Domain.Game.Pipelines;
+using backend.Core.Domain.GameSpace.Pipelines;
 using MediatR;
-using SignalR;
+using System;
 
 namespace backend.Hubs
 {
@@ -14,14 +13,14 @@ namespace backend.Hubs
         public GameHub(IMediator mediator) => _mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
         public async Task Guess(string guess)
         {
-            string user = HubCallerContext.UserIdentifier;
-            await _mediator.SendAsync(new Request.Guess(User = user, Guess = guess));
+            string user = Context.UserIdentifier;
+            await _mediator.Send(new Guess.Request(Guid.Parse(user), guess));
         }
 
         public async Task Propose(int proposition)
         {
-            string user = HubCallerContext.UserIdentifier;
-            await _mediator.SendAsync(new Request.Propose(User = user, Proposition = proposition));
+            string user = Context.UserIdentifier;
+            await _mediator.Send(new Propose.Request(Guid.Parse(user), proposition));
         }
     }
 }

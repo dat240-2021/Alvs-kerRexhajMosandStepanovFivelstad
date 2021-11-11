@@ -1,79 +1,139 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using backend.Core.Domain.Lobby.Models;
+using backend.Core.Domain.GameSpace.Events;
 using Domain.Image;
+using SharedKernel;
 
-namespace Core.Domain.Game{
-    internal enum GameState
-    {
-        Propose,
-        Guess,
-    }
-    public class Game {
+namespace backend.Core.Domain.GameSpace{
+    // internal enum GameState
+    // {
+    //     Propose,
+    //     Guess,
+    // }
+    public class Game : BaseEntity {
         public Guid Id { get; protected set; }
-        public GameSettings Settings { get; protected set; }
-        private GameState State { get; set; }
-
-        private int _currentImage { get; set; }
-        public Image CurrentImage { get => Settings.Images.ElementAtOrDefault(_currentImage); }
+        // public GameSettings Settings { get; protected set; }
         public DateTime StartTime;
         public TimeSpan RoundTime;
 
-        public Game() {
-            State = GameState.Propose;
-        }
+        private int _currentImage { get; set; }
+        public Image CurrentImage { get => Images.ElementAtOrDefault(_currentImage); }
 
-        private void ValidateRoundTime()
-        {
-            /// Allow propositions if round time has elapsed.
-            if ((StartTime + RoundTime) >= DateTime.Now)
-            {
-                State = GameState.Propose;
-            }
-        }
 
-        public string Guess(GuessDto guess)
-        {
-            ValidateRoundTime();
+        public Proposer Proposer;
+        public List<Guesser> Guessers;
+        public List<Image> Images;
+        public List<int> SlicesShown;
+        public int nProposes {get => SlicesShown.Count(); }
 
-            Guesser guesser = Settings.Guessers.Find(g => g.Id == guess.User);
-            guesser.Guessed = true;
+        private bool _proposersTurn;
 
-            if (State == GameState.Guess)
-            {
-                /// Check valid guess
-                /// If valid, add score to user and move to next image
-                /// Else, register guess and check  
-                if (CurrentImage.Label == guess.Guess) {
-                    guesser.UpdateScore();
-                    Settings.Proposer.UpdateScore();
-
-                    AdvanceRound();
-                }
-
-                if (Settings.Guessers.All(x => x.Guessed))
+        //When _proposersTurn is changed we have to send an event.
+        private bool ProposersTurn { get => _proposersTurn ; set {
+                if (value)
                 {
-                    Advanceround();
+                    Events.Add( new ProposersTurnEvent(){ProposerId = Proposer.Id.ToString()});
+                } else
+                {
+                    Events.Add( new GuessersTurnEvent(){GuesserIds = Guessers.Select( g => g.Id.ToString()).ToList() });
                 }
-                return Guess.guess;
+                _proposersTurn = value;
+            }
+        }
+
+        public Game() {
+            _currentImage = 0;
+            Events.Add(new NewImageEvent()
+                {
+                    ImageId = CurrentImage.Id,
+                    GuesserIds = Guessers.Select( g => g.Id.ToString()).ToList(),
+                    ProposerId = Proposer.Id.ToString()
+                }
+            );
+        }
+
+        public void Update() {
+            // what to do when we update.
+            //checks if state has changed, and if so, sends an event.
+
+            //If guesser time runs out of time.
+            if (!ProposersTurn) {
+                if (( StartTime + RoundTime) >= DateTime.Now) {
+                    //Toggle role turn
+                    ProposersTurn = true;
+                }
+
+                //If all the players have guessed
+                if ( Guessers.All(x => x.Guessed) ) {
+                    ProposersTurn = true;
+                }
             }
 
+
+            //if proposer times out
+            // if () {
+            //     Events.Add( new GuessersTurnEvent(){GuesserIds = Guessers.Select( g => g.Id.ToString()).ToList() });
+            // }
+        }
+
+        //reset vars getting ready for next image.
+        public void NextImage() {
+            _currentImage++;
+            if (_currentImage>=Images.Count)
+            {
+                GameOver();
+                return;
+            }
+            foreach( var g in Guessers){
+                g.Guessed = false;
+            }
+            SlicesShown.Clear();
+        }
+
+        public void GameOver(){
+            Events.Add(new GameOverEvent(){GameId = Id});
+        }
+
+
+        //returns bool, which implies this guess should be broadcast to all players
+        public bool Guess(GuessDto guess)
+        {
+            Guesser guesser = Guessers.Find(g => g.Id == guess.User);
+
+            if (!ProposersTurn && !guesser.Guessed)
+            {
+
+                guesser.Guessed = true;
+
+                if (CurrentImage.Label.Label == guess.Guess) {
+                    // guesser.UpdateScore();
+                    // Proposer.UpdateScore();
+
+                    NextImage();
+
+                    //other guessers can keep guessing until time runs out.
+                    return true;
+                }
+                return true;
+            }
+            return false;
+        }
+
+
+        public ImageSlice? Propose(ProposeDto proposition)
+        {
+            if (ProposersTurn)
+            {
+                // Do proposer stuff
+                if ( ( ! SlicesShown.Contains(proposition.SliceNumber) )  && (CurrentImage.Slices.Exists(x => x.SequenceNumber == proposition.SliceNumber) ))
+                {
+                    StartTime = DateTime.Now;
+                    ProposersTurn = false;
+                    return CurrentImage.Slices.Find(i => i.SequenceNumber == proposition.SliceNumber);
+                }
+            }
             return null;
         }
-
-
-        public void Propose(ProposeDto proposition)
-        {
-            ValidateRoundTime();
-
-            if (State == GameState.Propose)
-            {
-                // Propose
-                State = GameState.Guess;
-            }
-        }
-
     }
-
-
 }

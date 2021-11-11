@@ -2,8 +2,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
-namespace Core.Domain.Game{
+namespace backend.Core.Domain.GameSpace{
     public interface IGameService {
         Game Get(Guid gameId);
         Game GetByUserId(Guid userId);
@@ -15,6 +16,14 @@ namespace Core.Domain.Game{
         private ConcurrentDictionary<Guid, Game> Games;
         private ConcurrentDictionary<Guid, Guid> GameIdsByUsers;
 
+        private Thread Ticker ;
+
+        // Cleanup statements, preventing memory leaks etc.
+        ~GameService()  // finalizer
+        {
+            Ticker.Abort();
+        }
+
         //This is run when an event for a new game is handled...
         public Game Get(Guid gameId){
             Game active_game = null;
@@ -22,6 +31,23 @@ namespace Core.Domain.Game{
             Games.TryGetValue(gameId, out active_game);
             return active_game;
         }
+        private void UpdateGames() {
+            foreach (var game in Games.Values){
+                game.Update();
+            }
+        }
+        private void StartTicker(string[] args) {
+                Ticker = new Thread(() => {
+                    while (true) {
+                        UpdateGames();
+                        Thread.Sleep(1000);
+                    }
+                } )
+                {
+                    IsBackground = true
+                };
+                Ticker.Start();
+            }
 
         public Game GetByUserId(Guid userId)
         {
@@ -33,7 +59,7 @@ namespace Core.Domain.Game{
             foreach (Guesser guesser in game.Guessers)
             {
                 /// Test that a user cannot already exist here.
-                GamesByUsers.TryAdd(guesser.Id, game.Id);
+                GameIdsByUsers.TryAdd(guesser.Id, game.Id);
             }
             return Games.TryAdd(game.Id,game);
         }
