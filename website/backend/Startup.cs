@@ -42,6 +42,7 @@ namespace backend
 
             services.AddScoped<IAuthenticationService,AuthenticationService>();
             services.AddSingleton<IBackendGameService, BackendGameService>();
+            services.AddSingleton<IGameService, GameService>();
 
 
 
