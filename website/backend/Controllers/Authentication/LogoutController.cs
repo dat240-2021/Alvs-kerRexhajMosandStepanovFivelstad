@@ -1,6 +1,4 @@
 using System.Threading.Tasks;
-using Controllers.Authentication;
-using Controllers.Authentication.Dto;
 using Controllers.Generics;
 using Domain.Authentication.Pipelines;
 using MediatR;
@@ -10,7 +8,6 @@ using Microsoft.Extensions.Logging; // using Microsoft.AspNetCore.Http.StatusCod
 
 namespace backend.Controllers.Authentication
 {
-
     [Authorize]
     [ApiController]
     // [Route("[controller]")]
@@ -27,7 +24,10 @@ namespace backend.Controllers.Authentication
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(){
+        public async Task<IActionResult> Post()
+        {
+            //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            //await _signInManager.SignOutAsync();
             await _mediator.Send(new LogoutUser.Request());
             return Ok();
 
