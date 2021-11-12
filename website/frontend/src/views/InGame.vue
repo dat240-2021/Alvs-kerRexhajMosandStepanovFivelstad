@@ -1,104 +1,70 @@
 <template>
-    <div class="container vh-100 py-5">
-        
-        <div class="col d-flex justify-content-end">
-            <!--Submit>Leave Game</Submit-->
-            <router-link class="btn btn-primary" to="/home">
-                Leave Game
-            </router-link>
+    <div class="d-flex">
+        <div class="ms-auto m-2">
+            <button class="btn btn-outline-primary" type="button" @click="LeaveGame">Leave Game</button>
         </div>
-        <div class="col d-flex justify-content-center">
-            <h1>In Game</h1>
-        </div>  
-
-        <div class="row">
-            <div class="col">
-                <div class="row">
-                    <form>
-                        <div class="col d-flex justify-content-around">
-                            <Submit>Show one more</Submit> 
-                            <Input
-                                v-model="newGuess"
-                                error=""
-                                type="text"
-                                model-value="Guesser Input"
-                                id="guessing"                               
-                            />
-                            <Submit v-on:click="Check">Check</Submit>
-                        </div>                          
-                    </form> 
-                </div>                         
-            </div>               
-        </div>
-        <div class="row -flex justify-content-sm-between">
-            <div class="col-sm">
-                    <div class="row">                 
-                        <div class="border border-success">                         
-                        
-                        <div class="col-sm">
-                            <div>
-                                <table>
-                                    <tr>
-                                        <th>Guesses:</th>
-                                    </tr>
-                                    <tr v-for="g in guesses" :key="g">
-                                        <td>{{g.Guess}}</td>
-                                    </tr>
-                                </table>
-                                {{newGuess}}
-                            </div>
-                        </div> 
-                    </div>
-                    </div>                         
-            </div>
-        
-            <div class="col-md">
-                <div class="row">                 
-                    <div class="col">                         
-                        Here comes an image
-                    </div> 
-                                                             
-                </div>                         
-            </div>     
-           
-            <div class="col-md">
-                <div class="row">                 
-                    <div class="border border-success">                         
-                    
-                     <div class="sm-2">
-                        <div>
-                            <table>
-                                <tr>
-                                    <th>Player:</th>
-                                    <th>Score:</th>
-                                </tr>
-                                <tr v-for="p in players.sort((a, b) => b.Score-a.Score )" :key="p.Name">
-                                    <td >
-                                        {{ p.Name }}
-                                    </td>
-                                    <td >
-                                        {{p.Score}}
-                                    </td>
-                                </tr>
-                                    
-                            </table>
-                            
-                        </div>
-                    </div> 
-                    </div>                                      
-                </div>                         
-            </div>       
-        </div>
-
-
-
-        
     </div>
+    <div class="container-fluid">
+
+        <div class="row mt-5">
+
+            <form @submit.prevent="SendGuess" class="form-control border-0">
+                <div class="input-group mb-3 mt-5">
+                        <input type="text" class="form-control" placeholder="Your Guess"  v-model="newGuess" aria-label="" aria-describedby="basic-addon1">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-primary" type="submit" >Guess</button>
+                        </div>
+                </div>
+            </form>
+
+            <div class="col-1">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Guesses:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="g in guesses" :key="g">
+                            <td>{{g.Guess}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+
+                <img class="img-fluid" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg"/>
+
+            </div>
+            <div class="col-2">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Players:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="p in players.sort((a, b) => b.Score-a.Score )" :key="p.PlayerId">
+                            <td>{{p.Name}}</td>
+                            <td>{{p.Score}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+
+
 </template>
 
 <script lang="ts">
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
+import { defineComponent } from "vue";
+
+
 
 export class Player {
     Name: string;
@@ -120,13 +86,6 @@ export class Guess {
     }
 }
 
-//export class NewGuess {
-//    newGuess: string;
-//
-//    constructor(newguess: string) {
-//        this.newGuess = newguess;
-//    }
-//}
 
 declare interface BaseComponentData{
     players : Player[],
@@ -138,7 +97,7 @@ declare interface BaseComponentData{
 
 
 
-export default {
+export default defineComponent({
     name: "InGame",
     components: {
         Input,
@@ -147,16 +106,16 @@ export default {
     },
     data() : BaseComponentData {
         return {
-            
+
             players: [
-                new Player("Jamie Lannister", 10, "1"), 
+                new Player("Jamie Lannister", 10, "1"),
                 new Player("The Hound", 11, "2"),
                 new Player("Rob Stark", 9, "3"),
                 new Player("Elvis", 12, "4"),
                 new Player("Santa Claus", 4, "5"),
                 new Player("Madonna", 2, "6"),
                 new Player("Lady Gaga", 0, "7")
-                
+
             ] as Player[],
 
             guesses: [
@@ -165,36 +124,28 @@ export default {
                 new Guess("Cat"),
 
             ] as Guess[],
-                
+
             imageSlices: [],
             //incorrect: true,
             correct: "Fish",
             newGuess: "",
             //player: '',
-       
+
         };
     },
     methods:{
-        Check() {
-            //this.guesses.push(new Guess(this.newGuess))
-            //console.log(this.guesses)
-            //if (this.newGuess != this.correct) {
-            //    this.guesses.push(new Guess(this.newGuess))
-            //}
-            
-        }
+        SendGuess() {
+            console.log(this.newGuess);
+
+        },
+
+        LeaveGame(){
+        },
+
+        
     }
 
-};
+});
 
 
 </script>
-
-<style scoped>
-
-
-.row {
-    margin: 1em;
-}
-
-</style>
