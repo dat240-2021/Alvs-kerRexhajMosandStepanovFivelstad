@@ -33,7 +33,7 @@ namespace backend.Core.Domain.GameSpace{
         private bool ProposersTurn { get => _proposersTurn ; set {
                 if (value)
                 {
-                    Proposer.MyTurn();
+                    Proposer.NotifyTurn();
                 } else
                 {
                     Events.Add( new GuessersTurnEvent(){GuesserIds = Guessers.Select( g => g.Id.ToString()).ToList() });
@@ -42,8 +42,9 @@ namespace backend.Core.Domain.GameSpace{
             }
         }
 
-        public Game() {
+        public Game(Guid id) {
             _currentImage = 0;
+            Id = id;
 
             Events.Add(new NewImageEvent()
                 {
@@ -121,16 +122,16 @@ namespace backend.Core.Domain.GameSpace{
         }
 
 
-        public ImageSlice? Propose(ProposeDto proposition)
+        public ImageSlice? Propose(int proposition)
         {
             if (ProposersTurn)
             {
                 // Do proposer stuff
-                if ( ( ! SlicesShown.Contains(proposition.SliceNumber) )  && (CurrentImage.Slices.Exists(x => x.SequenceNumber == proposition.SliceNumber) ))
+                if ( ( ! SlicesShown.Contains(proposition) )  && (CurrentImage.Slices.Exists(x => x.SequenceNumber == proposition) ))
                 {
                     StartTime = DateTime.Now;
                     ProposersTurn = false;
-                    return CurrentImage.Slices.Find(i => i.SequenceNumber == proposition.SliceNumber);
+                    return CurrentImage.Slices.Find(i => i.SequenceNumber == proposition);
                 }
             }
             return null;

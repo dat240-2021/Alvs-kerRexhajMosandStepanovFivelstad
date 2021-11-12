@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace backend.Core.Domain.GameSpace.Events
 {
-    public record GameOverEvent: BaseDomainEvent
+    public record OracleTurnEvent : BaseDomainEvent
     {
         public Guid GameId;
-        public List<string> GuesserIds;
-        public string ProposerId;
+        public int Proposition;
+
     }
 
 }

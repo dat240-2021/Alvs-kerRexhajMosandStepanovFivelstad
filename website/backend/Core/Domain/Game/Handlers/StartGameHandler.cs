@@ -22,14 +22,14 @@ namespace backend.Core.Domain.GameSpace.Handlers
 
         public async Task Handle(StartGame notification, CancellationToken cancellationToken)
         {
-            IProposer proposer = new Oracle();
+            IProposer proposer = new Oracle(notification.GameId);
 
             if (notification.ProposerId is not null)
             {
                 proposer = new Proposer((Guid)notification.ProposerId);
             }
 
-            var game = new Game() {
+            var game = new Game(notification.GameId) {
                 Proposer = proposer,
                 Guessers = notification.GuesserIds.Select(g => new Guesser(g)).ToList(),
                 Images = await _db.Images.Where(i => notification.ImageIds.Contains(i.Id)).ToListAsync(),
