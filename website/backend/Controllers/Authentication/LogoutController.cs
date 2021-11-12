@@ -27,7 +27,7 @@ namespace backend.Controllers.Authentication
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(UserRequestDto user){
+        public async Task<IActionResult> Post(){
             await _mediator.Send(new LogoutUser.Request());
             return Ok();
 

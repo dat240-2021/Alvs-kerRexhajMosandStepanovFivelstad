@@ -27,7 +27,7 @@ namespace Controllers.Authentication
             _mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Post()
         { 
             return Ok(new UserResponseDto(User.Identity.Name));
