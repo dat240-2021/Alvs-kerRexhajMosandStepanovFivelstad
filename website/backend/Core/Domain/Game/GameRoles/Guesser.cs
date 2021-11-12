@@ -1,8 +1,10 @@
 using System;
+using backend.Core.Domain.GameSpace.Events;
+using SharedKernel;
 
 namespace backend.Core.Domain.GameSpace
 {
-    public class Guesser
+    public class Guesser : BaseEntity
     {
         public Guid Id { get; set; }
         public bool Guessed { get; set; }
@@ -19,5 +21,9 @@ namespace backend.Core.Domain.GameSpace
             // do something with the score.
             _ = timeScore * sliceScore;
         }
+
+
+        public string GetId() => Id.ToString();
+
     }
 }

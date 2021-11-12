@@ -9,7 +9,7 @@ namespace backend.Core.Domain.GameSpace.Events
     {
         public int ImageId;
         public List<string> GuesserIds;
-        public string ProposerId;
+        public string? ProposerId;
 
     }
 

@@ -28,7 +28,7 @@ namespace Controllers.Authentication
 
         [HttpPost]
         public async Task<IActionResult> Post()
-        { 
+        {
             return Ok(new UserResponseDto(User.Identity.Name));
         }
     }

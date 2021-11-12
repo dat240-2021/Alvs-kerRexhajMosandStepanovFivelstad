@@ -25,7 +25,11 @@ namespace backend.Hubs.Handlers
         {
             var image = await _db.Images.Where( x => x.Id == notification.ImageId).SingleOrDefaultAsync();
 
-            await _hub.Clients.Clients(notification.ProposerId).SendAsync("NewImageProposer", image);
+            if (notification.ProposerId is not null)
+            {
+                await _hub.Clients.Clients(notification.ProposerId).SendAsync("NewImageProposer", image);
+            }
+
             await _hub.Clients.Clients(notification.GuesserIds).SendAsync("NewImageGuesser", cancellationToken);
         }
     }

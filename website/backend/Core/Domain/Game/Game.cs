@@ -11,7 +11,7 @@ namespace backend.Core.Domain.GameSpace{
     //     Propose,
     //     Guess,
     // }
-    public class Game : BaseEntity {
+    public class Game<T> : BaseEntity where T : IProposer {
         public Guid Id { get; protected set; }
         // public GameSettings Settings { get; protected set; }
         public DateTime StartTime;
@@ -21,7 +21,7 @@ namespace backend.Core.Domain.GameSpace{
         public Image CurrentImage { get => Images.ElementAtOrDefault(_currentImage); }
 
 
-        public Proposer Proposer;
+        public T Proposer;
         public List<Guesser> Guessers;
         public List<Image> Images;
         public List<int> SlicesShown;
@@ -33,7 +33,7 @@ namespace backend.Core.Domain.GameSpace{
         private bool ProposersTurn { get => _proposersTurn ; set {
                 if (value)
                 {
-                    Events.Add( new ProposersTurnEvent(){ProposerId = Proposer.Id.ToString()});
+                    Proposer.MyTurn();
                 } else
                 {
                     Events.Add( new GuessersTurnEvent(){GuesserIds = Guessers.Select( g => g.Id.ToString()).ToList() });

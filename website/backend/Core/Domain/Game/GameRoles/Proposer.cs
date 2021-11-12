@@ -1,8 +1,10 @@
 using System;
+using backend.Core.Domain.GameSpace.Events;
+using SharedKernel;
 
 namespace backend.Core.Domain.GameSpace
 {
-    public class Proposer
+    public class Proposer : BaseEntity, IProposer
     {
         public Guid Id { get; set; }
 
@@ -19,5 +21,12 @@ namespace backend.Core.Domain.GameSpace
             // do something with the score.
             _ = timeScore * sliceScore;
         }
+
+
+        public void MyTurn(){
+            Events.Add( new ProposersTurnEvent(){ProposerId = Id.ToString()});
+        }
+
+        public string GetId() => Id.ToString();
     }
 }
