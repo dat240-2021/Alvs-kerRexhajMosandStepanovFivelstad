@@ -163,5 +163,5 @@ nupkg/
 # Visual Studio 2015
 .vs/
 
-# API testing file
+# API testing files
 *.http
