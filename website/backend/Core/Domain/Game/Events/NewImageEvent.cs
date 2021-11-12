@@ -11,7 +11,6 @@ namespace backend.Core.Domain.GameSpace.Events
         public List<string> GuesserIds;
         public string ProposerId;
 
-
     }
 
 }

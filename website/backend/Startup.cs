@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Domain.Authentication;
 using Domain.Authentication.Services;
+using backend.Core.Domain.GameSpace;
 
 namespace backend
 {

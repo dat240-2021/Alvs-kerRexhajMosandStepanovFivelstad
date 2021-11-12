@@ -8,6 +8,9 @@ namespace backend.Core.Domain.GameSpace.Events
     public record GameOverEvent: BaseDomainEvent
     {
         public Guid GameId;
+
+        public List<string> GuesserIds;
+        public string ProposerId;
     }
 
 }
