@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace backend.Core.Domain.GameSpace{
+namespace backend.Core.Domain.GameSpace {
     public interface IGameService {
         Game Get(Guid gameId);
         Game GetByUserId(Guid userId);

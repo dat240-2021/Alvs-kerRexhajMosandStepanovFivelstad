@@ -9,8 +9,9 @@ namespace backend.Core.Domain.GameSpace
     {
         void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices);
         void MyTurn();
-        void HandleNewImage();
+        void HandleNewImage() {}
         string? GetId();
 
+        
     }
 }
