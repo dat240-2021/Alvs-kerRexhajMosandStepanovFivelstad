@@ -32,6 +32,8 @@
         </form>
       </div>
 
+      <h2 v-if="isProposer" class="text-center" >Solution Text</h2>
+
       <div class="col-1">
         <table>
           <thead>
@@ -56,7 +58,6 @@
             class="position-absolute top-0 start-0"
           />
         </div>
-        <h2 v-else>Solution Text</h2>
         <!-- <canvas id="image-canvas" width="1000" height="1000"></canvas> -->
       </div>
       <div class="col-2">
