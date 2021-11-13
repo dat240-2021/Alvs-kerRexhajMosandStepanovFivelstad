@@ -41,11 +41,12 @@
           </tbody>
         </table>
       </div>
-      <div class="col position-relative">
+      <div class="col position-relative" id="canvas-div" :click="AddImage">
 
-            <img  v-for="i in GenerateImagePaths()" :key="i" class="position-absolute top-0 start-0 " style="width:100%;"
-            :src="i"
-            />
+            <!-- <canvas id="image-canvas" width="1000" height="1000"></canvas> -->
+            <!-- <img  v-for="i in GenerateImagePaths()" @mousemove="MouseMove" @click="SelectedTile(i)" :key="i.id" class="" style="width:100%;"
+            :src="i.src"
+            /> -->
 
 
       </div>
@@ -73,7 +74,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
 export class Player {
   Name: string;
   Score: number;
@@ -93,18 +93,33 @@ export class Guess {
   }
 }
 
+export class Slice {
+  src: string;
+  id: string;
+
+  constructor(src: string,id: string) {
+    this.src = src;
+    this.id = "slice-".concat(id);
+  }
+}
+
 declare interface BaseComponentData {
   players: Player[];
   guesses: Guess[];
   imageSlices: string[];
   newGuess: string;
   correct: string;
+  coords: {
+    x : number,
+    y : number,
+  }
 }
 
 export default defineComponent({
   name: "InGame",
   data(): BaseComponentData {
     return {
+      coords : {x: 0, y : 0},
       players: [
         new Player("Jamie Lannister", 10, "1"),
         new Player("The Hound", 11, "2"),
@@ -129,36 +144,71 @@ export default defineComponent({
     };
   },
   methods: {
-
+    mounted(){
+      console.log("FUCK OFF");
+    },
     SendGuess() {
       console.log(this.newGuess);
-      this.GenerateImagePaths();
+      this.AddImages();
+
     },
 
     LeaveGame(){
       console.log("leaving game");
     },
 
-    MousePosToImage(){
-      $("#something").click(function(e){
-        var parentOffset = $(this).parent().offset(); 
-        //or $(this).offset(); if you really just want the current element's offset
-        var relX = e.pageX - parentOffset.left;
-        var relY = e.pageY - parentOffset.top;
-      });
+    AddImages() {
+      var paths = this.GenerateImagePaths();
+      var div = document.getElementById('canvas-div')
+      if (div==null) { console.log("NOT FOUND: canvas"); return; };
+      var height = div.clientHeight;
+      var width = div.clientHeight;
+      console.log(height);
+      console.log(width);
+      for (var i=0; i<paths.length ; i++){
+      this.AddImage(paths[i].src,800);
+      }
+    },
+    AddImage(path:string,inheight: number){
+      var div = document.getElementById('canvas-div')
+      if (div==null) { console.log("NOT FOUND: canvas"); return; };
+      var canvas = document.createElement('canvas');
+
+      canvas?.classList.add("position-absolute","top-0","start-0");
+      div?.appendChild(canvas);
+
+      var context = canvas.getContext('2d');
+      if (context==null) { console.log("NOT FOUND: context"); return; };
+
+
+        var img = new Image();
+        img.src = path;
+
+        img.onload = function () {
+          console.log("FUCK OFF")
+            //scale the image and canvas
+            canvas.height = inheight;
+            canvas.width = img.width * inheight/img.width;
+            img.width = canvas.width;
+            img.height = canvas.height;
+          // if (context==null) { console.log("NOT FOUND: context 2"); return; };
+          context?.drawImage(img, 0, 0, img.width,img.height);
+      }
+
+
+    },
+    SelectedTile(i : any){
+      // for (var i in this.GenerateImagePaths()){
+      console.log("wdhadwadwa")
+    },
+    MouseMove(event : any){
+      var rect = event.target.getBoundingClientRect();
+      this.coords.x = event.clientX - rect.left; //x position within the element.
+      this.coords.y = event.clientY - rect.top; //
     },
 
     GenerateImagePaths() {
-        let path = "file:///home/ardijan/repos/groupProject240/website/backend/Infrastructure/ImageFetch/DownloadedFiles/Images/ILSVRC2012_val_00000086_scattered/";
-        let ext = ".png";
-
-        let paths : string[] = [];
-
-        for (let i = 0; i<50; i++){
-          paths.push(path.concat(i as any as string,ext));
-        }
-
-        return ["https://i.ibb.co/rkvRk2v/1.png",
+ var _paths = ["https://i.ibb.co/rkvRk2v/1.png",
 "https://i.ibb.co/Qn2fzTD/1.png",
 "https://i.ibb.co/1vv6ZHx/1.png",
 "https://i.ibb.co/5cRWN0W/1.png",
@@ -207,6 +257,14 @@ export default defineComponent({
 "https://i.ibb.co/N3TKrNx/1.png",
 "https://i.ibb.co/xGmGVrV/1.png",
 "https://i.ibb.co/B6VWy5f/1.png"];
+
+        let paths : Slice[] = [];
+
+        for (let i = 0; i<_paths.length; i++){
+          paths.push(new Slice(_paths[i],i as any as string));
+        }
+
+        return paths
     }
   },
 });
