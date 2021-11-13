@@ -13,8 +13,8 @@ namespace backend.Core.Domain.GameSpace {
     }
 
     public class GameService : IGameService{
-        private ConcurrentDictionary<Guid, Game> Games;
-        private ConcurrentDictionary<Guid, Guid> GameIdsByUsers;
+        private ConcurrentDictionary<Guid, Game> Games = new();
+        private ConcurrentDictionary<Guid, Guid> GameIdsByUsers = new();
 
         private Thread Ticker ;
 
