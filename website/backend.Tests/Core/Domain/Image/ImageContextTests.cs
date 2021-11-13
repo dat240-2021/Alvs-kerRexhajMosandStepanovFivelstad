@@ -32,10 +32,10 @@ namespace backend.Tests.Core.Domain.Image
             var ImageList = new List<(byte[], int)>();
 
 
-            foreach (string file in Directory.GetFiles(("..\\..\\..\\Infrastructure\\Data\\Images")) )
+            foreach (string file in Directory.GetFiles(("../../../Infrastructure/Data/Images")) )
             {
                 int number;
-                if (int.TryParse(file.Split("\\").Last().Replace(".png", ""), out number)){
+                if (int.TryParse(file.Split("/").Last().Replace(".png", ""), out number)){
 
                         ImageList.Add((File.ReadAllBytes(file), number ));
 
@@ -61,7 +61,7 @@ namespace backend.Tests.Core.Domain.Image
                 var actImageList = context.Images.Select(i => i.Slices);
                 Assert.Equal(Category,actCategory.First());
                 Assert.Equal(ImageLabel,actLabel.First());
-                Assert.Equal(5,actImageList.First().Count());
+                Assert.Equal(5, actImageList.First().Count());
             }
         }
         
