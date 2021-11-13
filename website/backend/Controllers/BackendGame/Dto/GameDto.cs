@@ -16,7 +16,7 @@ namespace backend.Controllers.BackendGame.Dto
             Id = data.Game.Id;
             Settings = data.Game.Settings;
             State = data.Game.State;
-            OccupiedSlotsCount = data.SlotInfo.PlayerSlots.Count;
+            OccupiedSlotsCount = data.SlotInfo.GuessersIds.Count;
         }
     }
 }

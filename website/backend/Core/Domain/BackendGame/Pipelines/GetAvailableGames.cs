@@ -30,10 +30,8 @@ namespace backend.Core.Domain.BackendGame.Pipelines
             
             public async Task<List<GameWithSlotInfo>> Handle(Request request, CancellationToken cancellationToken)
             {
-                var statesToInclude = new List<GameState>(){ GameState.Active, GameState.Created }; 
-                
                 var games = await _db.Games
-                    .Where(g => statesToInclude.Contains(g.State))
+                    .Where(g => g.State.Equals(GameState.Created))
                     .ToListAsync(cancellationToken);
 
                 return games.Select(game => new GameWithSlotInfo(game, _backendGameService.GetSlotInfo(game))
