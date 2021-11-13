@@ -50,7 +50,7 @@ export const leaveGameRoom = async (id: string) => {
 };
 
 export const fetchCategories = async () => {
-  const { data: data } = await axios.get("/api/category");
+  const { data: data } = await axios.get("/api/categories");
   console.log(data);
 };
 

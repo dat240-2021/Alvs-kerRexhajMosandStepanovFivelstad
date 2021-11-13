@@ -12,8 +12,7 @@ namespace backend.Controllers.NewGame
 {
 
     [ApiController]
-    // [Route("[controller]")]
-    [Route("/api/category")]
+    [Route("/api/categories")]
     public class CategoryController : ApiBaseController
     {
         private readonly ILogger<CategoryController> _logger;
@@ -30,7 +29,7 @@ namespace backend.Controllers.NewGame
             var result = await _mediator.Send(new GetCategoryList.Request());
 
             if (result != null){
-                return Ok();
+                return Ok(result);
             }
 
             return UnprocessableEntity();
