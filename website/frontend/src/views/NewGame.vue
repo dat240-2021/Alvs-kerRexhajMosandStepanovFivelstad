@@ -60,9 +60,7 @@
                 id="roundLengthInput"
                 label="Round length (seconds)"
               />
-              <div v-if="failed" class="alert alert-danger" role="alert">
-                Something went wrong! Try again later.
-              </div>
+              <div v-if="error.length" class="alert alert-danger" role="alert">{{ error }}</div>
               <div class="form-group d-flex justify-content-around mt-2">
                 <Submit :disabled="disabled">Start game</Submit>
               </div>
@@ -80,6 +78,11 @@ import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
 import { createGame, fetchCategories } from "@/api/BackendGame";
 import { Category } from "@/typings";
+
+const errors = {
+  noCategorySelected: "At least one category must be picked",
+  default: "Something went wrong! Try again later"
+}
 
 export default defineComponent({
   name: "NewGame",
@@ -99,20 +102,30 @@ export default defineComponent({
         imagesCount: 1,
         roundDuration: 30,
       },
-      failed: false,
+      error: "",
       disabled: false,
       categories: [] as Category[],
     };
   },
   methods: {
+    validate() {
+      if (!this.form.categoryIds.length) {
+        this.error = errors.noCategorySelected;
+        return false;
+      }
+
+      this.error = "";
+      return true;
+    },
     handleSubmit() {
+      if (!this.validate()) return;
+
       this.disabled = true;
-      this.failed = false;
       createGame(this.form)
         .then((id) => {
           this.$router.push({ name: "Game", params: { id } });
         })
-        .catch(() => this.failed = true)
+        .catch(() => this.error = errors.default)
         .finally(() => this.disabled = false);
     },
     loadCategories() {

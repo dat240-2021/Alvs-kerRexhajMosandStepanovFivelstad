@@ -10,6 +10,7 @@ namespace backend.Controllers.BackendGame.Dto
         public string ProposerType { get; set; }
         
         [Required]
+        [MinLength(1)]
         public List<int> CategoryIds { get; set; }
         
         [Required]
