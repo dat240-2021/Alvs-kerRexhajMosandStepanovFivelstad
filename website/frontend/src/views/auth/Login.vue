@@ -33,7 +33,7 @@ import { defineComponent } from "vue";
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
 import auth from "@/api/Auth";
-import { setCurrentUser } from "@/utils/auth";
+import { setAuthUser } from "@/utils/auth";
 import validators from "@/utils/validators";
 
 const ERROR_LABEL_BY_CODE: { [index: string]: any } = {
@@ -75,7 +75,7 @@ export default defineComponent({
 
       auth
         .authUser(userName, password)
-        .then(setCurrentUser)
+        .then(setAuthUser)
         .then(() => this.$router.push({ name: "Home" }))
         .catch((e) => {
           const status = e.response.status as string;

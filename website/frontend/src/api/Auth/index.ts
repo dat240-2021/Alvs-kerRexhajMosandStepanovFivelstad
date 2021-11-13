@@ -1,5 +1,9 @@
 import axios from "axios";
 import { User } from "@/typings";
+import { isUserAuth } from "@/utils/auth";
+
+// const getAuthUser = async (): Promise<User | null> =>
+//   (await axios.get("/me")) as User;
 
 const authUser = async (userName: string, password: string): Promise<User> => {
   const { data }: { data: User } = await axios.post("/api/login", {
@@ -19,21 +23,19 @@ const registrateUser = async (
   });
   return { ...data, isAuth: true };
 };
+/*
+temp for testing
+ */
 
-export const getCurrentUser = async (): Promise<User> => {
-  const {
-    data: { data: userData },
-  } = await axios.get("/api/me");
-  return userData.username ? { ...userData, isAuth: true } : { isAuth: false };
-};
+// not auth user
+const getAuthUser = async (): Promise<User | null> => null;
 
-export const logout = async () => {
-  await axios.post("/api/logout");
-};
+// auth user
+// const getAuthUser = async (): Promise<User | null> =>
+//   ({ isAuth: true } as User);
 
 export default {
-  getCurrentUser,
+  getAuthUser,
   authUser,
   registrateUser,
-  logout,
 };

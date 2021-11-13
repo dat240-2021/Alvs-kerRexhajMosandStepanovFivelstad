@@ -42,7 +42,7 @@ import { defineComponent } from "vue";
 import auth from "@/api/Auth";
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
-import { setCurrentUser } from "@/utils/auth";
+import { setAuthUser } from "@/utils/auth";
 
 import validators from "@/utils/validators";
 
@@ -90,7 +90,7 @@ export default defineComponent({
 
       auth
         .registrateUser(userName, password)
-        .then(setCurrentUser)
+        .then(setAuthUser)
         .then(() => this.$router.push({ name: "Home" }))
         .catch((e) => {
           const status = e.response.status as string;
