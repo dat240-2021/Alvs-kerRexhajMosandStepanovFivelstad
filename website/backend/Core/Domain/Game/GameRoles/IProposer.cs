@@ -3,7 +3,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace backend.Core.Domain.GameSpace
+namespace backend.Core.Domain.Games
 {
     public interface IProposer
     {

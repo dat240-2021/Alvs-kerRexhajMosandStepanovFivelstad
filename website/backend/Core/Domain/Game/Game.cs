@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using backend.Core.Domain.GameSpace.Events;
-using backend.Core.Domain.Image;
+using backend.Core.Domain.Games.Events;
+using backend.Core.Domain.Images;
 using SharedKernel;
 
-namespace backend.Core.Domain.GameSpace{
+namespace backend.Core.Domain.Games{
     // internal enum GameState
     // {
     //     Propose,
@@ -18,12 +18,12 @@ namespace backend.Core.Domain.GameSpace{
         public TimeSpan RoundTime;
 
         private int _currentImage { get; set; }
-        public Image.Image CurrentImage { get => Images.ElementAtOrDefault(_currentImage); }
+        public Images.Image CurrentImage { get => Images.ElementAtOrDefault(_currentImage); }
 
 
         public IProposer Proposer;
         public List<Guesser> Guessers;
-        public List<Image.Image> Images;
+        public List<Images.Image> Images;
         public List<int> SlicesShown;
         public int nProposes { get => SlicesShown.Count(); }
 

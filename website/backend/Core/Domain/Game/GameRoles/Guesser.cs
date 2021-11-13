@@ -1,8 +1,8 @@
 using System;
-using backend.Core.Domain.GameSpace.Events;
+using backend.Core.Domain.Games.Events;
 using SharedKernel;
 
-namespace backend.Core.Domain.GameSpace
+namespace backend.Core.Domain.Games
 {
     public class Guesser : BaseEntity
     {

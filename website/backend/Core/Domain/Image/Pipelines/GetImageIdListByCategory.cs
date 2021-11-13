@@ -7,7 +7,7 @@ using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Core.Domain.Image.Pipelines
+namespace backend.Core.Domain.Images.Pipelines
 {
 	public class GetImageIdListByCategory
 	{

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
-using backend.Core.Domain.GameSpace.Pipelines;
+using backend.Core.Domain.Games.Pipelines;
 using MediatR;
 using System;
 

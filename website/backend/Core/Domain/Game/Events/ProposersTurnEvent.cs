@@ -3,7 +3,7 @@ using System;
 using SharedKernel;
 using System.Collections.Generic;
 
-namespace backend.Core.Domain.GameSpace.Events
+namespace backend.Core.Domain.Games.Events
 {
     public record ProposersTurnEvent: BaseDomainEvent
     {
