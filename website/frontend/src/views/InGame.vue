@@ -95,13 +95,6 @@ export class Player {
     this.PlayerId = PlayerId;
   }
 }
-export class Guess {
-  Guess: string;
-
-  constructor(guess: string) {
-    this.Guess = guess;
-  }
-}
 
 export class Slice {
   src: string;
@@ -115,7 +108,7 @@ export class Slice {
 
 declare interface BaseComponentData {
   players: Player[];
-  guesses: Guess[];
+  guesses: string[];
   imageSlices: string[];
   newGuess: string;
   correct: string;
@@ -141,11 +134,7 @@ export default defineComponent({
         new Player("Lady Gaga", 0, "7"),
       ] as Player[],
 
-      guesses: [
-        new Guess("Monkey"),
-        new Guess("Donkey"),
-        new Guess("Cat"),
-      ] as Guess[],
+      guesses: ["test1", "ship", "helloworld", "i am testing"],
 
       isProposer: true,
 
