@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 import {
+  Category,
   Game,
   GameSlotUpdateNotification,
   subscribeToGameRoomsCreationCb,
@@ -49,9 +50,11 @@ export const leaveGameRoom = async (id: string) => {
   await axios.post(`api/games/${id}/leave`);
 };
 
-export const fetchCategories = async () => {
-  const { data: data } = await axios.get("/api/categories");
-  console.log(data);
+export const fetchCategories = async (): Promise<Category[]> => {
+  const {
+    data: { data: categories },
+  } = await axios.get("/api/categories");
+  return categories as Category[];
 };
 
 export const subscribeToGameRoomsCreation = (

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Models;
 using MediatR;
@@ -31,31 +32,31 @@ namespace backend.Core.Domain.BackendGame.Services
         public bool HasAvailableSlots(Guid gameId)
         {
             return _games.TryGetValue(gameId, out var gameSlotInfo) ? 
-                gameSlotInfo.Players.Count < gameSlotInfo.MaxSlotsCount :
+                gameSlotInfo.PlayerSlots.Count < gameSlotInfo.MaxSlotsCount :
                 throw new Exception($"Game with id {gameId} not found");
         }
 
-        public async Task JoinGame(Game game, Guid userId)
+        public async Task JoinGame(Game game, Guid userId, SlotRole role)
         {
             if (!_games.ContainsKey(game.Id))
             {
-                
                 _games.TryAdd(game.Id, new GameSlotInfo{ MaxSlotsCount = game.Settings.PlayersCount });
             }
 
             if (_games.TryGetValue(game.Id, out var gameSlotInfo))
             {
-                if (gameSlotInfo.MaxSlotsCount.Equals(gameSlotInfo.Players.Count))
+                if (gameSlotInfo.MaxSlotsCount.Equals(gameSlotInfo.PlayerSlots.Count))
                 {
                     throw new Exception($"Room with id { game.Id } is full");
                 }
 
-                if (gameSlotInfo.Players.Contains(userId))
+                if (gameSlotInfo.PlayerIds.Contains(userId))
                 {
                     throw new Exception($"User with id { userId } is already in room with id { game.Id }");
                 }
-                
-                gameSlotInfo.Players.Add(userId);
+
+                var slot = new Slot(userId, role);
+                gameSlotInfo.PlayerSlots.Add(slot);
             }
         }
 
@@ -68,12 +69,13 @@ namespace backend.Core.Domain.BackendGame.Services
             
             if (_games.TryGetValue(gameId, out var gameSlotInfo))
             {
-                if (!gameSlotInfo.Players.Contains(userId))
+                if (!gameSlotInfo.PlayerIds.Contains(userId))
                 {
                     throw new Exception($"User with id { userId } is not found in room { gameId }");
                 }
                 
-                gameSlotInfo.Players.Remove(userId);
+                var slot = gameSlotInfo.PlayerSlots.Find(s => s.Id.Equals(userId));
+                gameSlotInfo.PlayerSlots.Remove(slot);
             }
 
             

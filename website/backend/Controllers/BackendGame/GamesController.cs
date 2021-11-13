@@ -35,9 +35,11 @@ namespace backend.Controllers.BackendGame
 
             var gameId = await _mediator.Send(new CreateGame.Request(new GameSettings
                 {
-                    Duration = settings.Duration,
+                    Duration = settings.RoundDuration,
                     ImagesCount = settings.ImagesCount,
                     PlayersCount = settings.PlayersCount,
+                    CategoryIds = settings.CategoryIds,
+                    ProposerType = settings.ProposerType
                 },
                 userId
             ));
@@ -57,7 +59,7 @@ namespace backend.Controllers.BackendGame
         public async Task<IActionResult> Join(Guid id)
         {
             var userId = _userManager.GetUserId(HttpContext.User);
-            await _mediator.Send(new JoinGame.Request(new Guid(userId), id));
+            await _mediator.Send(new JoinGame.Request(new Guid(userId), id, SlotRole.Guesser));
             return Ok();
         }
         

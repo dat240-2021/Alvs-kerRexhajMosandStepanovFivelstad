@@ -28,11 +28,12 @@ namespace backend.Core.Domain.BackendGame.Pipelines
             public async Task<Guid> Handle(Request request, CancellationToken cancellationToken)
             {
                 var game = new Game(Guid.NewGuid(), request.GameSettings);
+                var creatorRole = request.GameSettings.ProposerType == "AI" ? SlotRole.Guesser : SlotRole.Proposer;
+                
                 _db.Games.Add(game);
                 await _db.SaveChangesAsync(cancellationToken);
                 await _mediator.Publish(new GameCreated(game), cancellationToken);
-                
-                await _mediator.Send(new JoinGame.Request(request.UserId, game.Id), cancellationToken);
+                await _mediator.Send(new JoinGame.Request(request.UserId, game.Id, creatorRole), cancellationToken);
                 return game.Id;
             }
         }

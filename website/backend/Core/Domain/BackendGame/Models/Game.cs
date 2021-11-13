@@ -5,7 +5,7 @@ namespace backend.Core.Domain.BackendGame.Models
     public class Game
     {
         public Guid Id { get; protected set; }
-        public GameSettings Settings { get; protected set; }
+        public GameSettings Settings { get; set; }
 
         public GameState State { get; set; } = GameState.Created;
         

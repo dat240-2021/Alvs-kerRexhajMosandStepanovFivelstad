@@ -25,6 +25,11 @@ export interface Game {
   occupiedSlotsCount: number;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+}
+
 export interface GameSlotUpdateNotification {
   gameId: string;
   occupiedSlotsCount: number;

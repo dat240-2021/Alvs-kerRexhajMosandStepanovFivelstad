@@ -38,6 +38,14 @@ namespace Infrastructure.Data
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Game>().OwnsOne(
+                g => g.Settings, od =>
+                {
+                    od.Property(e => e.CategoryIds).HasConversion(
+                        id => string.Join(';', id),
+                        ids => ids.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
+                    );
+                });
         }
 	}
 
