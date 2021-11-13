@@ -32,7 +32,7 @@
         </form>
       </div>
 
-      <h2 v-if="isProposer" class="text-center" >Solution Text</h2>
+      <h2 v-if="isProposer" class="text-center">Solution Text</h2>
 
       <div class="col-1">
         <table>
@@ -165,7 +165,6 @@ export default defineComponent({
     },
     LeaveGame() {
       console.log("leaving game");
-      this.AddImageProposer();
     },
 
     AddImageProposer() {
