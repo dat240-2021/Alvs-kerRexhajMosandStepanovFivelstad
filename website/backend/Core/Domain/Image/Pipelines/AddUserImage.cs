@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Authentication.Pipelines;
+using Domain.Image;
 using Infrastructure.Data;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Image.Pipelines
+namespace backend.Core.Domain.Image.Pipelines
 {
 	public class AddUserImage
 	{
@@ -29,15 +26,14 @@ namespace Domain.Image.Pipelines
 				var tempCategory = _db.ImageCategories.SingleOrDefault(i => i.Name == request.Category);
 				if (tempCategory is null)
 				{
-					// tempCategory = new ImageCategory("My Images");
+					tempCategory = new ImageCategory(request.Category);
 					_db.ImageCategories.Add(tempCategory);
 				}
 
-				var image = new Image(request.UserId,new ImageLabel(request.ImageLabel,tempCategory));
+				var image = new global::backend.Core.Domain.Image.Image(request.UserId,new ImageLabel(request.ImageLabel,tempCategory));
 				foreach (var item in request.ImageList)
 				{
-					var tempPiece = new ImageSlice(item.Item1, item.Item2);
-					image.Slices.Add(tempPiece);
+					image.AddImageSlice(item.Item1,item.Item2);
 				}
 
 				_db.Add(image);

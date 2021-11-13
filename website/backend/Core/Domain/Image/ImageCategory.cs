@@ -1,7 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
-namespace Domain.Image
+namespace backend.Core.Domain.Image
 {
 
     public class ImageCategory : BaseEntity

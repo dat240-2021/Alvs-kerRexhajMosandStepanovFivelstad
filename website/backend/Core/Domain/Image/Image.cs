@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Image;
 using SharedKernel;
 
-namespace Domain.Image
+namespace backend.Core.Domain.Image
 {
     public class Image : BaseEntity
     {
@@ -17,7 +17,7 @@ namespace Domain.Image
         // public string Label { get=> _lbl.Label; protected set {} }
         public string Category { get=> Label.Category.Name; protected set {} }
 
-        public List<ImageSlice> Slices { get; protected set; }
+        public List<ImageSlice> Slices { get; protected set; } = new List<ImageSlice>();
 
 
 
