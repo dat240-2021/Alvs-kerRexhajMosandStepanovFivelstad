@@ -49,6 +49,11 @@ export const leaveGameRoom = async (id: string) => {
   await axios.post(`api/games/${id}/leave`);
 };
 
+export const fetchCategories = async () => {
+  const { data: data } = await axios.get("/api/category");
+  console.log(data);
+};
+
 export const subscribeToGameRoomsCreation = (
   cb: subscribeToGameRoomsCreationCb
 ) => {
