@@ -43,7 +43,7 @@
           </thead>
           <tbody>
             <tr v-for="g in guesses" :key="g">
-              <td>{{ g.Guess }}</td>
+              <td>{{ g }}</td>
             </tr>
           </tbody>
         </table>
