@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using SharedKernel;
 
-namespace backend.Core.Domain.Image
+namespace backend.Core.Domain.Images
 {
     public class ImageSlice : BaseEntity
     {

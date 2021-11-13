@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
-using backend.Core.Domain.GameSpace.Events;
+using backend.Core.Domain.Games.Events;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +9,7 @@ using System;
 using Microsoft.AspNetCore.SignalR;
 using backend.Hubs;
 
-namespace backend.Core.Domain.GameSpace.Handlers
+namespace backend.Core.Domain.Games.Handlers
 {
     public class GameOverHandler: INotificationHandler<GameOverEvent>
     {

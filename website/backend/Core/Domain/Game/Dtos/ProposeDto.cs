@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Domain.Image;
 
-namespace backend.Core.Domain.GameSpace {
+namespace backend.Core.Domain.Games {
     public record ProposeDto {
 
         public Guid ProposerId {get; set;}

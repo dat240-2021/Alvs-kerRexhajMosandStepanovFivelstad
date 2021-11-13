@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using System.Linq;
 using backend.Hubs;
 
-namespace backend.Core.Domain.GameSpace.Pipelines
+namespace backend.Core.Domain.Games.Pipelines
 {
     public class Guess
     {
