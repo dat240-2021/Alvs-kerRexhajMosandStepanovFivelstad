@@ -128,8 +128,9 @@ export default defineComponent({
       console.log(this.newGuess);
     },
 
-    // LeaveGame(){
-    // },
+    LeaveGame(){
+      console.log("leaving game");
+    },
   },
 });
 </script>
