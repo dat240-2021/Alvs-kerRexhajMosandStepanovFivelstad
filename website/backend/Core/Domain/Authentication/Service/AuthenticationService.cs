@@ -1,71 +1,52 @@
-using System;
-using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Infrastructure.Data;
+using Domain.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Domain.Authentication.Services
 {
-    public interface IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
-        Task<(bool Success,string[] errors)> RegisterUser(string username,string password);
-        Task<bool> LoginUser(string username,string password);
-        Task<Unit> LogoutUser();
-    }
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-
-    public class AuthenticationService : IAuthenticationService {
-        GameContext Db;
-
-        private UserManager<User> userManager;
-        private SignInManager<User> signInManager;
-
-        public AuthenticationService(GameContext db, UserManager<User> user, SignInManager<User> signIn){
-            Db = db;
-            userManager = user;
-            signInManager = signIn;
+        public AuthenticationService(UserManager<User> user, SignInManager<User> signIn)
+        {
+            _userManager = user;
+            _signInManager = signIn;
         }
 
 
-        public async Task<(bool Success,string[] errors)> RegisterUser(string username,string password){
-            // var user = await userManager.FindByNameAsync(username);
-            // if (user != null) return (false,new string[]{"Username allready exists"});
-
-            var result = await userManager.CreateAsync(new User { UserName = username }, password);
-
-            var errors = new List<string>();
-
-            foreach(var err in result.Errors){
-                errors.Add(err.Description);
-            }
-
-            return (result.Succeeded,errors.ToArray());
+        public async Task<(bool Success, string[] errors)> RegisterUser(string username, string password)
+        {
+            var result = await _userManager.CreateAsync(new User {UserName = username}, password);
+            return (result.Succeeded, result.Errors.Select(err => err.Description).ToArray());
         }
 
-        public async Task<bool> LoginUser(string username,string password){
-            User user;
-            Microsoft.AspNetCore.Identity.SignInResult result;
+        public async Task<bool> LoginUser(string username, string password)
+        {
+            var user = await _userManager.FindByNameAsync(username);
 
-            user = await userManager.FindByNameAsync(username);
+            if (user == null) return false;
+            var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
+            return result.Succeeded;
 
-            if (user!=null){
-
-                result = await signInManager.PasswordSignInAsync(user, password, false, false);
-                return result.Succeeded;
-            }
-            return false;
         }
 
-        public async Task<Unit> LogoutUser(){
-            await signInManager.SignOutAsync();
+        public async Task<Unit> LogoutUser()
+        {
+            await _signInManager.SignOutAsync();
             return Unit.Value;
         }
+
+        public async Task<User> GetCurrentUser()
+        {
+            var claimsPrincipal = _signInManager.Context.User;
+            var userId =  _userManager.GetUserId(claimsPrincipal);
+            return await _userManager.FindByIdAsync(userId);
+        }
     }
-
-
 }

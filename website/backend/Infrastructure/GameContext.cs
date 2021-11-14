@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame;
 using backend.Core.Domain.BackendGame.Models;
 using backend.Core.Domain.BackendGame.Pipelines;
+using backend.Core.Domain.Images;
 using Domain.Authentication;
 using Domain.Image;
 using MediatR;

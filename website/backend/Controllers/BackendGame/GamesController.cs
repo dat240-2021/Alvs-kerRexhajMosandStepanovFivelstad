@@ -7,11 +7,13 @@ using backend.Core.Domain.BackendGame.Pipelines;
 using Controllers.Generics;
 using Domain.Authentication;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers.BackendGame
 {
+    [Authorize]
     [ApiController]
     [Route("api/games")]
     public class GamesController: ApiBaseController
@@ -25,7 +27,7 @@ namespace backend.Controllers.BackendGame
             _userManager = userManager;
         }
 
-
+        
         [HttpPost]
         public async Task<IActionResult> Create(GameSettingsDto settings)
         {
@@ -34,7 +36,7 @@ namespace backend.Controllers.BackendGame
             var gameId = await _mediator.Send(new CreateGame.Request(new GameSettings
                 {
                     Duration = settings.Duration,
-                    ImagesCount = settings.ImagesCount,
+                    ImageCount = settings.ImagesCount,
                     PlayersCount = settings.PlayersCount,
                 },
                 userId

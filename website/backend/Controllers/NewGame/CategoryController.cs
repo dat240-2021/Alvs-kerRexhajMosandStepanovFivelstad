@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using backend.Controllers.NewGame.Dto;
+using backend.Core.Domain.Images.Pipelines;
 using Controllers.Authentication;
 using Controllers.Generics;
 using Domain.Image.Pipelines;

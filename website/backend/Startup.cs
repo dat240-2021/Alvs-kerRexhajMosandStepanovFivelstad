@@ -17,6 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Domain.Authentication;
 using Domain.Authentication.Services;
+using backend.Core.Domain.Games;
+using Microsoft.AspNetCore.Http;
 
 namespace backend
 {
@@ -42,6 +44,7 @@ namespace backend
 
             services.AddScoped<IAuthenticationService,AuthenticationService>();
             services.AddSingleton<IBackendGameService, BackendGameService>();
+            services.AddSingleton<IGameService, GameService>();
 
 
 
@@ -49,6 +52,15 @@ namespace backend
             services.AddIdentity<User,IdentityRole<Guid>>()
             .AddEntityFrameworkStores<GameContext>()
             .AddUserManager<UserManager<User>>();
+            
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                };
+            });
             
 
             // services.AddAuthentication().AddIdentityServerJwt();

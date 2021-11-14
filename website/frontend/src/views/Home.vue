@@ -1,4 +1,7 @@
 <template>
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-primary m-2" @click="handleLogout">Logout</button>
+  </div>
   <div class="container vh-100 py-5">
     <div class="row mt-5 h-25 justify-content-center">
       <div class="col-8 d-flex">
@@ -54,12 +57,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { fetchWaitingRooms, subscribeToGameRoomsCreation, subscribeToGameRoomsUpdates } from "@/api/BackendGame";
-import { joinGameRoom } from "@/api/BackendGame";
+import { fetchWaitingRooms, subscribeToGameRoomsCreation, subscribeToGameRoomsUpdates, joinGameRoom } from "@/api/BackendGame";
 import {
   Game,
   GameSlotUpdateNotification
 } from "@/typings";
+import { logoutUser } from "@/utils/auth";
 
 export default defineComponent({
   name: "Home",
@@ -96,6 +99,9 @@ export default defineComponent({
       joinGameRoom(id)
         .then(() => this.$router.push({ name: "Game", params: { id } }));
     },
+    handleLogout() {
+      logoutUser().then(() => this.$router.push({ name: "Index" }));
+    }
   },
   computed: {
     visibleGameRooms(): Game[] {
