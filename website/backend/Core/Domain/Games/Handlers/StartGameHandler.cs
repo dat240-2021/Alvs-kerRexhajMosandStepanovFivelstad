@@ -29,10 +29,9 @@ namespace backend.Core.Domain.Games.Handlers
                 proposer = new Proposer((Guid)notification.ProposerId);
             }
 
-            var game = new Game(notification.GameId) {
-                Proposer = proposer,
-                Guessers = notification.GuesserIds.Select(g => new Guesser(g)).ToList(),
-                Images = await _db.Images.Where(i => notification.ImageIds.Contains(i.Id)).ToListAsync(),
+            var images = await _db.Images.Where(i => notification.ImageIds.Contains(i.Id)).ToListAsync();
+
+            var game = new Game(notification.GameId, images, notification.GuesserIds.Select(g => new Guesser(g)).ToList(), proposer) {
                 RoundTime = notification.RoundTime,
             };
 

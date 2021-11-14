@@ -24,7 +24,7 @@ namespace backend.Core.Domain.Games{
         public IProposer Proposer;
         public List<Guesser> Guessers;
         public List<Images.Image> Images;
-        public List<int> SlicesShown;
+        public List<int> SlicesShown = new();
         public int nProposes { get => SlicesShown.Count(); }
 
         private bool _proposersTurn;
@@ -42,14 +42,18 @@ namespace backend.Core.Domain.Games{
             }
         }
 
-        public Game(Guid id) {
+        public Game(Guid id, List<Image> images, List<Guesser> guessers, IProposer proposer) {
             _currentImage = 0;
+            _proposersTurn = true;
+            Images = images;
             Id = id;
+            Proposer = proposer;
+            Guessers = guessers;
 
             Events.Add(new NewImageEvent()
                 {
                     ImageId = CurrentImage.Id,
-                    GuesserIds = Guessers.Select( g => g.Id.ToString()).ToList(),
+                    GuesserIds = Guessers.Select(g => g.Id.ToString()).ToList(),
                     ProposerId = Proposer.GetId()
                 }
             );
@@ -67,9 +71,7 @@ namespace backend.Core.Domain.Games{
                 }
 
                 //If all the players have guessed
-                if ( Guessers.All(x => x.Guessed) ) {
-                    ProposersTurn = true;
-                }
+                
             }
 
 
@@ -82,6 +84,7 @@ namespace backend.Core.Domain.Games{
         //reset vars getting ready for next image.
         public void NextImage() {
             _currentImage++;
+            //Console.WriteLine(_currentImage);
             if (_currentImage>=Images.Count)
             {
                 GameOver();
@@ -91,6 +94,7 @@ namespace backend.Core.Domain.Games{
                 g.Guessed = false;
             }
             SlicesShown.Clear();
+            ProposersTurn = true;
         }
 
         public void GameOver(){
@@ -103,19 +107,25 @@ namespace backend.Core.Domain.Games{
         {
             Guesser guesser = Guessers.Find(g => g.Id == guess.User);
 
-            if (!ProposersTurn && !guesser.Guessed)
+            if (!ProposersTurn && !guesser.Guessed && CurrentImage is not null)
             {
-
                 guesser.Guessed = true;
 
                 if (CurrentImage.Label.Label == guess.Guess) {
-                    // guesser.UpdateScore();
-                    // Proposer.UpdateScore();
+                    //guesser.UpdateScore();
+                    //Proposer.UpdateScore();
 
                     NextImage();
-
+                    return true;
                     //other guessers can keep guessing until time runs out.
+                } 
+                
+                if ( Guessers.All(x => x.Guessed) && CurrentImage.Slices.Count == SlicesShown.Count)
+                {
+                    NextImage();
                 }
+
+                // Implies valid guess -> broadcasted by hub
                 return true;
             }
             return false;
@@ -131,6 +141,7 @@ namespace backend.Core.Domain.Games{
                 {
                     StartTime = DateTime.Now;
                     ProposersTurn = false;
+                    SlicesShown.Add(proposition);
                     return CurrentImage.Slices.Find(i => i.SequenceNumber == proposition);
                 }
             }
