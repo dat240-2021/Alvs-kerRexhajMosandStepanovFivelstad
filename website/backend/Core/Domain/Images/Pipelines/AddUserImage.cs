@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using backend.Core.Domain.Images.ImageSliceHelpers;
 using Infrastructure.Data;
 using MediatR;
 
@@ -10,7 +11,7 @@ namespace backend.Core.Domain.Images.Pipelines
 {
 	public class AddUserImage
 	{
-		public record Request(List<(byte[],int)> ImageList, Guid UserId, string ImageLabel, string Category) : IRequest<Response>;
+		public record Request(List<(byte[],string, string)> ImageList, Guid UserId) : IRequest<Response>;
 
 		public record Response(bool Success);
 
@@ -22,20 +23,27 @@ namespace backend.Core.Domain.Images.Pipelines
 
 			public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
 			{
-				var tempCategory = _db.ImageCategories.SingleOrDefault(i => i.Name == request.Category);
-				if (tempCategory is null)
-				{
-					tempCategory = new ImageCategory(request.Category);
-					_db.ImageCategories.Add(tempCategory);
-				}
-
-				var image = new global::backend.Core.Domain.Images.Image(request.UserId,new ImageLabel(request.ImageLabel,tempCategory));
 				foreach (var item in request.ImageList)
 				{
-					image.AddImageSlice(item.Item1,item.Item2);
+					var tempCategory = _db.ImageCategories.SingleOrDefault(i => i.Name == item.Item3);
+					if (tempCategory is null)
+					{
+						tempCategory = new ImageCategory(item.Item3);
+						_db.ImageCategories.Add(tempCategory);
+					}
+					
+					var slicedList = new SliceImage().Slice(item.Item1);
+					var image = new global::backend.Core.Domain.Images.Image(request.UserId,new ImageLabel(item.Item2,tempCategory));
+					var sequenceNumber = 0;
+					foreach (var slice in slicedList)
+					{
+						image.AddImageSlice(slice,sequenceNumber);
+						sequenceNumber++;
+					}
+					_db.Add(image);
+					
 				}
-
-				_db.Add(image);
+				
 				await _db.SaveChangesAsync();
 
 				return new Response(Success: true);
@@ -44,3 +52,4 @@ namespace backend.Core.Domain.Images.Pipelines
 		}
 	}
 }
+

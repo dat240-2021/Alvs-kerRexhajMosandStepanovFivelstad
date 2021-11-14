@@ -7,13 +7,10 @@ namespace backend.Controllers.NewGame.Dto
     public record ImageUploadDto
     {
         [Required]
-        public List<(byte[],int)> ImageList { get; set;}
+        public List<(byte[],string, string)> ImageList { get; set;}
         [Required]
         public Guid UserId { get; set; }
-        [Required]
-        public string Label { get; set; }
-        public string Category { get; set; }
-        
+
     }
 
 }
