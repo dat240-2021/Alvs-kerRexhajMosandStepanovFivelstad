@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Domain.Image;
 using SharedKernel;
 
-namespace backend.Core.Domain.Image
+namespace backend.Core.Domain.Images
 {
     public class Image : BaseEntity
     {

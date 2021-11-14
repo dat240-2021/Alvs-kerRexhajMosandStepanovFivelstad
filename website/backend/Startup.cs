@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Domain.Authentication;
 using Domain.Authentication.Services;
+using backend.Core.Domain.Games;
 using Microsoft.AspNetCore.Http;
 
 namespace backend
@@ -43,6 +44,7 @@ namespace backend
 
             services.AddScoped<IAuthenticationService,AuthenticationService>();
             services.AddSingleton<IBackendGameService, BackendGameService>();
+            services.AddSingleton<IGameService, GameService>();
             services.AddSingleton<IConnectionIdsStorage, ConnectionIdsStorage>();
 
 

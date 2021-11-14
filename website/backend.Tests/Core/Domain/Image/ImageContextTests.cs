@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using backend.Core.Domain.Image;
-using backend.Core.Domain.Image.Pipelines;
+using backend.Core.Domain.Images;
+using backend.Core.Domain.Images.Pipelines;
 using backend.Tests.Helpers;
-using Domain.Image;
-using Domain.Image.Pipelines;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace backend.Tests.Core.Domain.Image
+namespace backend.Tests.Core.Domain.Images
 {
     public class ImageContextTests : DbTest
     {

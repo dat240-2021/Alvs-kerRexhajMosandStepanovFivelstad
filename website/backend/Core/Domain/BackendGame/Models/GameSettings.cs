@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Domain.Image;
+using System.Collections.Generic;
 
 namespace backend.Core.Domain.BackendGame.Models
 {

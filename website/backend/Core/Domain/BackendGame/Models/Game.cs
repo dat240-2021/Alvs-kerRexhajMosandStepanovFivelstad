@@ -9,12 +9,12 @@ namespace backend.Core.Domain.BackendGame.Models
         public GameSettings Settings { get; set; }
 
         public GameState State { get; set; } = GameState.Created;
-        
+
         public User Creator { get; set; }
         
+
         public Game()
         {
-            
         }
 
         public Game(Guid id, GameSettings settings, User creator)

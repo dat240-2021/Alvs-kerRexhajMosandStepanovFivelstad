@@ -1,6 +1,6 @@
 using SharedKernel;
 
-namespace backend.Core.Domain.Image
+namespace backend.Core.Domain.Images
 {
 
     public class ImageLabel : BaseEntity
