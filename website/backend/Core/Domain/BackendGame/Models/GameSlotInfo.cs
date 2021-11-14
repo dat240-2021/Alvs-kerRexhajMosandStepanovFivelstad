@@ -12,5 +12,6 @@ namespace backend.Core.Domain.BackendGame.Models
         public List<Guid> PlayerIds => PlayerSlots.Select(p => p.Id).ToList();
         
         public List<Guid> GuessersIds => PlayerSlots.Where(p => p.Role.Equals(SlotRole.Guesser)).Select(p => p.Id).ToList();
+        public Guid? ProposerId => PlayerSlots.FirstOrDefault(p => p.Role.Equals(SlotRole.Proposer))?.Id;
     }
 }

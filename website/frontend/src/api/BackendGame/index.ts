@@ -22,6 +22,10 @@ connection.on("GameCreated", (data) => {
   );
 });
 
+connection.on("TEST", (data) => {
+  console.log(data);
+});
+
 connection.on("GameRoomUpdated", (data: GameSlotUpdateNotification) => {
   updateSlotsHandlers.forEach((handler) => handler(data));
 });

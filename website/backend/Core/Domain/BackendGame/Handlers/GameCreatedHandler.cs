@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Events;
@@ -12,11 +15,13 @@ namespace backend.Core.Domain.BackendGame.Handlers
     {
         private readonly GameContext _db;
         private readonly IHubContext<GamesHub> _hubContext;
+        private readonly IConnectionIdsStorage _connectionIdsStorage;
 
-        public GameCreatedHandler(GameContext db, IHubContext<GamesHub> hubContext)
+        public GameCreatedHandler(GameContext db, IHubContext<GamesHub> hubContext, IConnectionIdsStorage connectionIdsStorage)
         {
             _db = db ?? throw new System.ArgumentException(nameof(db));
             _hubContext = hubContext;
+            _connectionIdsStorage = connectionIdsStorage;
         }
 
         public async Task Handle(GameCreated domainEvent, CancellationToken cancellationToken)
