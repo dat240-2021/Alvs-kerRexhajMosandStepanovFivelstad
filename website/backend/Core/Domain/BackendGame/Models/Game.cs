@@ -8,10 +8,8 @@ namespace backend.Core.Domain.BackendGame.Models
         public GameSettings Settings { get; protected set; }
 
         public GameState State { get; set; } = GameState.Created;
-        
         public Game()
         {
-            
         }
 
         public Game(Guid id, GameSettings settings)

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Image;
 using Infrastructure.Data;
 using MediatR;
 
-namespace backend.Core.Domain.Image.Pipelines
+namespace backend.Core.Domain.Images.Pipelines
 {
 	public class AddUserImage
 	{
@@ -30,7 +29,7 @@ namespace backend.Core.Domain.Image.Pipelines
 					_db.ImageCategories.Add(tempCategory);
 				}
 
-				var image = new global::backend.Core.Domain.Image.Image(request.UserId,new ImageLabel(request.ImageLabel,tempCategory));
+				var image = new global::backend.Core.Domain.Images.Image(request.UserId,new ImageLabel(request.ImageLabel,tempCategory));
 				foreach (var item in request.ImageList)
 				{
 					image.AddImageSlice(item.Item1,item.Item2);
