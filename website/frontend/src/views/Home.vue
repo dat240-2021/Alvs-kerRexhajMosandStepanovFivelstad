@@ -53,19 +53,32 @@
       </div>
     </div>
   </div>
+  <teleport to="body">
+    <LoadingGameModal v-if="joinedGame" v-model:game="joinedGame" :game="joinedGame" />
+  </teleport>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { fetchWaitingRooms, subscribeToGameRoomsCreation, subscribeToGameRoomsUpdates, joinGameRoom } from "@/api/BackendGame";
+import {
+  fetchWaitingRooms,
+  subscribeToGameRoomsCreation,
+  subscribeToGameRoomsUpdates,
+  joinGameRoom,
+  leaveGameRoom
+} from "@/api/BackendGame";
 import {
   Game,
   GameSlotUpdateNotification
 } from "@/typings";
 import { logoutUser } from "@/utils/auth";
+import LoadingGameModal from "@/components/Modal/LoadingGameModal.vue";
 
 export default defineComponent({
   name: "Home",
+  components: {
+    LoadingGameModal
+  },
   created() {
     this.fetchGameRooms();
     this.subscribeToGames();
@@ -74,6 +87,7 @@ export default defineComponent({
     return {
       leaderBoard: [],
       gameRooms: [] as Game[],
+      joinedGame: null as Game | null,
     };
   },
   methods: {
@@ -96,8 +110,25 @@ export default defineComponent({
       subscribeToGameRoomsCreation(this.storeGameRoom);
     },
     joinGame(id: string) {
-      joinGameRoom(id)
-        .then(() => this.$router.push({ name: "Game", params: { id } }));
+      joinGameRoom(id).then(() => {
+        const game = this.gameRooms.find(g => g.id === id);
+        if (!game) {
+          throw new Error("Game was not found!");
+        }
+        this.joinedGame = game;
+      });
+      // joinGameRoom(id)
+      //   .then(() => this.$router.push({ name: "Game", params: { id } }));
+    },
+    leaveGame() {
+      if (!this.joinedGame) {
+        throw new Error("Game was not found!");
+      }
+      const { id } = this.joinedGame;
+
+      leaveGameRoom(id).then(() => {
+        this.joinedGame = null;
+      });
     },
     handleLogout() {
       logoutUser().then(() => this.$router.push({ name: "Index" }));
