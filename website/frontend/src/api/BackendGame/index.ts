@@ -1,15 +1,12 @@
 import axios from "axios";
-import {
-  Category,
-  Game,
-  GameSlotUpdateNotification,
-  subscribeToGameRoomsCreationCb,
-  subscribeToGameRoomsUpdateCb,
-} from "@/typings";
+import { Category, Game, GameSlotUpdateNotification } from "@/typings";
 import * as signalR from "@microsoft/signalr";
-
-let createGameHandlers: subscribeToGameRoomsCreationCb[] = [];
-let updateSlotsHandlers: subscribeToGameRoomsUpdateCb[] = [];
+import {
+  createGameHandlers,
+  deleteGameHandlers,
+  updateSlotsHandlers,
+  startGameHandlers,
+} from "@/api/BackendGame/subscriptions";
 
 export const gameHubConnection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/games")
@@ -26,11 +23,17 @@ gameHubConnection.on("GameRoomUpdated", (data: GameSlotUpdateNotification) => {
   updateSlotsHandlers.forEach((handler) => handler(data));
 });
 
-export const createGame = async (settings: any) => {
-  const {
-    data: { data: id },
-  } = await axios.post("/api/games", settings);
-  return id;
+gameHubConnection.on("GameDeleted", (id: string) => {
+  deleteGameHandlers.forEach((handler) => handler(id));
+});
+
+gameHubConnection.on("GameStarted", () => {
+  startGameHandlers.forEach((handler) => handler());
+});
+
+export const createGame = async (settings: any): Promise<Game> => {
+  const { data } = await axios.post("/api/games", settings);
+  return data.data;
 };
 
 export const fetchWaitingRooms = async (): Promise<Game[]> => {
@@ -48,33 +51,13 @@ export const leaveGameRoom = async (id: string) => {
   await axios.post(`api/games/${id}/leave`);
 };
 
+export const startGame = async (id: string) => {
+  await axios.post(`api/games/${id}/start`);
+};
+
 export const fetchCategories = async (): Promise<Category[]> => {
   const {
     data: { data: categories },
   } = await axios.get("/api/categories");
   return categories as Category[];
-};
-
-export const subscribeToGameRoomsCreation = (
-  cb: subscribeToGameRoomsCreationCb
-) => {
-  createGameHandlers = [...createGameHandlers, cb];
-};
-
-export const subscribeToGameRoomsUpdates = (
-  cb: subscribeToGameRoomsUpdateCb
-) => {
-  updateSlotsHandlers = [...updateSlotsHandlers, cb];
-};
-
-export const unsubscribeToGameRoomsCreation = (
-  cb: subscribeToGameRoomsCreationCb
-) => {
-  createGameHandlers = createGameHandlers.filter((h) => h !== cb);
-};
-
-export const unsubscribeToGameRoomsUpdates = (
-  cb: subscribeToGameRoomsUpdateCb
-) => {
-  updateSlotsHandlers = updateSlotsHandlers.filter((h) => h !== cb);
 };

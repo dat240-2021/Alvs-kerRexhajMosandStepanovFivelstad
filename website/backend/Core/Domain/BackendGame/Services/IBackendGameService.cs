@@ -10,6 +10,8 @@ namespace backend.Core.Domain.BackendGame.Services
         Task LeaveGame(Guid gameId, Guid userId);
         GameSlotInfo GetSlotInfo(Game game);
         bool HasAvailableSlots(Guid gameId);
+        
+        bool deleteGame(Guid gameId);
 
     }
 }

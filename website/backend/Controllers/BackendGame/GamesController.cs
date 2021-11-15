@@ -33,18 +33,18 @@ namespace backend.Controllers.BackendGame
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            var gameId = await _mediator.Send(new CreateGame.Request(new GameSettings
+            var game = await _mediator.Send(new CreateGame.Request(new GameSettings
                 {
                     Duration = settings.RoundDuration,
                     ImagesCount = settings.ImagesCount,
-                    PlayersCount = settings.PlayersCount,
+                    GuessersCount = settings.GuessersCount,
                     CategoryIds = settings.CategoryIds,
                     ProposerType = settings.ProposerType
                 },
                 user
             ));
             
-            return Ok(gameId);
+            return Ok(new GameDto(game));
         }
         
         [HttpGet]
@@ -69,6 +69,14 @@ namespace backend.Controllers.BackendGame
             var userId = _userManager.GetUserId(HttpContext.User);
             await _mediator.Send(new LeaveGame.Request(new Guid(userId), id));
             return Ok();
+        }
+        
+        [HttpPost("{id:guid}/start")]
+        public async Task<IActionResult> Start(Guid id)
+        {
+            var userId = _userManager.GetUserId(HttpContext.User);
+            var res = await _mediator.Send(new StartGame.Request(id, Guid.Parse(userId)));
+            return res.Success ? Ok() : UnprocessableEntity();
         }
 
     }

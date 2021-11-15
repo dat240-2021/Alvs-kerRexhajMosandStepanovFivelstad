@@ -31,7 +31,7 @@
                 <option>Player</option>
               </select>
               <Input
-                :model-value="form.playersCount"
+                v-model="form.guessersCount"
                 class="mb-2"
                 error=""
                 type="number"
@@ -41,7 +41,7 @@
                 label="Number of guessers"
               />
               <Input
-                :model-value="form.imagesCount"
+                v-model="form.imagesCount"
                 class="mb-2"
                 error=""
                 type="number"
@@ -51,7 +51,7 @@
                 label="Number of pictures"
               />
               <Input
-                :model-value="form.roundDuration"
+                v-model="form.roundDuration"
                 class="mb-2"
                 error=""
                 type="number"
@@ -62,7 +62,7 @@
               />
               <div v-if="error.length" class="alert alert-danger" role="alert">{{ error }}</div>
               <div class="form-group d-flex justify-content-around mt-2">
-                <Submit :disabled="disabled">Start game</Submit>
+                <Submit :disabled="disabled">Create game</Submit>
               </div>
             </div>
           </div>
@@ -70,6 +70,9 @@
       </div>
     </form>
   </div>
+  <teleport to="body">
+    <LoadingGameModal v-if="createdGame" v-model:game="createdGame" isCreator />
+  </teleport>
 </template>
 
 <script lang="ts">
@@ -77,7 +80,9 @@ import { defineComponent } from "vue";
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
 import { createGame, fetchCategories } from "@/api/BackendGame";
-import { Category } from "@/typings";
+import { Category, Game, GameSlotUpdateNotification } from "@/typings";
+import LoadingGameModal from "@/components/Modal/LoadingGameModal.vue";
+import * as ws from "@/api/BackendGame/subscriptions";
 
 const errors = {
   noCategorySelected: "At least one category must be picked",
@@ -89,19 +94,23 @@ export default defineComponent({
   components: {
     Input,
     Submit,
+    LoadingGameModal,
   },
   created() {
     this.loadCategories();
+    this.subscribeToGames();
+
   },
   data() {
     return {
       form: {
         proposerType: "AI",
         categoryIds: [] as number[],
-        playersCount: 1,
+        guessersCount: 1,
         imagesCount: 1,
         roundDuration: 30,
       },
+      createdGame: null as Game | null,
       error: "",
       disabled: false,
       categories: [] as Category[],
@@ -122,17 +131,26 @@ export default defineComponent({
 
       this.disabled = true;
       createGame(this.form)
-        .then((id) => {
-          this.$router.push({ name: "Game", params: { id } });
-        })
-        .catch(() => this.error = errors.default)
-        .finally(() => this.disabled = false);
+        .then((game) => (this.createdGame = game))
+        .finally(() => (this.disabled = false));
     },
     loadCategories() {
       fetchCategories().then((categories) => {
         this.form.categoryIds = categories.map(c => c.id);
         this.categories = categories;
       });
+    },
+    updateGameRoom(data: GameSlotUpdateNotification) {
+      if (!this.createdGame) {
+        return;
+      }
+      if (data.gameId !== this.createdGame.id) {
+        return;
+      }
+      this.createdGame.occupiedSlotsCount = data.occupiedSlotsCount;
+    },
+    subscribeToGames() {
+      ws.subscribeToGameRoomsUpdates(this.updateGameRoom);
     },
   },
 });

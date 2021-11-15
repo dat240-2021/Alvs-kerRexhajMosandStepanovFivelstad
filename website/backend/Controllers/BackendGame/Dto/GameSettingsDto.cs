@@ -14,7 +14,7 @@ namespace backend.Controllers.BackendGame.Dto
         public List<int> CategoryIds { get; set; }
         
         [Required]
-        public int PlayersCount { get; set;}
+        public int GuessersCount { get; set;}
 
         [Required]
         public int ImagesCount { get; set;}

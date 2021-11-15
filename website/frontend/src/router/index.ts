@@ -43,7 +43,7 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isUserNotAuthenticated,
   },
   {
-    path: "/game/:id",
+    path: "/game",
     name: "Game",
     component: Game,
     beforeEnter: isUserNotAuthenticated,

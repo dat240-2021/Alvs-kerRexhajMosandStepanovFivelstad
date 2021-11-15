@@ -7,18 +7,18 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Core.Domain.BackendGame.Handlers
 {
-    public class GameTerminatedHandler : INotificationHandler<GameTerminated>
+    public class GameDeletedHandler : INotificationHandler<GameDeleted>
     {
         private readonly IHubContext<GamesHub> _hubContext;
 
-        public GameTerminatedHandler(IHubContext<GamesHub> hubContext)
+        public GameDeletedHandler(IHubContext<GamesHub> hubContext)
         {
             _hubContext = hubContext;
         }
 
-        public async Task Handle(GameTerminated notification, CancellationToken cancellationToken)
+        public async Task Handle(GameDeleted notification, CancellationToken cancellationToken)
         {
-            await _hubContext.Clients.All.SendAsync("GameTerminated", notification.Game, cancellationToken);
+            await _hubContext.Clients.All.SendAsync("GameDeleted", notification.Game.Id, cancellationToken);
         }
     }
 }

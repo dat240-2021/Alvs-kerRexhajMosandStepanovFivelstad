@@ -24,7 +24,7 @@ namespace backend.Core.Domain.BackendGame.Services
                 return gameSlotInfo;
             }
 
-            var slotInfo = new GameSlotInfo {MaxSlotsCount = game.Settings.PlayersCount};
+            var slotInfo = new GameSlotInfo {MaxSlotsCount = game.Settings.GuessersCount};
             _games.TryAdd(game.Id, slotInfo);
             return slotInfo;
         }
@@ -36,11 +36,16 @@ namespace backend.Core.Domain.BackendGame.Services
                 throw new Exception($"Game with id {gameId} not found");
         }
 
+        public bool deleteGame(Guid gameId)
+        {
+            return _games.TryRemove(gameId, out _);
+        }
+
         public async Task JoinGame(Game game, Guid userId, SlotRole role)
         {
             if (!_games.ContainsKey(game.Id))
             {
-                _games.TryAdd(game.Id, new GameSlotInfo{ MaxSlotsCount = game.Settings.PlayersCount });
+                _games.TryAdd(game.Id, new GameSlotInfo{ MaxSlotsCount = game.Settings.GuessersCount });
             }
 
             if (_games.TryGetValue(game.Id, out var gameSlotInfo))

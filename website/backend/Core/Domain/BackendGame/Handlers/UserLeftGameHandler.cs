@@ -32,18 +32,11 @@ namespace backend.Core.Domain.BackendGame.Handlers
        
             await _hubContext.Clients.All.SendAsync("GameRoomUpdated", domainEvent.Notification, cancellationToken);
             
-            var game = await _db.Games.FirstAsync(g => g.Id == domainEvent.Notification.GameId, cancellationToken);
-            var slotInfo = _backendGameService.GetSlotInfo(game);
+            var game = await _db.Games.Include(g => g.Creator).FirstAsync(g => g.Id == domainEvent.Notification.GameId, cancellationToken);
 
-            if (!slotInfo.GuessersIds.Any())
+            if (game.Creator.Id.Equals(domainEvent.UserId))
             {
-                await _mediator.Send(new TerminateGame.Request(game), cancellationToken);
-                return;
-            }
-
-            if (slotInfo.ProposerId.Equals(domainEvent.UserId))
-            {
-                // update proposer in game context
+                await _mediator.Send(new DeleteGame.Request(game), cancellationToken);
             }
         }
     }

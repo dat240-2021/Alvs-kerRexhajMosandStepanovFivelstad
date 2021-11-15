@@ -12,7 +12,7 @@ namespace backend.Core.Domain.BackendGame.Models
         
         public List<int> CategoryIds { get; set; }
         
-        public int PlayersCount { get; set;}
+        public int GuessersCount { get; set;}
         
         public int ImagesCount { get; set;}
         

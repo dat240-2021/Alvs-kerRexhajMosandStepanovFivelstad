@@ -40,7 +40,7 @@
             <tbody>
               <tr v-for="game in visibleGameRooms" :key="game.id">
                 <td>Some type here</td>
-                <td>{{ game.occupiedSlotsCount }} / {{ game.settings.playersCount }}</td>
+                <td>{{ game.occupiedSlotsCount }} / {{ game.settings.guessersCount }}</td>
                 <td>
                   <button class="btn" @click="joinGame(game.id)">
                     <i class="bi bi-box-arrow-in-right"></i>
@@ -60,13 +60,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import {
-  fetchWaitingRooms,
-  subscribeToGameRoomsCreation,
-  subscribeToGameRoomsUpdates,
-  joinGameRoom,
-  leaveGameRoom
-} from "@/api/BackendGame";
+import { fetchWaitingRooms, joinGameRoom, startGame } from "@/api/BackendGame";
+import * as ws from "@/api/BackendGame/subscriptions";
 import {
   Game,
   GameSlotUpdateNotification
@@ -82,6 +77,12 @@ export default defineComponent({
   created() {
     this.fetchGameRooms();
     this.subscribeToGames();
+  },
+  unmounted() {
+    ws.unsubscribeFromGameRoomsUpdates(this.updateGameRoom);
+    ws.unsubscribeFromGameRoomsCreation(this.storeGameRoom);
+    ws.unsubscribeFromGameRoomsDeletes(this.deleteGameRoom);
+    ws.unsubscribeFromGameStart(this.startGame);
   },
   data() {
     return {
@@ -105,9 +106,18 @@ export default defineComponent({
     storeGameRoom(game: Game) {
       this.gameRooms = [...this.gameRooms, game];
     },
+    deleteGameRoom(id: string) {
+      this.gameRooms = this.gameRooms.filter(game => game.id !== id);
+      
+      if (this.joinedGame?.id === id) {
+        this.joinedGame = null;
+      }
+    },
     subscribeToGames() {
-      subscribeToGameRoomsUpdates(this.updateGameRoom);
-      subscribeToGameRoomsCreation(this.storeGameRoom);
+      ws.subscribeToGameRoomsUpdates(this.updateGameRoom);
+      ws.subscribeToGameRoomsCreation(this.storeGameRoom);
+      ws.subscribeToGameRoomsDeletes(this.deleteGameRoom);
+      ws.subscribeToGameStart(this.startGame);
     },
     joinGame(id: string) {
       joinGameRoom(id).then(() => {
@@ -117,18 +127,9 @@ export default defineComponent({
         }
         this.joinedGame = game;
       });
-      // joinGameRoom(id)
-      //   .then(() => this.$router.push({ name: "Game", params: { id } }));
     },
-    leaveGame() {
-      if (!this.joinedGame) {
-        throw new Error("Game was not found!");
-      }
-      const { id } = this.joinedGame;
-
-      leaveGameRoom(id).then(() => {
-        this.joinedGame = null;
-      });
+    startGame() {
+      this.$router.push({ name: "Game" });
     },
     handleLogout() {
       logoutUser().then(() => this.$router.push({ name: "Index" }));
@@ -136,7 +137,7 @@ export default defineComponent({
   },
   computed: {
     visibleGameRooms(): Game[] {
-      return this.gameRooms.filter((game: Game) => game.occupiedSlotsCount < game.settings.playersCount);
+      return this.gameRooms.filter((game: Game) => game.occupiedSlotsCount < game.settings.guessersCount);
     }
   },
 });

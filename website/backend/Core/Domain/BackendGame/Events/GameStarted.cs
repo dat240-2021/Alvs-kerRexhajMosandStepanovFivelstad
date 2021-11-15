@@ -3,11 +3,11 @@ using SharedKernel;
 
 namespace backend.Core.Domain.BackendGame.Events
 {
-    public record GameReadyToStart: BaseDomainEvent
+    public record GameStarted: BaseDomainEvent
     {
         public Game Game { get; set; }
 
-        public GameReadyToStart(Game game)
+        public GameStarted(Game game)
         {
             Game = game;
         }
