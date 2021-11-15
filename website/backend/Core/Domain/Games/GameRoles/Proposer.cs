@@ -13,15 +13,14 @@ namespace backend.Core.Domain.Games
             Id = id;
         }
 
-            public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices){
-            // if you spend more than 100 seconds guessing on one slice you get no points.
-            var timeScore = 120 - timeDelta.TotalSeconds;
-            var sliceScore = totalSlices - slicesShown;
+            public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
+
+            int timeScore = (int)Math.Round(RoundTime.TotalSeconds - timeDelta.TotalSeconds);
+            int sliceScore = totalSlices - slicesShown;
 
             // do something with the score.
-            _ = timeScore * sliceScore;
+            int Score = timeScore * timeScore;
         }
-
 
         public void NotifyTurn(){
             Events.Add( new ProposersTurnEvent(){ProposerId = Id.ToString()});

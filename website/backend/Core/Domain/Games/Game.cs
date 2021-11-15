@@ -112,14 +112,15 @@ namespace backend.Core.Domain.Games{
                 guesser.Guessed = true;
 
                 if (CurrentImage.Label.Label == guess.Guess) {
-                    //guesser.UpdateScore();
-                    //Proposer.UpdateScore();
+
+                    guesser.UpdateScore(RoundTime,DateTime.Now - StartTime,nProposes, CurrentImage.Slices.Count);
+                    Proposer.UpdateScore(RoundTime,DateTime.Now - StartTime,nProposes, CurrentImage.Slices.Count,Guessers.Count);
 
                     NextImage();
                     return true;
                     //other guessers can keep guessing until time runs out.
-                } 
-                
+                }
+
                 if ( Guessers.All(x => x.Guessed) && CurrentImage.Slices.Count == SlicesShown.Count)
                 {
                     NextImage();

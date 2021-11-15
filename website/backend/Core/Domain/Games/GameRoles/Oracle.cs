@@ -16,13 +16,13 @@ namespace backend.Core.Domain.Games
             GameId = id;
         }
 
-        public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices){}
+        public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){}
 
         public void NotifyTurn(){
             Events.Add( new OracleTurnEvent(){ GameId = GameId, Proposition = _propositions[_index++]});
         }
 
-        public string? GetId() => null;
+        public string GetId() => null;
 
         public void HandleNewImage(List<int> slices)
         {

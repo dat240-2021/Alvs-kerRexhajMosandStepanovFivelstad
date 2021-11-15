@@ -10,6 +10,7 @@ import {
   subscribeToGuessCb,
   sendProposalCb,
   sendGuessCb,
+  newScore,
 } from "@/typings";
 
 
@@ -21,6 +22,9 @@ let proposersTurnHandlers: (() => void)[] = [];
 
 let newImageGuesserHandlers: (() => void)[] = [];
 let newImageProposerHandlers: subscribeToNewImageCb[] = [];
+
+let APlayerScoredHandlers: ((score: newScore) => void)[] = [];
+
 
 const connection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/game")
@@ -34,7 +38,7 @@ connection.on("Guess", (guess: Guess) => {
 connection.on("Proposal", (proposal: Proposal) => {
   proposalHandlers.forEach((handler) => handler(proposal));
 });
- 
+
 connection.on("GuessersTurn", () => {
   guessersTurnHandlers.forEach((handler) => handler());
 });
@@ -49,6 +53,10 @@ connection.on("NewImageGuesser", () => {
 
 connection.on("NewImageProposer", (image: Image) => {
   newImageProposerHandlers.forEach((handler) => handler(image));
+});
+
+connection.on("APlayerScored", (score: newScore) => {
+  APlayerScoredHandlers.forEach((handler) => handler(score));
 });
 
 connection.start();
@@ -87,6 +95,13 @@ export const subscribeToNewGuess = (
   cb: ((guess: Guess) => void)
 ) => {
   guessHandlers = [...guessHandlers, cb];
+};
+
+
+export const subscribeToPlayerScores = (
+  cb: ((score: newScore) => void)
+) => {
+  APlayerScoredHandlers = [...APlayerScoredHandlers, cb];
 };
 
 export const sendNewGuess = (val: string): void => {

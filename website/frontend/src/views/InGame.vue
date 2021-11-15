@@ -93,30 +93,16 @@ import {
   sendNewGuess,
   subscribeToGuessersTurn,
   subscribeToProposersTurn,
+  subscribeToPlayerScores,
 } from "@/api/InGame";
-import { Image, ImageSlice, Guess, Proposal } from "@/typings";
-
-export class Player {
-  Name: string;
-  Score: number;
-  PlayerId: string;
-
-  constructor(Name: string, Score: number, PlayerId: string) {
-    this.Name = Name;
-    this.Score = Score;
-    this.PlayerId = PlayerId;
-  }
-}
-
-export class Slice {
-  src: string;
-  id: string;
-
-  constructor(src: string, id: string) {
-    this.src = src;
-    this.id = "slice-".concat(id);
-  }
-}
+import {
+  Image,
+  ImageSlice,
+  Guess,
+  Player,
+  Proposal,
+  newScore,
+} from "@/typings";
 
 declare interface BaseComponentData {
   players: Player[];
@@ -138,15 +124,7 @@ export default defineComponent({
   data(): BaseComponentData {
     return {
       coords: { x: 0, y: 0 },
-      players: [
-        new Player("Jamie Lannister", 10, "1"),
-        new Player("The Hound", 11, "2"),
-        new Player("Rob Stark", 9, "3"),
-        new Player("Elvis", 12, "4"),
-        new Player("Santa Claus", 4, "5"),
-        new Player("Madonna", 2, "6"),
-        new Player("Lady Gaga", 0, "7"),
-      ] as Player[],
+      players: [] as Player[],
 
       imageSlicesConverted: [],
 
@@ -154,17 +132,17 @@ export default defineComponent({
 
       isProposer: false,
 
-      imageSlices: [],
+      imageSlices: [] as ImageSlice[],
       //incorrect: true,
       correct: "Fish",
       newGuess: "",
-      myTurn: false
+      myTurn: false,
       //player: '',
     };
   },
   methods: {
     mounted() {
-      console.log("FUCK OFF");
+      console.log("hello world");
     },
     sendGuess() {
       sendNewGuess(this.newGuess);
@@ -177,6 +155,8 @@ export default defineComponent({
     },
 
     newImageGuesser() {
+      //clear variables
+      //get scores
     },
 
     newImageProposer(image: Image) {
@@ -185,29 +165,13 @@ export default defineComponent({
       for (var i = 0; i < image.slices.length; i++) {
         this.AddSlice(image.slices[i]);
       }
-      // //identifies role
-      // this.isProposer = true;
-
-      // var div = document.getElementById("canvas-div");
-      // if (div == null) {
-      //   return;
-      // }
-
-      // //scales the image to a max size
-      // //optimises draw time for canvas
-      // const width = 500;
-      // for (var i = 0; i < image.slices.length; i++) {
-      //   this.AddSliceProposer(image.slices[i], width);
-      // }
-
-      // div.style.transformOrigin = "0 0";
-      // console.log(div.clientWidth);
-      // //use css to scale, much faster.
-      // div.style.transform = "scale(" + div.clientWidth / width + ")";
     },
 
     AddSlice(slice: ImageSlice) {
-      this.imageSlices.push(slice);
+      if (this.isProposer) {
+        this.imageSlices.push(slice);
+      }
+
       this.imageSlicesConverted.push(
         URL.createObjectURL(
           new Blob([slice.imageData.buffer], { type: "image/png" } /* (1) */)
@@ -223,58 +187,81 @@ export default defineComponent({
       this.myTurn = true;
     },
 
-    checkTransparency(slice: ImageSlice, x: number, y: number): boolean {
-      var width = 1;
-      var data = slice.imageData;
-      let index = (y * width + x) * 4;
-      let alpha = data[index + 3];
-
-      if (alpha < 5) {
-        return true;
-      }
-
-      return false;
-    },
-
     proposerSelectedSlice(event: any) {
-      var x = event.offsetX;
-      var y = event.offsetY;
-
-      var children = document.getElementById("canvas-div")?.children;
-      if (children == null) {
+      if (!this.isProposer) {
         return;
       }
 
-      for (let i = 0; i < children.length; i++) {
-        var cnvs = children.item(i);
-        if (!(cnvs instanceof HTMLCanvasElement)) {
-          return;
-        }
-        var canvas: HTMLCanvasElement = cnvs;
-        var context = canvas.getContext("2d");
-        if (context == null) {
-          return;
-        }
+      //these need to be scaled
+      var x: number = event.offsetX;
+      var y: number = event.offsetY;
 
-        var data = context.getImageData(0, 0, canvas.width, canvas.height);
-        let index = (y * data.width + x) * 4;
-        let alpha = data?.data[index + 3];
+      if (this.imageSlices.length < 1) {
+        return;
+      }
+
+      for (let i = 0; i < this.imageSlices.length; i++) {
+        //width needs to be calculated
+        var width = 1;
+        var data = this.imageSlices[i].imageData;
+        let index = (y * width + x) * 4;
+        let alpha = data[index + 3];
+
         if (alpha > 5) {
-          console.log(i);
-          canvas.style.filter = "brightness(100%)";
-          sendNewProposal(i);
-          return;
+          return this.imageSlices[i];
         }
       }
+
+      return;
     },
+
+    //old ----- to be deleted, kept for refrence
+    // proposerSelectedSlice(event: any) {
+    //   var x = event.offsetX;
+    //   var y = event.offsetY;
+
+    //   var children = document.getElementById("canvas-div")?.children;
+    //   if (children == null) {
+    //     return;
+    //   }
+
+    //   for (let i = 0; i < children.length; i++) {
+    //     var cnvs = children.item(i);
+    //     if (!(cnvs instanceof HTMLCanvasElement)) {
+    //       return;
+    //     }
+    //     var canvas: HTMLCanvasElement = cnvs;
+    //     var context = canvas.getContext("2d");
+    //     if (context == null) {
+    //       return;
+    //     }
+
+    //     var data = context.getImageData(0, 0, canvas.width, canvas.height);
+    //     let index = (y * data.width + x) * 4;
+    //     let alpha = data?.data[index + 3];
+    //     if (alpha > 5) {
+    //       console.log(i);
+    //       canvas.style.filter = "brightness(100%)";
+    //       sendNewProposal(i);
+    //       return;
+    //     }
+    //   }
+    // },
 
     addIncomingGuess(guess: Guess) {
       this.guesses.push(guess.guess);
     },
+    updateScores(score: newScore) {
+      var player = this.players.find((x) => x.PlayerId == score.userId);
+      if (player) {
+        player.Score += score.score;
+      }
+
+    },
 
     subscribeToActiveGame() {
       /// Received by guesser
-      // 
+      //
       subscribeToGuessersTurn(this.guessersTurn);
       subscribeToNewProposal(this.AddSlice);
       subscribeToNewImageGuesser(this.newImageGuesser);
@@ -285,12 +272,9 @@ export default defineComponent({
       subscribeToNewImageProposer(this.newImageProposer);
 
       /// Received by all
+      subscribeToPlayerScores(this.updateScores);
       subscribeToNewGuess(this.addIncomingGuess);
-
     },
   },
 });
-
-//TODO: SignalR coms
-//TODO:
 </script>

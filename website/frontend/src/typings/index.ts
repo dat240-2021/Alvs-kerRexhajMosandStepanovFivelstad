@@ -74,6 +74,19 @@ export interface Guess {
   guess: string;
 }
 
+export interface newScore {
+  userId: string;
+  score: number;
+}
+
+
+export interface Player {
+  Name: string;
+  Score: number;
+  PlayerId: string;
+
+}
+
 export type Proposal = ImageSlice;
 
 export type subscribeToGuessCb = (data: Guess) => void;

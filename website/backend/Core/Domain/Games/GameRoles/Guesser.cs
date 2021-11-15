@@ -14,14 +14,16 @@ namespace backend.Core.Domain.Games
             Id = id;
         }
         public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices){
-            // if you spend more than 100 seconds guessing on one slice you get no points.
-            var timeScore = 120 - timeDelta.TotalSeconds;
-            var sliceScore = totalSlices - slicesShown;
+
+
+            int timeScore = (int)Math.Round(RoundTime.TotalSeconds - timeDelta.TotalSeconds);
+            int sliceScore = totalSlices - slicesShown;
 
             // do something with the score.
-            _ = timeScore * sliceScore;
-        }
+            int Score = timeScore * timeScore;
 
+            Events.Add( new PlayerScoredEvent{UserId = Id, Score = Score});
+        }
 
         public string GetId() => Id.ToString();
 
