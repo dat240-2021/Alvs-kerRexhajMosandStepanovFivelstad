@@ -64,7 +64,7 @@ export type subscribeToNewImageCb = (
   data: Image
 ) => void;
 
-export type subscribeToNewSliceCb = (
+export type subscribeToProposalCb = (
   data: ImageSlice
 ) => void;
 

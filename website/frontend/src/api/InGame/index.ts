@@ -5,7 +5,7 @@ import {
   ImageSlice,
   Guess,
   Proposal,
-  subscribeToNewSliceCb,
+  subscribeToProposalCb,
   subscribeToNewImageCb,
   subscribeToGuessCb,
   sendProposalCb,
@@ -14,16 +14,13 @@ import {
 
 
 let guessHandlers: subscribeToGuessCb[] = [];
+let proposalHandlers: subscribeToProposalCb[] = [];
 
 let guessersTurnHandlers: (() => void)[] = [];
 let proposersTurnHandlers: (() => void)[] = [];
 
-let newSliceGuesserHandlers: subscribeToNewSliceCb[] = [];
+let newImageGuesserHandlers: (() => void)[] = [];
 let newImageProposerHandlers: subscribeToNewImageCb[] = [];
-
-//can we do something with generics here, this seems like too much...
-
-
 
 const connection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/game")
@@ -32,8 +29,12 @@ const connection = new signalR.HubConnectionBuilder()
 
 connection.on("Guess", (guess: Guess) => {
   guessHandlers.forEach((handler) => handler(guess));
-})
+});
 
+connection.on("Proposal", (proposal: Proposal) => {
+  proposalHandlers.forEach((handler) => handler(proposal));
+});
+ 
 connection.on("GuessersTurn", () => {
   guessersTurnHandlers.forEach((handler) => handler());
 });
@@ -42,8 +43,8 @@ connection.on("ProposersTurn", () => {
   proposersTurnHandlers.forEach((handler) => handler());
 });
 
-connection.on("NewSliceGuesser", (slice : ImageSlice) => {
-  newSliceGuesserHandlers.forEach((handler) => handler(slice));
+connection.on("NewImageGuesser", () => {
+  newImageGuesserHandlers.forEach((handler) => handler());
 });
 
 connection.on("NewImageProposer", (image: Image) => {
@@ -64,28 +65,23 @@ export const subscribeToProposersTurn = (
   proposersTurnHandlers = [...proposersTurnHandlers, cb];
 };
 
-export const SubscribeToNewImageProposer = (
+export const subscribeToNewImageProposer = (
   cb: ((image: Image) => void)
 ) => {
   newImageProposerHandlers = [...newImageProposerHandlers, cb];
 };
 
-export const SubscribeToNewSliceGuesser = (
+export const subscribeToNewProposal = (
   cb: ((slice: ImageSlice) => void)
 ) => {
-  newSliceGuesserHandlers = [...newSliceGuesserHandlers, cb];
+  proposalHandlers = [...proposalHandlers, cb];
 };
 
-
-
-export const SubscribeToNewGuess = (
+export const subscribeToNewGuess = (
   cb: ((guess: Guess) => void)
 ) => {
   guessHandlers = [...guessHandlers, cb];
 };
-
-
-
 
 export const sendNewGuess = (val: string): void => {
   connection.invoke("Guess", val);

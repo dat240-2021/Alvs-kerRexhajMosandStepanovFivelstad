@@ -4,7 +4,7 @@
       <button
         class="btn btn-outline-primary mb-5"
         type="button"
-        @click="LeaveGame"
+        @click="leaveGame"
       >
         Leave Game
       </button>
@@ -13,7 +13,7 @@
   <div class="container-fluid min-vh-100">
     <div class="row mt-5">
       <div v-if="!isProposer">
-        <form @submit.prevent="SendGuess" class="form-control border-0">
+        <form @submit.prevent="sendGuess" class="form-control border-0">
           <div class="input-group mb-3">
             <input
               type="text"
@@ -85,11 +85,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import {
-  SubscribeToNewImageProposer,
-  SubscribeToNewSliceGuesser,
-  SubscribeToNewGuess,
+  subscribeToNewImageProposer,
+  subscribeToNewProposal,
+  subscribeToNewGuess,
   sendNewProposal,
   sendNewGuess,
+  subscribeToProposersTurn,
 } from "@/api/InGame";
 import { Image, ImageSlice, Guess, Proposal } from "@/typings";
 
@@ -206,6 +207,10 @@ export default defineComponent({
       );
     },
 
+    proposersTurn() {
+      this.isProposer = true;
+    },
+
     checkTransparency(slice: ImageSlice, x: number, y: number): boolean {
       var width = 1;
       var data = slice.imageData;
@@ -245,7 +250,7 @@ export default defineComponent({
         if (alpha > 5) {
           console.log(i);
           canvas.style.filter = "brightness(100%)";
-          //here we call the api to send the image slice id.
+          sendNewProposal(i);
           return;
         }
       }
@@ -254,11 +259,22 @@ export default defineComponent({
     addIncomingGuess(guess: Guess) {
       this.guesses.push(guess.guess);
     },
-    subscribeToActiveGame() {
-      SubscribeToNewSliceGuesser(this.AddSlice);
-      SubscribeToNewImageProposer(this.newImageProposer);
 
-      SubscribeToNewGuess(this.addIncomingGuess);
+    subscribeToActiveGame() {
+      /// Received by guesser
+      // 
+      // subscribeToGuessersTurn();
+      // subscribeToNewProposal(this.AddSlice);
+      // subscribeToNewImageProposer();
+
+      /// Received by proposer
+      //
+      // subscribeToProposersTurn(this.proposersTurn);
+      // subscribeToNewImageProposer(this.newImageProposer);
+
+      /// Received by all
+      subscribeToNewGuess(this.addIncomingGuess);
+
     },
   },
 });
