@@ -65,6 +65,12 @@ export const subscribeToProposersTurn = (
   proposersTurnHandlers = [...proposersTurnHandlers, cb];
 };
 
+export const subscribeToNewImageGuesser = (
+  cb: (() => void)
+) => {
+  newImageGuesserHandlers = [...newImageGuesserHandlers, cb];
+};
+
 export const subscribeToNewImageProposer = (
   cb: ((image: Image) => void)
 ) => {

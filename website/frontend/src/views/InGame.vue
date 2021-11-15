@@ -85,11 +85,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import {
+  subscribeToNewImageGuesser,
   subscribeToNewImageProposer,
   subscribeToNewProposal,
   subscribeToNewGuess,
   sendNewProposal,
   sendNewGuess,
+  subscribeToGuessersTurn,
   subscribeToProposersTurn,
 } from "@/api/InGame";
 import { Image, ImageSlice, Guess, Proposal } from "@/typings";
@@ -124,6 +126,7 @@ declare interface BaseComponentData {
   newGuess: string;
   correct: string;
   isProposer: boolean;
+  myTurn: boolean;
   coords: {
     x: number;
     y: number;
@@ -149,12 +152,13 @@ export default defineComponent({
 
       guesses: ["test1", "ship", "helloworld", "i am testing"],
 
-      isProposer: true,
+      isProposer: false,
 
       imageSlices: [],
       //incorrect: true,
       correct: "Fish",
       newGuess: "",
+      myTurn: false
       //player: '',
     };
   },
@@ -172,8 +176,12 @@ export default defineComponent({
       console.log("leaving game");
     },
 
+    newImageGuesser() {
+    },
+
     newImageProposer(image: Image) {
       this.isProposer = true;
+
       for (var i = 0; i < image.slices.length; i++) {
         this.AddSlice(image.slices[i]);
       }
@@ -208,7 +216,11 @@ export default defineComponent({
     },
 
     proposersTurn() {
-      this.isProposer = true;
+      this.myTurn = true;
+    },
+
+    guessersTurn() {
+      this.myTurn = true;
     },
 
     checkTransparency(slice: ImageSlice, x: number, y: number): boolean {
@@ -263,14 +275,14 @@ export default defineComponent({
     subscribeToActiveGame() {
       /// Received by guesser
       // 
-      // subscribeToGuessersTurn();
-      // subscribeToNewProposal(this.AddSlice);
-      // subscribeToNewImageProposer();
+      subscribeToGuessersTurn(this.guessersTurn);
+      subscribeToNewProposal(this.AddSlice);
+      subscribeToNewImageGuesser(this.newImageGuesser);
 
       /// Received by proposer
       //
-      // subscribeToProposersTurn(this.proposersTurn);
-      // subscribeToNewImageProposer(this.newImageProposer);
+      subscribeToProposersTurn(this.proposersTurn);
+      subscribeToNewImageProposer(this.newImageProposer);
 
       /// Received by all
       subscribeToNewGuess(this.addIncomingGuess);
