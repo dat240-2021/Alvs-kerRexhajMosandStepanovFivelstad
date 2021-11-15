@@ -64,6 +64,11 @@ export type subscribeToNewImageCb = (
   data: Image
 ) => void;
 
+export type subscribeToNewSliceCb = (
+  data: ImageSlice
+) => void;
+
+
 export interface Guess {
   userId: string;
   guess: string;

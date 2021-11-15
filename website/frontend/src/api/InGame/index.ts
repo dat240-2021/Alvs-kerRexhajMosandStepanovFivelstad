@@ -2,8 +2,10 @@ import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 import {
   Image,
+  ImageSlice,
   Guess,
   Proposal,
+  subscribeToNewSliceCb,
   subscribeToNewImageCb,
   subscribeToGuessCb,
   subscribeToProposalCb
@@ -14,8 +16,11 @@ let proposalHandlers: subscribeToProposalCb[] = [];
 
 let guessersTurnHandlers: (() => void)[] = [];
 let proposersTurnHandlers: (() => void)[] = [];
-let newImageGuesserHandlers: (() => void)[] = [];
+
+let newSliceGuesserHandlers: subscribeToNewSliceCb[] = [];
 let newImageProposerHandlers: subscribeToNewImageCb[] = [];
+
+
 
 const connection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/game")
@@ -37,8 +42,8 @@ connection.on("ProposersTurn", () => {
   proposersTurnHandlers.forEach((handler) => handler());
 });
 
-connection.on("NewImageGuesser", () => {
-  newImageGuesserHandlers.forEach((handler) => handler());
+connection.on("NewSliceGuesser", () => {
+  newSliceGuesserHandlers.forEach((handler) => handler());
 });
 
 connection.on("NewImageProposer", (image: Image) => {
@@ -57,4 +62,30 @@ export const subscribeToProposersTurn = (
   cb: (() => void)
 ) => {
   proposersTurnHandlers = [...proposersTurnHandlers, cb];
+};
+
+export const SubscribeToNewImageProposer = (
+  cb: ((image: Image) => void)
+) => {
+  newImageProposerHandlers = [...newImageProposerHandlers, cb];
+};
+
+export const SubscribeToNewSliceGuesser = (
+  cb: ((slice: ImageSlice) => void)
+) => {
+  newSliceGuesserHandlers = [...newSliceGuesserHandlers, cb];
+};
+
+
+
+export const SubscribeToNewGuess = (
+  cb: ((guess: Guess) => void)
+) => {
+  guessHandlers = [...guessHandlers, cb];
+};
+
+export const SubscribeToNewProposal = (
+  cb: ((proposal: Proposal) => void)
+) => {
+  proposalHandlers = [...proposalHandlers, cb];
 };
