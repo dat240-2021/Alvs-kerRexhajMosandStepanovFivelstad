@@ -84,10 +84,10 @@ namespace backend.Tests.Core.Domain.Images
                 var handler = new GetCategoryList.Handler(context);
 
                 var result = handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
-                Assert.True(result[0].Equals(cat1));
-                Assert.True(result[1].Equals(cat2));
-                Assert.True(result[2].Equals(cat3));
-                Assert.False(result[2].Equals(cat1));
+                Assert.True(result[0].Name.Equals(cat1));
+                Assert.True(result[1].Name.Equals(cat2));
+                Assert.True(result[2].Name.Equals(cat3));
+                Assert.False(result[2].Name.Equals(cat1));
             }
         }
     }

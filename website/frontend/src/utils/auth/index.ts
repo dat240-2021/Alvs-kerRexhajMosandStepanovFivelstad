@@ -1,8 +1,12 @@
 import { User } from "@/typings";
 import { logout } from "@/api/Auth";
+import initWebsockets from "@/api/websockets";
 
 export const setCurrentUser = (user: User) => {
   localStorage.setItem("user", JSON.stringify(user));
+  if (user.isAuth) {
+    initWebsockets();
+  }
 };
 
 const getStoredUser = (): User => {
