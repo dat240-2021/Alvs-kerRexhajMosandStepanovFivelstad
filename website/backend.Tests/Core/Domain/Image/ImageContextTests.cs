@@ -50,7 +50,7 @@ namespace backend.Tests.Core.Domain.Image
             {
                 context.Images.Count().ShouldBe(2);
                 context.ImageCategories.Count().ShouldBe(2);
-                var actCategory = context.Images.Select(i => i.Category);
+                var actCategory = context.Images.Select(i => i.Label.Category.Name);
                 var actLabel = context.Images.Select(i => i.Label.Label);
                 var actImageList = context.Images.Select(i => i.Slices);
                 Assert.Equal("Test Category 1",actCategory.First());
