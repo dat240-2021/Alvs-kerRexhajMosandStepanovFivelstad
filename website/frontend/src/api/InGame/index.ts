@@ -8,11 +8,12 @@ import {
   subscribeToNewSliceCb,
   subscribeToNewImageCb,
   subscribeToGuessCb,
-  subscribeToProposalCb
+  sendProposalCb,
+  sendGuessCb,
 } from "@/typings";
 
+
 let guessHandlers: subscribeToGuessCb[] = [];
-let proposalHandlers: subscribeToProposalCb[] = [];
 
 let guessersTurnHandlers: (() => void)[] = [];
 let proposersTurnHandlers: (() => void)[] = [];
@@ -20,19 +21,18 @@ let proposersTurnHandlers: (() => void)[] = [];
 let newSliceGuesserHandlers: subscribeToNewSliceCb[] = [];
 let newImageProposerHandlers: subscribeToNewImageCb[] = [];
 
+//can we do something with generics here, this seems like too much...
+
 
 
 const connection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/game")
   .build();
 
+
 connection.on("Guess", (guess: Guess) => {
   guessHandlers.forEach((handler) => handler(guess));
 })
-
-connection.on("Proposal", (proposal: Proposal) => {
-  proposalHandlers.forEach((handler) => handler(proposal));
-});
 
 connection.on("GuessersTurn", () => {
   guessersTurnHandlers.forEach((handler) => handler());
@@ -42,8 +42,8 @@ connection.on("ProposersTurn", () => {
   proposersTurnHandlers.forEach((handler) => handler());
 });
 
-connection.on("NewSliceGuesser", () => {
-  newSliceGuesserHandlers.forEach((handler) => handler());
+connection.on("NewSliceGuesser", (slice : ImageSlice) => {
+  newSliceGuesserHandlers.forEach((handler) => handler(slice));
 });
 
 connection.on("NewImageProposer", (image: Image) => {
@@ -84,8 +84,13 @@ export const SubscribeToNewGuess = (
   guessHandlers = [...guessHandlers, cb];
 };
 
-export const SubscribeToNewProposal = (
-  cb: ((proposal: Proposal) => void)
-) => {
-  proposalHandlers = [...proposalHandlers, cb];
-};
+
+
+
+export const sendNewGuess = (val: string): void => {
+  connection.invoke("Guess", val);
+}
+
+export const sendNewProposal = (val: number): void => {
+  connection.invoke("Proposal", val);
+}

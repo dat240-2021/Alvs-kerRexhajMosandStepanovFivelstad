@@ -51,9 +51,9 @@
       <div class="col position-relative" id="canvas-div">
         <div v-if="!isProposer" class="position-relative">
           <img
-            v-for="im in GenerateImagePaths()"
+            v-for="im in imageSlicesConverted"
             :key="im.id"
-            :src="im.src"
+            :src="im.imageData"
             style="width: 100%"
             class="position-absolute top-0 start-0"
           />
@@ -84,19 +84,14 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { 
+import {
   SubscribeToNewImageProposer,
   SubscribeToNewSliceGuesser,
-  SubscribeToNewProposal,
-  SubscribeToNewGuess
-  } from "@/api/InGame";
-import { 
-  Image, 
-  ImageSlice,
-  Guess,
-  Proposal,
-  } from "@/typings";
-
+  SubscribeToNewGuess,
+  sendNewProposal,
+  sendNewGuess,
+} from "@/api/InGame";
+import { Image, ImageSlice, Guess, Proposal } from "@/typings";
 
 export class Player {
   Name: string;
@@ -123,7 +118,8 @@ export class Slice {
 declare interface BaseComponentData {
   players: Player[];
   guesses: string[];
-  imageSlices: string[];
+  imageSlices: ImageSlice[];
+  imageSlicesConverted: any[];
   newGuess: string;
   correct: string;
   isProposer: boolean;
@@ -148,6 +144,8 @@ export default defineComponent({
         new Player("Lady Gaga", 0, "7"),
       ] as Player[],
 
+      imageSlicesConverted: [],
+
       guesses: ["test1", "ship", "helloworld", "i am testing"],
 
       isProposer: true,
@@ -164,74 +162,67 @@ export default defineComponent({
       console.log("FUCK OFF");
     },
     sendGuess() {
-      // console.log(this.newGuess);
+      sendNewGuess(this.newGuess);
+    },
+    newProposal(i: number) {
+      sendNewProposal(i);
     },
     leaveGame() {
       console.log("leaving game");
     },
 
-    newImageProposer(image : Image) {
-      //identifies role
+    newImageProposer(image: Image) {
       this.isProposer = true;
-
-      var div = document.getElementById("canvas-div");
-      if (div == null) {
-        return;
-      }
-
-      //scales the image to a max size
-      //optimises draw time for canvas
-      const width = 500;
       for (var i = 0; i < image.slices.length; i++) {
-        this.AddSliceProposer(image.slices[i], width);
+        this.AddSlice(image.slices[i]);
       }
+      // //identifies role
+      // this.isProposer = true;
 
-      div.style.transformOrigin = "0 0";
-      console.log(div.clientWidth);
-      //use css to scale, much faster.
-      div.style.transform = "scale(" + div.clientWidth / width + ")";
-    },
-
-    AddSlice(slice : ImageSlice) {
       // var div = document.getElementById("canvas-div");
-      // var canvas = document.createElement("canvas");
-
-      // canvas?.classList.add("position-absolute", "top-0", "start-0");
-      // canvas.style.filter = "brightness(60%)";
-
-      // canvas?.addEventListener("click", this.SelectedTile);
-
-      // div?.appendChild(canvas);
-      // var context = canvas.getContext("2d");
-      // if (context == null) {
-      //   console.log("NOT FOUND: context");
+      // if (div == null) {
       //   return;
       // }
 
-      // var img = new Image();
-      // img.src = slice;
-      // img.crossOrigin = "anonymous";
+      // //scales the image to a max size
+      // //optimises draw time for canvas
+      // const width = 500;
+      // for (var i = 0; i < image.slices.length; i++) {
+      //   this.AddSliceProposer(image.slices[i], width);
+      // }
 
-      // img.onload = function () {
-      //   //scale the image and canvas
-      //   canvas.height = (img.height * inWidth) / img.height;
-      //   canvas.width = inWidth;
-      //   img.width = canvas.width;
-      //   img.height = canvas.height;
-
-      //   context?.drawImage(
-      //     img,
-      //     0,
-      //     0,
-      //     Math.floor(img.width),
-      //     Math.floor(img.height)
-      //   );
-      // };
+      // div.style.transformOrigin = "0 0";
+      // console.log(div.clientWidth);
+      // //use css to scale, much faster.
+      // div.style.transform = "scale(" + div.clientWidth / width + ")";
     },
 
-    SelectedTile(event: any) {
+    AddSlice(slice: ImageSlice) {
+      this.imageSlices.push(slice);
+      this.imageSlicesConverted.push(
+        URL.createObjectURL(
+          new Blob([slice.imageData.buffer], { type: "image/png" } /* (1) */)
+        )
+      );
+    },
+
+    checkTransparency(slice: ImageSlice, x: number, y: number): boolean {
+      var width = 1;
+      var data = slice.imageData;
+      let index = (y * width + x) * 4;
+      let alpha = data[index + 3];
+
+      if (alpha < 5) {
+        return true;
+      }
+
+      return false;
+    },
+
+    proposerSelectedSlice(event: any) {
       var x = event.offsetX;
       var y = event.offsetY;
+
       var children = document.getElementById("canvas-div")?.children;
       if (children == null) {
         return;
@@ -259,83 +250,16 @@ export default defineComponent({
         }
       }
     },
-    newProposal(proposal: Proposal){
 
-    },
-    addNewGuess(guess : Guess) {
+    addIncomingGuess(guess: Guess) {
       this.guesses.push(guess.guess);
     },
     subscribeToActiveGame() {
       SubscribeToNewSliceGuesser(this.AddSlice);
       SubscribeToNewImageProposer(this.newImageProposer);
-      SubscribeToNewGuess(this.addNewGuess);
-      SubscribeToNewProposal(this.newProposal);
+
+      SubscribeToNewGuess(this.addIncomingGuess);
     },
-    // HandleSliceGuesser(){},
-    // HandleImageProposer(){},
-    // Handle
-
-  //   GenerateImagePaths() {
-  //     var _paths = [
-  //       "https://i.ibb.co/rkvRk2v/1.png",
-  //       "https://i.ibb.co/Qn2fzTD/1.png",
-  //       "https://i.ibb.co/1vv6ZHx/1.png",
-  //       "https://i.ibb.co/5cRWN0W/1.png",
-  //       "https://i.ibb.co/Lrj1JqZ/1.png",
-  //       "https://i.ibb.co/1rnGKwS/1.png",
-  //       "https://i.ibb.co/T2KbjFv/1.png",
-  //       "https://i.ibb.co/CM0yLDb/1.png",
-  //       "https://i.ibb.co/X8XF0Zm/1.png",
-  //       "https://i.ibb.co/tcLrjyX/1.png",
-  //       "https://i.ibb.co/n79x3d2/1.png",
-  //       "https://i.ibb.co/T2sHsZw/1.png",
-  //       "https://i.ibb.co/9VcfNNW/1.png",
-  //       "https://i.ibb.co/RN7xQCP/1.png",
-  //       "https://i.ibb.co/6mFbwT3/1.png",
-  //       "https://i.ibb.co/Db0hrxN/1.png",
-  //       "https://i.ibb.co/0C3nvXF/1.png",
-  //       "https://i.ibb.co/HFHsB8L/1.png",
-  //       "https://i.ibb.co/RQjKCtK/1.png",
-  //       "https://i.ibb.co/7XzdmMb/1.png",
-  //       "https://i.ibb.co/LRr44qp/1.png",
-  //       "https://i.ibb.co/brqc1pT/1.png",
-  //       "https://i.ibb.co/d6V6VBL/1.png",
-  //       "https://i.ibb.co/W2ZWKmD/1.png",
-  //       "https://i.ibb.co/PFpBRp7/1.png",
-  //       "https://i.ibb.co/KsV0xfX/1.png",
-  //       "https://i.ibb.co/VSBHvFV/1.png",
-  //       "https://i.ibb.co/TKC1Vm2/1.png",
-  //       "https://i.ibb.co/Mg0KYv5/1.png",
-  //       "https://i.ibb.co/9t2zyZr/1.png",
-  //       "https://i.ibb.co/2tntL8b/1.png",
-  //       "https://i.ibb.co/V9CLzkf/1.png",
-  //       "https://i.ibb.co/kSm7nXY/1.png",
-  //       "https://i.ibb.co/VmZGRkW/1.png",
-  //       "https://i.ibb.co/CWg1TjL/1.png",
-  //       "https://i.ibb.co/KNfp9db/1.png",
-  //       "https://i.ibb.co/qDHvLtZ/1.png",
-  //       "https://i.ibb.co/0y8ndtv/1.png",
-  //       "https://i.ibb.co/P4Ktddb/1.png",
-  //       "https://i.ibb.co/Z8MsfvQ/1.png",
-  //       "https://i.ibb.co/myRTRX7/1.png",
-  //       "https://i.ibb.co/sgxszkf/1.png",
-  //       "https://i.ibb.co/jkqdKhQ/1.png",
-  //       "https://i.ibb.co/kMpmyGN/1.png",
-  //       "https://i.ibb.co/4W66fw0/1.png",
-  //       "https://i.ibb.co/RN4FvdH/1.png",
-  //       "https://i.ibb.co/N3TKrNx/1.png",
-  //       "https://i.ibb.co/xGmGVrV/1.png",
-  //       "https://i.ibb.co/B6VWy5f/1.png",
-  //     ];
-
-  //     let paths: Slice[] = [];
-
-  //     for (let i = 0; i < _paths.length; i++) {
-  //       paths.push(new Slice(_paths[i], i as any as string));
-  //     }
-
-  //     return paths;
-  //   },
   },
 });
 

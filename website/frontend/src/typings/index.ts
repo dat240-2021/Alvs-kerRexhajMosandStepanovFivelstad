@@ -49,7 +49,7 @@ export interface ImageLabel {
 export interface ImageSlice {
   id: number;
   sequenceNumber: number;
-  imageData: Blob;
+  imageData: Uint8ClampedArray;
 }
 
 export interface Image {
@@ -76,13 +76,12 @@ export interface Guess {
 
 export type Proposal = ImageSlice;
 
-export type subscribeToGuessCb = (
-  data: Guess
-) => void;
+export type subscribeToGuessCb = (data: Guess) => void;
 
-export type subscribeToProposalCb = (
-  data: Proposal
-) => void;
+export type sendProposalCb = () => number;
+
+export type sendGuessCb = () => string;
+
 
 export enum HttpStatus {
   Unathorized = 401,
