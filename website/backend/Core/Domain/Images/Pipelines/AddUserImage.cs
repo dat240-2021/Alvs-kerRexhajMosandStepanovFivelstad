@@ -33,7 +33,7 @@ namespace backend.Core.Domain.Images.Pipelines
 					}
 					
 					var slicedList = new SliceImage().Slice(item.Item1);
-					var image = new global::backend.Core.Domain.Images.Image(request.UserId,new ImageLabel(item.Item2,tempCategory));
+					var image = new Image(request.UserId,new ImageLabel(item.Item2,tempCategory));
 					var sequenceNumber = 0;
 					foreach (var slice in slicedList)
 					{
