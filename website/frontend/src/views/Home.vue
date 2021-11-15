@@ -54,7 +54,7 @@
     </div>
   </div>
   <teleport to="body">
-    <LoadingGameModal v-if="joinedGame" v-model:game="joinedGame" :game="joinedGame" />
+    <LoadingGameModal v-if="joinedGame" v-model:game="joinedGame" />
   </teleport>
 </template>
 
