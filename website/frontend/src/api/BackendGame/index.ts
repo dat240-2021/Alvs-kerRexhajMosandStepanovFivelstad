@@ -1,37 +1,39 @@
 import axios from "axios";
+import { Category, Game, GameSlotUpdateNotification } from "@/typings";
 import * as signalR from "@microsoft/signalr";
 import {
-  Game,
-  GameSlotUpdateNotification,
-  subscribeToGameRoomsCreationCb,
-  subscribeToGameRoomsUpdateCb,
-} from "@/typings";
+  createGameHandlers,
+  deleteGameHandlers,
+  updateSlotsHandlers,
+  startGameHandlers,
+} from "@/api/BackendGame/subscriptions";
 
-let createGameHandlers: subscribeToGameRoomsCreationCb[] = [];
-let updateSlotsHandlers: subscribeToGameRoomsUpdateCb[] = [];
-
-const connection = new signalR.HubConnectionBuilder()
+export const gameHubConnection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/games")
   .build();
 
-connection.on("GameCreated", (data) => {
+gameHubConnection.on("GameCreated", (data) => {
   const { game, occupiedSlotsCount } = data;
   createGameHandlers.forEach((handler) =>
     handler({ ...game, occupiedSlotsCount })
   );
 });
 
-connection.on("GameRoomUpdated", (data: GameSlotUpdateNotification) => {
+gameHubConnection.on("GameRoomUpdated", (data: GameSlotUpdateNotification) => {
   updateSlotsHandlers.forEach((handler) => handler(data));
 });
 
-connection.start();
+gameHubConnection.on("GameDeleted", (id: string) => {
+  deleteGameHandlers.forEach((handler) => handler(id));
+});
 
-export const createGame = async (settings: any) => {
-  const {
-    data: { data: id },
-  } = await axios.post("/api/games", settings);
-  return id;
+gameHubConnection.on("GameStarted", () => {
+  startGameHandlers.forEach((handler) => handler());
+});
+
+export const createGame = async (settings: any): Promise<Game> => {
+  const { data } = await axios.post("/api/games", settings);
+  return data.data;
 };
 
 export const fetchWaitingRooms = async (): Promise<Game[]> => {
@@ -49,14 +51,13 @@ export const leaveGameRoom = async (id: string) => {
   await axios.post(`api/games/${id}/leave`);
 };
 
-export const subscribeToGameRoomsCreation = (
-  cb: subscribeToGameRoomsCreationCb
-) => {
-  createGameHandlers = [...createGameHandlers, cb];
+export const startGame = async (id: string) => {
+  await axios.post(`api/games/${id}/start`);
 };
 
-export const subscribeToGameRoomsUpdates = (
-  cb: subscribeToGameRoomsUpdateCb
-) => {
-  updateSlotsHandlers = [...updateSlotsHandlers, cb];
+export const fetchCategories = async (): Promise<Category[]> => {
+  const {
+    data: { data: categories },
+  } = await axios.get("/api/categories");
+  return categories as Category[];
 };

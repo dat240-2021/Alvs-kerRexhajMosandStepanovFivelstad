@@ -1,5 +1,3 @@
-import { subscribeToGameRoomsCreation } from "@/api/BackendGame";
-
 export interface User {
   id: string;
   userName: string;
@@ -7,7 +5,7 @@ export interface User {
 }
 
 interface GameSettings {
-  playersCount: number;
+  guessersCount: number;
   imagesCount: number;
   duration: number;
 }
@@ -25,6 +23,11 @@ export interface Game {
   occupiedSlotsCount: number;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+}
+
 export interface GameSlotUpdateNotification {
   gameId: string;
   occupiedSlotsCount: number;
@@ -34,6 +37,8 @@ export type subscribeToGameRoomsCreationCb = (game: Game) => void;
 export type subscribeToGameRoomsUpdateCb = (
   data: GameSlotUpdateNotification
 ) => void;
+export type subscribeToGameRoomsDeletionCb = (id: string) => void;
+export type subscribeToGameStartCb = () => void;
 
 export enum HttpStatus {
   Unathorized = 401,
