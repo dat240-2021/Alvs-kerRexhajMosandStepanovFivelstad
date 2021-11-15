@@ -1,5 +1,4 @@
 import axios from "axios";
-import * as signalR from "@microsoft/signalr";
 import {
   Category,
   Game,
@@ -7,30 +6,25 @@ import {
   subscribeToGameRoomsCreationCb,
   subscribeToGameRoomsUpdateCb,
 } from "@/typings";
+import * as signalR from "@microsoft/signalr";
 
 let createGameHandlers: subscribeToGameRoomsCreationCb[] = [];
 let updateSlotsHandlers: subscribeToGameRoomsUpdateCb[] = [];
 
-const connection = new signalR.HubConnectionBuilder()
+export const gameHubConnection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/games")
   .build();
 
-connection.on("GameCreated", (data) => {
+gameHubConnection.on("GameCreated", (data) => {
   const { game, occupiedSlotsCount } = data;
   createGameHandlers.forEach((handler) =>
     handler({ ...game, occupiedSlotsCount })
   );
 });
 
-connection.on("TEST", (data) => {
-  console.log(data);
-});
-
-connection.on("GameRoomUpdated", (data: GameSlotUpdateNotification) => {
+gameHubConnection.on("GameRoomUpdated", (data: GameSlotUpdateNotification) => {
   updateSlotsHandlers.forEach((handler) => handler(data));
 });
-
-connection.start();
 
 export const createGame = async (settings: any) => {
   const {
@@ -71,4 +65,16 @@ export const subscribeToGameRoomsUpdates = (
   cb: subscribeToGameRoomsUpdateCb
 ) => {
   updateSlotsHandlers = [...updateSlotsHandlers, cb];
+};
+
+export const unsubscribeToGameRoomsCreation = (
+  cb: subscribeToGameRoomsCreationCb
+) => {
+  createGameHandlers = createGameHandlers.filter((h) => h !== cb);
+};
+
+export const unsubscribeToGameRoomsUpdates = (
+  cb: subscribeToGameRoomsUpdateCb
+) => {
+  updateSlotsHandlers = updateSlotsHandlers.filter((h) => h !== cb);
 };
