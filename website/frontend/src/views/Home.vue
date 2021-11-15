@@ -108,7 +108,7 @@ export default defineComponent({
     },
     deleteGameRoom(id: string) {
       this.gameRooms = this.gameRooms.filter(game => game.id !== id);
-      
+
       if (this.joinedGame?.id === id) {
         this.joinedGame = null;
       }

@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Events;
 using backend.Core.Domain.BackendGame.Models;
+using backend.Core.Domain.BackendGame.Services;
+using backend.Core.Domain.Images.Pipelines;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +23,13 @@ namespace backend.Core.Domain.BackendGame.Pipelines
 
             private readonly GameContext _db;
             private readonly IMediator _mediator;
+            private readonly IBackendGameService _backendGameService;
 
-            public Handler(GameContext db, IMediator mediator)
+            public Handler(GameContext db, IMediator mediator, IBackendGameService backendGameService)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
                 _mediator = mediator;
+                _backendGameService = backendGameService;
             }
 
             public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
@@ -38,6 +42,11 @@ namespace backend.Core.Domain.BackendGame.Pipelines
                 game.State = GameState.Active;
                 await _db.SaveChangesAsync(cancellationToken);
                 await _mediator.Publish(new GameStarted(game), cancellationToken);
+
+                var imageIds = await _mediator.Send(new GetImageIdsListByCategoriesIds.Request(game.Settings.CategoryIds));
+                var slotInfo = _backendGameService.GetSlotInfo(game);
+                await _mediator.Send(new Games.Pipelines.StartGame.Request(new GameWithSlotInfo(game, slotInfo), imageIds), cancellationToken);
+                
                 return new Response(true);
             }
         }
