@@ -19,7 +19,7 @@ namespace backend.Hubs.Handlers
 
         public async Task Handle(GuessersTurnEvent notification, CancellationToken cancellationToken)
         {
-            await _hub.Clients.Clients(notification.GuesserIds).SendAsync("Guess", cancellationToken);
+            await _hub.Clients.Users(notification.GuesserIds).SendAsync("GuessersTurn", cancellationToken);
         }
     }
 }

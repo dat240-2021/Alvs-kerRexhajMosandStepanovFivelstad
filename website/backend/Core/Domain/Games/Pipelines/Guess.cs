@@ -36,7 +36,7 @@ namespace backend.Core.Domain.Games.Pipelines
 
                     if (result)
                     {
-                        _hub.Clients.Clients(game.Guessers.Select(g => g.Id.ToString())).SendAsync("Guess", request.Guess);
+                        _hub.Clients.All.SendAsync("Guess", request, cancellationToken);
                     }
                 }
 
