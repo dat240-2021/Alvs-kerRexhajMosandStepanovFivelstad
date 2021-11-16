@@ -27,10 +27,10 @@ namespace backend.Hubs.Handlers
 
             if (notification.ProposerId is not null)
             {
-                await _hub.Clients.Clients(notification.ProposerId).SendAsync("NewImageProposer", image);
+                await _hub.Clients.User(notification.ProposerId).SendAsync("NewImageProposer", image, cancellationToken);
             }
 
-            await _hub.Clients.Clients(notification.GuesserIds).SendAsync("NewImageGuesser", cancellationToken);
+            await _hub.Clients.Users(notification.GuesserIds).SendAsync("NewImageGuesser", cancellationToken);
         }
     }
 }

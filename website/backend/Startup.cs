@@ -115,6 +115,7 @@ namespace backend
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<GamesHub>("/hub/games");
+                endpoints.MapHub<GameHub>("/hub/game");
             });
         }
     }
