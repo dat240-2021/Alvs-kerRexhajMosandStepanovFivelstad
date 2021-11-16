@@ -39,7 +39,6 @@ namespace backend.Core.Domain.Images.Pipelines
                     // Console.WriteLine(item.File);
 
 					var b64 = item.File.Remove(0,"data:image/jpeg;base64,".Length);
-					Console.WriteLine(b64);
 
 					var slicedList = new SliceImage().Slice(Convert.FromBase64String(b64));
 					var image = new Image(request.UserId,new ImageLabel(item.Label,cat));
