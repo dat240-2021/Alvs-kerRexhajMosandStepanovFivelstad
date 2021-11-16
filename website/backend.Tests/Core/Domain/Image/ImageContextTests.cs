@@ -6,13 +6,15 @@ using System.Threading;
 using backend.Core.Domain.Images;
 using backend.Core.Domain.Images.Pipelines;
 using backend.Tests.Helpers;
+using Domain.Image;
+using Domain.Image.Pipelines;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace backend.Tests.Core.Domain.Images
+namespace backend.Tests.Core.Domain.Image
 {
     public class ImageContextTests : DbTest
     {
@@ -20,27 +22,21 @@ namespace backend.Tests.Core.Domain.Images
         {
         }
 
-        //Test AddUserImage pipeline by adding one image. 
+        //Test AddUserImage pipeline by adding two images. 
         [Fact]
-        public void AddNewImage_AddsOneImage()
+        public void AddNewImage_AddsTwoImages()
         {
             var UserId = Guid.NewGuid();
-            var ImageLabel = "Test Label";
-            var Category = "Test Category";
-            var ImageList = new List<(byte[], int)>();
-
+            var ImageList = new List<(byte[], string, string)>();
+            var number = 1;
 
             foreach (string file in Directory.GetFiles(Path.Join("..", "..", "..", "Infrastructure", "Data", "Images")))
             {
-                int number;
-                if (int.TryParse(file.Split("/").Last().Replace(".png", ""), out number)){
-
-                        ImageList.Add((File.ReadAllBytes(file), number ));
-
-                }
+                ImageList.Add((File.ReadAllBytes(file), $"Test Label {number}",$"Test Category {number}" ));
+                number++;
             }
 
-            var request = new AddUserImage.Request(ImageList,UserId,ImageLabel,Category);
+            var request = new AddUserImage.Request(ImageList,UserId);
 
             using (var context = new GameContext(ContextOptions, null))
             {
@@ -52,14 +48,14 @@ namespace backend.Tests.Core.Domain.Images
             }
             using (var context = new GameContext(ContextOptions, null))
             {
-                context.Images.Count().ShouldBe(1);
-                context.ImageCategories.Count().ShouldBe(1);
-                var actCategory = context.Images.Select(i => i.Category);
+                context.Images.Count().ShouldBe(2);
+                context.ImageCategories.Count().ShouldBe(2);
+                var actCategory = context.Images.Select(i => i.Label.Category.Name);
                 var actLabel = context.Images.Select(i => i.Label.Label);
                 var actImageList = context.Images.Select(i => i.Slices);
-                Assert.Equal(Category,actCategory.First());
-                Assert.Equal(ImageLabel,actLabel.First());
-                Assert.Equal(5, actImageList.First().Count());
+                Assert.Equal("Test Category 1",actCategory.First());
+                Assert.Equal("Test Label 1",actLabel.First());
+                Assert.Equal(49, actImageList.First().Count());
             }
         }
         
@@ -92,3 +88,4 @@ namespace backend.Tests.Core.Domain.Images
         }
     }
 }
+
