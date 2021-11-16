@@ -32,7 +32,7 @@ namespace backend.Core.Domain.Games.Pipelines
             var result = game.Propose(request.SliceNumber);
             if (result is not null)
             {
-                _hub.Clients.Clients(game.Guessers.Select(g => g.Id.ToString())).SendAsync("Tile", result);
+                _hub.Clients.Users(game.Guessers.Select(g => g.Id.ToString())).SendAsync("Proposal", result, cancellationToken);
             }
                 return Task.FromResult(Unit.Value);
             }

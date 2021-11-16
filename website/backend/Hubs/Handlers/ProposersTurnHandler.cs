@@ -19,7 +19,7 @@ namespace backend.Hubs.Handlers
 
         public async Task Handle(ProposersTurnEvent notification, CancellationToken cancellationToken)
         {
-            await _hub.Clients.Clients(notification.ProposerId).SendAsync("Propose", cancellationToken);
+            await _hub.Clients.User(notification.ProposerId).SendAsync("ProposersTurn", cancellationToken);
         }
     }
 }
