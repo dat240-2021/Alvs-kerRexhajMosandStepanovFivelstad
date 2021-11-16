@@ -45,7 +45,15 @@
               <Input v-model="i.label" error="" type="text" id="imagetitle" />
             </td>
             <td>
-              <Input v-model="i.category" error="" type="text" id="category" />
+              <select v-model="i.category" class="form-select">
+                <option
+                  v-for="c in categories.sort((a, b) => a.id - b.id)"
+                  :key="c.id"
+                  :value="c.id"
+                >
+                  {{ c.name }}
+                </option>
+              </select>
             </td>
           </tr>
         </table>
@@ -58,8 +66,9 @@
 import { defineComponent } from "vue";
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
-import { ImageFile,Category } from "@/typings";
+import { ImageFile, Category } from "@/typings";
 import { fetchCategories } from "@/api/BackendGame";
+import { uploadImages } from "@/api/Images";
 
 declare interface BaseComponentData {
   images: ImageFile[];
@@ -69,7 +78,7 @@ declare interface BaseComponentData {
 }
 
 export default defineComponent({
-  name: "UploadImages",
+  name: "ImageUpload",
   components: {
     Input,
     Submit,
@@ -82,6 +91,9 @@ export default defineComponent({
       categories: [],
       error: "",
     };
+  },
+  mounted() {
+    this.loadCategories();
   },
   methods: {
     onImagesSelected(event: any) {
@@ -111,6 +123,7 @@ export default defineComponent({
 
       //do the actual upload
       console.log(this.images);
+      uploadImages(this.images);
     },
 
     loadCategories() {
