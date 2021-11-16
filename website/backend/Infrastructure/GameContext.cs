@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame;
 using backend.Core.Domain.BackendGame.Models;
 using backend.Core.Domain.BackendGame.Pipelines;
+using backend.Core.Domain.Images;
 using Domain.Authentication;
 using Domain.Image;
 using MediatR;
@@ -31,101 +32,123 @@ namespace Infrastructure.Data
 
         public DbSet<Image> Images { get; set; } = null!;
         public DbSet<ImageCategory> ImageCategories { get; set; } = null!;
-		public DbSet<Score> Scores { get; set; } = null!;
-		public DbSet<Game> Games { get; set; } = null!;
+        public DbSet<Score> Scores { get; set; } = null!;
+        public DbSet<Game> Games { get; set; } = null!;
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Game>().OwnsOne(
+                g => g.Settings, od =>
+                {
+                    od.Property(e => e.CategoryIds).HasConversion(
+                        id => string.Join(';', id),
+                        ids => ids.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
+                    );
+                });
         }
-	}
+    }
 
-        internal class  ImagePreprocessor{
+    internal class ImagePreprocessor
+    {
 
-            // Relative path from current dir.
-            public List<Image> Images = new List<Image>();
+        // Relative path from current dir.
+        public List<Image> Images = new List<Image>();
 
-            public List<ImageCategory> Categories = new List<ImageCategory>();
-            public List<ImageLabel> Labels = new List<ImageLabel>();
-            public List<(string, int)> LabelMapping = new List<(string,int)>();
-            private List<String> Path = new List<string>{Directory.GetCurrentDirectory(),"Infrastructure","ImageFetch","DownloadedFiles","Images"};
+        public List<ImageCategory> Categories = new List<ImageCategory>();
+        public List<ImageLabel> Labels = new List<ImageLabel>();
+        public List<(string, int)> LabelMapping = new List<(string, int)>();
+        private List<String> _path = new List<string> { Directory.GetCurrentDirectory(), "Infrastructure", "ImageFetch", "DownloadedFiles", "Images" };
 
-            public void Parse(){
+        public void Parse()
+        {
 
-                CheckFiles();
+            CheckFiles();
 
-                //check each folder use the folder name to create an image, add it to images list
-                foreach ( string dirFile in Directory.GetDirectories(System.IO.Path.Combine(Path.ToArray())) ){
-                    var newImage = new Image(dirFile.Split("/").Last().Replace("_scattered", ""));
+            //check each folder use the folder name to create an image, add it to images list
+            foreach (string dirFile in Directory.GetDirectories(System.IO.Path.Combine(_path.ToArray())))
+            {
+                var newImage = new Image(dirFile.Split(Path.DirectorySeparatorChar).Last().Replace("_scattered", ""));
 
-                    foreach ( string filePath in Directory.GetFiles(dirFile) ){
-                            int number;
-                            if (int.TryParse(filePath.Split("/").Last().Replace(".png", ""), out number)){
-
-                            newImage.AddImageSlice(File.ReadAllBytes(filePath), number );
-
-                            }
-                    }
-                    Images.Add(newImage);
-                };
-
-                foreach (string line in System.IO.File.ReadLines( ModifyPath("Categories.csv",2) ))
+                foreach (string filePath in Directory.GetFiles(dirFile))
                 {
-                    var categoryLine = line.Split(":");
-                    Categories.Add(new ImageCategory(Int32.Parse(categoryLine[0]),categoryLine[1]));
-                }
+                    int number;
+                    if (int.TryParse(filePath.Split(Path.DirectorySeparatorChar).Last().Replace(".png", ""), out number))
+                    {
 
-                //check each line in the label mapping file create a category and add it to the categories list
-                foreach (string line in System.IO.File.ReadLines( ModifyPath("label_mapping_with_categories.csv",2) ))
-                {
-                    var labelLine = line.Split(":");
-                    Labels.Add(
-                        new ImageLabel(Int32.Parse(labelLine[0]),labelLine[1], Categories.Find(x => x.Id==Int32.Parse(labelLine[2]))));
-                }
+                        newImage.AddImageSlice(File.ReadAllBytes(filePath), number);
 
-
-                //check each line in the image mapping file, add it to the mapping list
-                foreach (string line in System.IO.File.ReadLines( ModifyPath("image_mapping.csv",1) ))
-                {
-                    var mappingLine = line.Split(" ");
-                    string image = mappingLine[0];
-                    int labelid = Int32.Parse(mappingLine[1]);
-                    var img = Images.Find(x=> x.ImportId==image);
-
-                    if (img!=null){
-                        img.SetLabel(Labels.Find( x=> x.Id == labelid));
                     }
                 }
+                Images.Add(newImage);
+            };
 
-
+            foreach (string line in System.IO.File.ReadLines(ModifyPath("Categories.csv", 2)))
+            {
+                var categoryLine = line.Split(":");
+                Categories.Add(new ImageCategory(Int32.Parse(categoryLine[0]), categoryLine[1]));
             }
 
-        //Checks if all folders exist if so it uses them, otherwise starts a download using shellscript.
-        public void CheckFiles(){
-                var folders_ok = false;
-                try{
-                    folders_ok = Directory.GetDirectories(System.IO.Path.Combine(Path.ToArray())).Count() <= 299;
-                } catch {}
+            //check each line in the label mapping file create a category and add it to the categories list
+            foreach (string line in System.IO.File.ReadLines(ModifyPath("label_mapping_with_categories.csv", 2)))
+            {
+                var labelLine = line.Split(":");
+                Labels.Add(
+                    new ImageLabel(Int32.Parse(labelLine[0]), labelLine[1], Categories.Find(x => x.Id == Int32.Parse(labelLine[2]))));
+            }
 
-                if ( !folders_ok ){
-                    Console.WriteLine("Downloading Files");
-                    var script = new ProcessStartInfo( ModifyPath("DownloadScript.sh",2),ModifyPath("",2)) ;
-                    var process = Process.Start(script);
-                    process.WaitForExit();
 
-                    //if script fails
-                    if (process.ExitCode != 0){
-                        throw new FileLoadException("Something went wrong while downloading files!");
-                    }
-                } else {
-                    Console.WriteLine("Using Downloaded Files!");
+            //check each line in the image mapping file, add it to the mapping list
+            foreach (string line in System.IO.File.ReadLines(ModifyPath("image_mapping.csv", 1)))
+            {
+                var mappingLine = line.Split(" ");
+                string image = mappingLine[0];
+                int labelid = Int32.Parse(mappingLine[1]);
+                var img = Images.Find(x => x.ImportId == image);
+
+                if (img != null)
+                {
+                    img.SetLabel(Labels.Find(x => x.Id == labelid));
                 }
+            }
+
+
         }
 
-        public string ModifyPath(string add,int remove){
-                var tmp = Path.GetRange(0,Path.Count-remove);
-                tmp.Add(add);
-                return System.IO.Path.Combine(tmp.ToArray());
+        //Checks if all folders exist if so it uses them, otherwise starts a download using shellscript.
+        public void CheckFiles()
+        {
+            var folders_ok = false;
+            try
+            {
+                folders_ok = Directory.GetDirectories(System.IO.Path.Combine(_path.ToArray())).Count() <= 299;
+            }
+            catch { }
+
+            if (!folders_ok)
+            {
+                Console.WriteLine("Downloading Files");
+                var script = new ProcessStartInfo(ModifyPath("DownloadScript.sh", 2), ModifyPath("", 2));
+                var process = Process.Start(script);
+                process.WaitForExit();
+
+                //if script fails
+                if (process.ExitCode != 0)
+                {
+                    throw new FileLoadException("Something went wrong while downloading files!");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Using Downloaded Files!");
+            }
+        }
+
+        public string ModifyPath(string add, int remove)
+        {
+            var tmp = _path.GetRange(0, _path.Count - remove);
+            tmp.Add(add);
+            return System.IO.Path.Combine(tmp.ToArray());
         }
     }
 }

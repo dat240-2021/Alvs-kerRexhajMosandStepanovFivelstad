@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using backend.Controllers.NewGame.Dto;
+using backend.Core.Domain.Images.Pipelines;
 using Controllers.Authentication;
 using Controllers.Generics;
 using Domain.Image.Pipelines;
@@ -13,10 +14,10 @@ namespace backend.Controllers.NewGame
     [ApiController]
     // [Route("[controller]")]
     [Route("/api/imageupload")]
-    public class ImageUploadController : ControllerBase
+    public class ImageUploadController : ApiBaseController
     {
         private readonly ILogger<CategoryController> _logger;
-		private readonly IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public ImageUploadController(ILogger<CategoryController> logger, IMediator mediator)
         {
@@ -26,7 +27,7 @@ namespace backend.Controllers.NewGame
 
         [HttpPost]
         public async Task<IActionResult> Post(ImageUploadDto image){
-            var result = await _mediator.Send(new AddUserImage.Request(image.ImageList, image.UserId, image.Label,image.Category));
+            var result = await _mediator.Send(new AddUserImage.Request(image.ImageList, image.UserId));
 
             if (result.Success)
             {
@@ -35,4 +36,4 @@ namespace backend.Controllers.NewGame
             return UnprocessableEntity();
         }
     }
-    }
+}

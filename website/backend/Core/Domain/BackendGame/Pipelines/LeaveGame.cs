@@ -34,7 +34,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
                 var game = await _db.Games.Where(g => g.Id.Equals(request.GameId)).FirstOrDefaultAsync(cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
                 await _backendGameService.LeaveGame(game.Id, request.UserId);
                 var gameSlotInfo = _backendGameService.GetSlotInfo(game);
-                await _mediator.Publish(new UserLeftGame(new GameSlotNotification(game.Id, gameSlotInfo.Players.Count)), cancellationToken);
+                await _mediator.Publish(new UserLeftGame(new GameSlotNotification(game.Id, gameSlotInfo.PlayerSlots.Count), request.UserId), cancellationToken);
                 return Unit.Value;
             }
         }

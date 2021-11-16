@@ -1,23 +1,27 @@
 import { User } from "@/typings";
-import auth from "@/api/Auth";
+import { logout } from "@/api/Auth";
+import initWebsockets from "@/api/websockets";
 
-export const fetchAuthUser = async (): Promise<User> => {
-  const user = await auth.getAuthUser();
-  return user ? { ...user, isAuth: true } : ({ isAuth: false } as User);
-};
-
-export const setAuthUser = (user: User) => {
+export const setCurrentUser = (user: User) => {
   localStorage.setItem("user", JSON.stringify(user));
+  if (user.isAuth) {
+    initWebsockets();
+  }
 };
 
-const getStoredUser = (): User | null => {
+const getStoredUser = (): User => {
   const dataString = localStorage.getItem("user");
 
   if (!dataString) {
-    return null;
+    throw new Error("User is supposed to be stored");
   }
 
   return JSON.parse(dataString) as User;
+};
+
+export const logoutUser = async () => {
+  await logout();
+  localStorage.setItem("user", JSON.stringify({ isAuth: false }));
 };
 
 export const isUserAuth = (): boolean => {

@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Events;
 using backend.Core.Domain.BackendGame.Models;
 using backend.Core.Domain.BackendGame.Services;
+using Domain.Authentication;
 using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +13,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
 {
     public class JoinGame
     {
-        public record Request(Guid UserId, Guid GameId): IRequest<Unit> {}
+        public record Request(User User, Guid GameId, SlotRole Role): IRequest<Unit> {}
         
         public class Handler: IRequestHandler<Request, Unit>
         {
@@ -34,16 +33,10 @@ namespace backend.Core.Domain.BackendGame.Pipelines
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
                 var game = await _db.Games.FirstOrDefaultAsync(g => g.Id.Equals(request.GameId), cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
-                await _backendGameService.JoinGame(game, request.UserId);
+                await _backendGameService.JoinGame(game, request.User.Id, request.Role);
                 var gameSlotInfo = _backendGameService.GetSlotInfo(game);
-                
-                await _mediator.Publish(new UserJoinGame(new GameSlotNotification(game.Id, gameSlotInfo.Players.Count)), cancellationToken);
+                await _mediator.Publish(new UserJoinGame(new GameSlotNotification(game.Id, gameSlotInfo.GuessersIds.Count)), cancellationToken);
 
-                if (!_backendGameService.HasAvailableSlots(game.Id))
-                {
-                    await _mediator.Publish(new Events.StartGame(game), cancellationToken);
-                }
-                
                 return Unit.Value;
             }
         }

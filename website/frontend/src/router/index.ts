@@ -49,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
     component: UploadImages,
   },
   {
-    path: "/game/:id",
+    path: "/game",
     name: "Game",
     component: Game,
     beforeEnter: isUserNotAuthenticated,

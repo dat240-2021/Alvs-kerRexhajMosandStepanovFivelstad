@@ -1,4 +1,7 @@
 <template>
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-primary m-2" @click="handleLogout">Logout</button>
+  </div>
   <div class="container vh-100 py-5">
     <div class="row mt-5 h-25 justify-content-center">
       <div class="col-8 d-flex">
@@ -37,7 +40,7 @@
             <tbody>
               <tr v-for="game in visibleGameRooms" :key="game.id">
                 <td>Some type here</td>
-                <td>{{ game.occupiedSlotsCount }} / {{ game.settings.playersCount }}</td>
+                <td>{{ game.occupiedSlotsCount }} / {{ game.settings.guessersCount }}</td>
                 <td>
                   <button class="btn" @click="joinGame(game.id)">
                     <i class="bi bi-box-arrow-in-right"></i>
@@ -50,27 +53,42 @@
       </div>
     </div>
   </div>
+  <teleport to="body">
+    <LoadingGameModal v-if="joinedGame" v-model:game="joinedGame" />
+  </teleport>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { fetchWaitingRooms, subscribeToGameRoomsCreation, subscribeToGameRoomsUpdates } from "@/api/BackendGame";
-import { joinGameRoom } from "@/api/BackendGame";
+import { fetchWaitingRooms, joinGameRoom, startGame } from "@/api/BackendGame";
+import * as ws from "@/api/BackendGame/subscriptions";
 import {
   Game,
   GameSlotUpdateNotification
 } from "@/typings";
+import { logoutUser } from "@/utils/auth";
+import LoadingGameModal from "@/components/Modal/LoadingGameModal.vue";
 
 export default defineComponent({
   name: "Home",
+  components: {
+    LoadingGameModal
+  },
   created() {
     this.fetchGameRooms();
     this.subscribeToGames();
+  },
+  unmounted() {
+    ws.unsubscribeFromGameRoomsUpdates(this.updateGameRoom);
+    ws.unsubscribeFromGameRoomsCreation(this.storeGameRoom);
+    ws.unsubscribeFromGameRoomsDeletes(this.deleteGameRoom);
+    ws.unsubscribeFromGameStart(this.startGame);
   },
   data() {
     return {
       leaderBoard: [],
       gameRooms: [] as Game[],
+      joinedGame: null as Game | null,
     };
   },
   methods: {
@@ -88,18 +106,38 @@ export default defineComponent({
     storeGameRoom(game: Game) {
       this.gameRooms = [...this.gameRooms, game];
     },
+    deleteGameRoom(id: string) {
+      this.gameRooms = this.gameRooms.filter(game => game.id !== id);
+
+      if (this.joinedGame?.id === id) {
+        this.joinedGame = null;
+      }
+    },
     subscribeToGames() {
-      subscribeToGameRoomsUpdates(this.updateGameRoom);
-      subscribeToGameRoomsCreation(this.storeGameRoom);
+      ws.subscribeToGameRoomsUpdates(this.updateGameRoom);
+      ws.subscribeToGameRoomsCreation(this.storeGameRoom);
+      ws.subscribeToGameRoomsDeletes(this.deleteGameRoom);
+      ws.subscribeToGameStart(this.startGame);
     },
     joinGame(id: string) {
-      joinGameRoom(id)
-        .then(() => this.$router.push({ name: "Game", params: { id } }));
+      joinGameRoom(id).then(() => {
+        const game = this.gameRooms.find(g => g.id === id);
+        if (!game) {
+          throw new Error("Game was not found!");
+        }
+        this.joinedGame = game;
+      });
     },
+    startGame() {
+      this.$router.push({ name: "Game" });
+    },
+    handleLogout() {
+      logoutUser().then(() => this.$router.push({ name: "Index" }));
+    }
   },
   computed: {
     visibleGameRooms(): Game[] {
-      return this.gameRooms.filter((game: Game) => game.occupiedSlotsCount < game.settings.playersCount);
+      return this.gameRooms.filter((game: Game) => game.occupiedSlotsCount < game.settings.guessersCount);
     }
   },
 });

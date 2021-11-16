@@ -1,120 +1,159 @@
 <template>
   <div class="container vh-100 py-5">
-    <div class="row h-75">
-      <div class="col">
-        <div class="row">
-          <div class="col">
-            <form @submit.prevent="handleSubmit">
+    <form class="h-100" @submit.prevent="handleSubmit">
+      <div class="row h-75 justify-content-around">
+        <div class="col-md-4 col-sm-6 pb-4 pb-sm-0 h-100">
+          <div class="categories h-100 d-flex flex-column p-4">
+            <div class="text-center pb-2">Select Categories</div>
+            <div class="overflow-scroll">
+              <div class="mb-1" v-for="category in categories" :key="category">
+                <input
+                  class="form-check-input me-1"
+                  type="checkbox"
+                  :id="'category_id_' + category"
+                  name="vehicle1"
+                  v-model="form.categoryIds"
+                  :value="category.id"
+                />
+                <label class="form-check-label d-inline" for="vehicle1">{{
+                  category.name
+                }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="row">
+            <div class="col">
+              <label for="proposerSelection">Proposer type</label>
+              <select v-model="form.proposerType" id="proposerSelection" class="form-select mb-2" aria-label="Proposer">
+                <option>AI</option>
+                <option>Player</option>
+              </select>
               <Input
+                v-model="form.guessersCount"
                 class="mb-2"
                 error=""
                 type="number"
-                model-value="1"
+                min="1"
+                max="6"
+                id="playersCountInput"
+                label="Number of guessers"
+              />
+              <Input
+                v-model="form.imagesCount"
+                class="mb-2"
+                error=""
+                type="number"
                 min="1"
                 max="10"
                 id="picturesCountInput"
                 label="Number of pictures"
               />
               <Input
+                v-model="form.roundDuration"
                 class="mb-2"
                 error=""
                 type="number"
-                model-value="1"
-                min="1"
-                max="6"
-                id="playersCountInput"
-                label="Number of players"
-              />
-              <Input
-                class="mb-2"
-                error=""
-                type="number"
-                model-value="1"
                 min="10"
                 max="120"
-                id="rounndLengthInput"
-                label="Round length in seconds"
+                id="roundLengthInput"
+                label="Round length (seconds)"
               />
+              <div v-if="error.length" class="alert alert-danger" role="alert">{{ error }}</div>
               <div class="form-group d-flex justify-content-around mt-2">
-                <Submit>Start game</Submit>
+                <Submit :disabled="disabled">Create game</Submit>
               </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="categories h-100 d-flex flex-column">
-          <div class="text-center pb-2">select categories</div>
-          <div class="mx-5">
-            <div>
-              <label for="vehicle1"> I have a bike</label>
-              <input
-                type="checkbox"
-                id="vehicle1"
-                name="vehicle1"
-                value="Bike"
-              />
-            </div>
-            <div>
-              <label for="vehicle1"> I have a bike</label>
-              <input
-                type="checkbox"
-                id="vehicle1"
-                name="vehicle1"
-                value="Bike"
-              />
-            </div>
-            <div>
-              <label for="vehicle1"> I have a bike</label>
-              <input
-                type="checkbox"
-                id="vehicle1"
-                name="vehicle1"
-                value="Bike"
-              />
-            </div>
-            <div>
-              <label for="vehicle1"> I have a bike</label>
-              <input
-                type="checkbox"
-                id="vehicle1"
-                name="vehicle1"
-                value="Bike"
-              />
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   </div>
+  <teleport to="body">
+    <LoadingGameModal v-if="createdGame" v-model:game="createdGame" isCreator />
+  </teleport>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
-import { createGame } from "@/api/BackendGame";
+import { createGame, fetchCategories } from "@/api/BackendGame";
+import { Category, Game, GameSlotUpdateNotification } from "@/typings";
+import LoadingGameModal from "@/components/Modal/LoadingGameModal.vue";
+import * as ws from "@/api/BackendGame/subscriptions";
 
-export default {
+const errors = {
+  noCategorySelected: "At least one category must be picked",
+  default: "Something went wrong! Try again later"
+}
+
+export default defineComponent({
   name: "NewGame",
   components: {
     Input,
     Submit,
+    LoadingGameModal,
+  },
+  created() {
+    this.loadCategories();
+    this.subscribeToGames();
+
+  },
+  data() {
+    return {
+      form: {
+        proposerType: "AI",
+        categoryIds: [] as number[],
+        guessersCount: 1,
+        imagesCount: 1,
+        roundDuration: 30,
+      },
+      createdGame: null as Game | null,
+      error: "",
+      disabled: false,
+      categories: [] as Category[],
+    };
   },
   methods: {
-    handleSubmit() {
-      const settings = {
-        "PlayersCount": 2,
-        "ImagesCount": 1,
-        "Duration": 30,
-        // "Categories": ["Animals", "Cars"]
-      };
+    validate() {
+      if (!this.form.categoryIds.length) {
+        this.error = errors.noCategorySelected;
+        return false;
+      }
 
-      createGame(settings).then((id) => {
-        this.$router.push({ name: "Game", params: { id } });
+      this.error = "";
+      return true;
+    },
+    handleSubmit() {
+      if (!this.validate()) return;
+
+      this.disabled = true;
+      createGame(this.form)
+        .then((game) => (this.createdGame = game))
+        .finally(() => (this.disabled = false));
+    },
+    loadCategories() {
+      fetchCategories().then((categories) => {
+        this.form.categoryIds = categories.map(c => c.id);
+        this.categories = categories;
       });
     },
+    updateGameRoom(data: GameSlotUpdateNotification) {
+      if (!this.createdGame) {
+        return;
+      }
+      if (data.gameId !== this.createdGame.id) {
+        return;
+      }
+      this.createdGame.occupiedSlotsCount = data.occupiedSlotsCount;
+    },
+    subscribeToGames() {
+      ws.subscribeToGameRoomsUpdates(this.updateGameRoom);
+    },
   },
-};
+});
 </script>
 
 <style scoped>
