@@ -33,8 +33,8 @@ namespace backend.Controllers.NewGame
         public async Task<IActionResult> Post(ImageUploadDto image)
         {
 
-            Console.WriteLine(Request.Body);
-            Console.WriteLine(image);
+            // Console.WriteLine(Request.Body);
+            // Console.WriteLine(image);
 
             var user = await _authenticationService.GetCurrentUser();
             var result = await _mediator.Send(new AddUserImage.Request(image.ImageList, user.Id));

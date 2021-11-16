@@ -7,7 +7,6 @@ namespace backend.Controllers.NewGame.Dto
     {
         [Required]
         public List<string> CategoryList { get; set;}
-        
     }
 
 }

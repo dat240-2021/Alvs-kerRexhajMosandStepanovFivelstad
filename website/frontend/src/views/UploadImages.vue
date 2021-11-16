@@ -99,7 +99,7 @@ export default defineComponent({
     onImagesSelected(event: any) {
       console.log(event.target.files);
       for (var i = 0; i < event.target.files.length; i++) {
-        var name = event.target.files[i].name
+        var name = event.target.files[i].name;
         var reader = new FileReader();
         reader.onloadend = () => {
           this.images.push({
@@ -110,7 +110,7 @@ export default defineComponent({
             label: "",
           } as ImageFile);
         };
-        reader.readAsBinaryString(event.target.files[i]);
+        reader.readAsDataURL(event.target.files[i]);
       }
 
       //this.images.Image = event.target.files[0]

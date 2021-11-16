@@ -12,7 +12,7 @@ namespace backend.Core.Domain.Images.Pipelines
 {
 	public class AddUserImage
 	{
-		public record Request(ImageUploaded[] ImageList, Guid UserId) : IRequest<Response>;
+		public record Request(ImageFile[] ImageList, Guid UserId) : IRequest<Response>;
 
 		public record Response(bool Success);
 
@@ -35,11 +35,14 @@ namespace backend.Core.Domain.Images.Pipelines
 
 					//file conversion to blob...
 
-					var cat = _db.ImageCategories.Where(x=> x.Id == item.category).FirstOrDefault();
-                    Console.WriteLine(item.file);
+					var cat = _db.ImageCategories.Where(x=> x.Id == item.Category).FirstOrDefault();
+                    // Console.WriteLine(item.File);
 
-					var slicedList = new SliceImage().Slice(Convert.FromBase64String(item.file));
-					var image = new Image(request.UserId,new ImageLabel(item.label,cat));
+					var b64 = item.File.Remove(0,"data:image/jpeg;base64,".Length);
+					Console.WriteLine(b64);
+
+					var slicedList = new SliceImage().Slice(Convert.FromBase64String(b64));
+					var image = new Image(request.UserId,new ImageLabel(item.Label,cat));
 					var sequenceNumber = 0;
 					foreach (var slice in slicedList)
 					{
