@@ -11,7 +11,7 @@ namespace backend.Core.Domain.Images.ImageSliceHelpers
         {
             int sliceSize = 75;
             int newImageSize = 525;
-            
+
             var sliceList = new List<byte[]>();
             for (var x = 0; x < (newImageSize / sliceSize); x++)
             {
@@ -27,5 +27,5 @@ namespace backend.Core.Domain.Images.ImageSliceHelpers
         }
 
     }
-    
+
 }

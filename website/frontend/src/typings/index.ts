@@ -25,6 +25,7 @@ export interface Game {
 
 export interface ImageFile {
   id: number;
+  name: string;
   file: any;
   category: string;
   label: string;

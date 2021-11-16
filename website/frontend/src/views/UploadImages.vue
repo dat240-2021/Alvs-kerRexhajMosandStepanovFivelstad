@@ -40,7 +40,7 @@
           </tr>
           <tr v-for="i in images" :key="i.id">
             <td>{{ i.id }}</td>
-            <td>{{ i.file.name }}</td>
+            <td>{{ i.name }}</td>
             <td>
               <Input v-model="i.label" error="" type="text" id="imagetitle" />
             </td>
@@ -99,12 +99,18 @@ export default defineComponent({
     onImagesSelected(event: any) {
       console.log(event.target.files);
       for (var i = 0; i < event.target.files.length; i++) {
-        this.images.push({
-          id: i,
-          file: event.target.files[i],
-          category: "",
-          label: "",
-        } as ImageFile);
+        var name = event.target.files[i].name
+        var reader = new FileReader();
+        reader.onloadend = () => {
+          this.images.push({
+            id: i,
+            name: name,
+            file: reader.result,
+            category: "",
+            label: "",
+          } as ImageFile);
+        };
+        reader.readAsBinaryString(event.target.files[i]);
       }
 
       //this.images.Image = event.target.files[0]
