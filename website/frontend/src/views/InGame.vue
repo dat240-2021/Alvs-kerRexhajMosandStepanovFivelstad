@@ -53,7 +53,7 @@
           <img
             v-for="im in imageSlices"
             :key="im.id"
-            :src="'data:image/png;base64,'+im.imageData"
+            :src="'data:image/png;base64,' + im.imageData"
             style="width: 70%"
             class="position-absolute top-0 start-0"
           />
@@ -108,14 +108,17 @@ declare interface BaseComponentData {
   players: Player[];
   guesses: string[];
   imageSlices: ImageSlice[];
-  imageSlicesConverted: any[];
+  imageSlicesConverted: {
+    sequenceNumber: number;
+    DataBytes: Uint8Array;
+  }[];
   newGuess: string;
   correct: string;
   isProposer: boolean;
   myTurn: boolean;
-  coords: {
-    x: number;
-    y: number;
+  imageSize: {
+    width: number;
+    height: number;
   };
 }
 
@@ -123,7 +126,10 @@ export default defineComponent({
   name: "InGame",
   data(): BaseComponentData {
     return {
-      coords: { x: 0, y: 0 },
+      imageSize: {
+        width: 0,
+        height: 0,
+      },
       players: [] as Player[],
 
       imageSlicesConverted: [],
@@ -141,7 +147,7 @@ export default defineComponent({
     };
   },
   created() {
-      this.subscribeToActiveGame();
+    this.subscribeToActiveGame();
   },
   methods: {
     mounted() {
@@ -174,14 +180,28 @@ export default defineComponent({
     AddSlice(slice: ImageSlice) {
       this.imageSlices.push(slice);
 
-      /*
-      this.imageSlicesConverted.push(
-        URL.createObjectURL(
-          fetch(slice.imageData)
-          .then(res => res.blob())
-        )
-      );
-      */
+      if (this.imageSize.width == 0) {
+        var image = new Image();
+        image.src = slice.imageData;
+        image.onload = () => {
+          return;
+        };
+      }
+
+      this.imageSlicesConverted.push({
+        sequenceNumber: slice.sequenceNumber,
+        DataBytes: this._base64ToArrayBuffer(slice.imageData),
+      });
+    },
+
+    _base64ToArrayBuffer(base64: string) {
+      var binary_string = window.atob(base64);
+      var len = binary_string.length;
+      var bytes = new Uint8Array(len);
+      for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+      }
+      return bytes;
     },
 
     proposersTurn() {
@@ -196,30 +216,40 @@ export default defineComponent({
       if (!this.isProposer) {
         return;
       }
-      /*
 
       //these need to be scaled
       var x: number = event.offsetX;
       var y: number = event.offsetY;
+      var slices_len = this.imageSlicesConverted.length;
 
-      if (this.imageSlices.length < 1) {
+      //need visible image size to scale down mouse position
+      var img = document.getElementById(this.imageSlices[0].id.toString());
+      var h1 = img?.clientHeight;
+      var w1 = img?.clientWidth;
+
+      if (h1 == null || w1 == null) {
         return;
       }
 
-      for (let i = 0; i < this.imageSlices.length; i++) {
-        //width needs to be calculated
-        var width = 1;
-        var data = this.imageSlices[i].imageData;
-        let index = (y * width + x) * 4;
+      //original size of the image
+      var h0 = this.imageSize.width;
+      var w0 = this.imageSize.height;
+
+      var yScaled = Math.floor((h0 * y) / h1);
+      var xScaled = Math.floor((w0 * x) / w1);
+      let index = (yScaled * w0 + xScaled) * 4;
+
+      //check all the image alpha values and return on the first one thats not transparent.
+      for (let i = 0; i < slices_len; i++) {
+        var data = this.imageSlicesConverted[i].DataBytes;
         let alpha = data[index + 3];
 
         if (alpha > 5) {
-          return this.imageSlices[i];
+          return i;
         }
       }
 
       return;
-      */
     },
 
     //old ----- to be deleted, kept for refrence
@@ -263,7 +293,6 @@ export default defineComponent({
       if (player) {
         player.Score += score.score;
       }
-
     },
 
     subscribeToActiveGame() {
