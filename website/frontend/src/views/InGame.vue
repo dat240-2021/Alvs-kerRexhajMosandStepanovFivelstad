@@ -49,12 +49,12 @@
         </table>
       </div>
       <div class="col position-relative" id="canvas-div">
-        <div v-if="!isProposer" class="position-relative">
+        <div class="position-relative">
           <img
-            v-for="im in imageSlicesConverted"
+            v-for="im in imageSlices"
             :key="im.id"
-            :src="im.imageData"
-            style="width: 100%"
+            :src="'data:image/png;base64,'+im.imageData"
+            style="width: 70%"
             class="position-absolute top-0 start-0"
           />
         </div>
@@ -132,13 +132,16 @@ export default defineComponent({
 
       isProposer: false,
 
-      imageSlices: [] as ImageSlice[],
+      imageSlices: [],
       //incorrect: true,
       correct: "Fish",
       newGuess: "",
       myTurn: false,
       //player: '',
     };
+  },
+  created() {
+      this.subscribeToActiveGame();
   },
   methods: {
     mounted() {
@@ -161,6 +164,7 @@ export default defineComponent({
 
     newImageProposer(image: Image) {
       this.isProposer = true;
+      console.log("Adding new image as proposer");
 
       for (var i = 0; i < image.slices.length; i++) {
         this.AddSlice(image.slices[i]);
@@ -168,15 +172,16 @@ export default defineComponent({
     },
 
     AddSlice(slice: ImageSlice) {
-      if (this.isProposer) {
-        this.imageSlices.push(slice);
-      }
+      this.imageSlices.push(slice);
 
+      /*
       this.imageSlicesConverted.push(
         URL.createObjectURL(
-          new Blob([slice.imageData.buffer], { type: "image/png" } /* (1) */)
+          fetch(slice.imageData)
+          .then(res => res.blob())
         )
       );
+      */
     },
 
     proposersTurn() {
@@ -191,6 +196,7 @@ export default defineComponent({
       if (!this.isProposer) {
         return;
       }
+      /*
 
       //these need to be scaled
       var x: number = event.offsetX;
@@ -213,6 +219,7 @@ export default defineComponent({
       }
 
       return;
+      */
     },
 
     //old ----- to be deleted, kept for refrence

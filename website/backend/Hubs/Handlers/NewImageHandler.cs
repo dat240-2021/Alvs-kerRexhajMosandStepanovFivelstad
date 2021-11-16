@@ -23,7 +23,7 @@ namespace backend.Hubs.Handlers
 
         public async Task Handle(NewImageEvent notification, CancellationToken cancellationToken)
         {
-            var image = await _db.Images.Where( x => x.Id == notification.ImageId).SingleOrDefaultAsync();
+            var image = await _db.Images.Where(x => x.Id == notification.ImageId).SingleOrDefaultAsync();
 
             if (notification.ProposerId is not null)
             {

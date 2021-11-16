@@ -54,7 +54,9 @@ export default defineComponent({
       leaveGameRoom(this.game.id).then(() => this.$emit("update:game", null));
     },
     handleStartGame() {
-      startGame(this.game.id).then(() => this.$router.push({ name: "Game" }));
+      //startGame(this.game.id).then(() => this.$router.push({ name: "InGame" }));
+      startGame(this.game.id);
+      this.$router.push({ name: "InGame" });
     }
   },
   emits: ['update:game'],

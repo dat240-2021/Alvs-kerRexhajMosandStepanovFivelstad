@@ -27,13 +27,13 @@ namespace backend.Core.Domain.Images.Pipelines
 				{
 					if (request.UserId != null && category == "My Images")
 					{
-						var userList = await _db.Images.Include(ic => ic.Category).Where(i => i.Category == "My Images").Where(i => i.UserId == request.UserId).Select(i => i.Id).ToListAsync(cancellationToken);
+						var userList = await _db.Images.Include(ic => ic.Label).ThenInclude(l => l.Category).Where(i => i.Label.Category.Name == "My Images").Where(i => i.UserId == request.UserId).Select(i => i.Id).ToListAsync(cancellationToken);
 						categoryImageIdList.AddRange(userList);
 					}
 
 					if (category != "My Images")
 					{
-						var tempList = await _db.Images.Include(ic => ic.Category).Where(i => i.Category == category).Select(i => i.Id).ToListAsync(cancellationToken);
+						var tempList = await _db.Images.Include(ic => ic.Label).ThenInclude(l => l.Category).Where(i => i.Label.Category.Name == category).Select(i => i.Id).ToListAsync(cancellationToken);
 						categoryImageIdList.AddRange(tempList);
 					}
 				}

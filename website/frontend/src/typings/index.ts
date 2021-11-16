@@ -54,7 +54,7 @@ export interface ImageLabel {
 export interface ImageSlice {
   id: number;
   sequenceNumber: number;
-  imageData: Uint8ClampedArray;
+  imageData: string;
 }
 
 export interface Image {

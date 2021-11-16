@@ -50,7 +50,7 @@ namespace backend.Core.Domain.BackendGame.Services
 
             if (_games.TryGetValue(game.Id, out var gameSlotInfo))
             {
-                if (gameSlotInfo.MaxSlotsCount.Equals(gameSlotInfo.PlayerSlots.Count))
+                if (gameSlotInfo.MaxSlotsCount.Equals(gameSlotInfo.PlayerSlots.Count - 1))
                 {
                     throw new Exception($"Room with id { game.Id } is full");
                 }
