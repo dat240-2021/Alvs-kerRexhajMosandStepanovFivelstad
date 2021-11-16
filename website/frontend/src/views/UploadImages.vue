@@ -1,122 +1,124 @@
 <template>
-    <div class="container vh-100 py-5">
-        <div class="row">
-            <div class="col d-flex justify-content-around">
-                <router-link class="btn btn-primary" to="/home">
-                    Return home
-                </router-link>
-                <Submit>Start game</Submit>    
-            </div>
+  <div class="container vh-100 py-5">
+    <div class="row">
+      <div class="col d-flex justify-content-around">
+        <router-link class="btn btn-primary" to="/home">
+          Return home
+        </router-link>
+        <Submit>Start game</Submit>
+      </div>
+    </div>
+
+    <div class="col d-flex justify-content-center">
+      <h1>Upload Image</h1>
+    </div>
+    <div class="row">
+      <form @submit.prevent="onUploadImage" class="form-control border-0">
+        <div class="col d-flex justify-content-around">
+          <p>Upload Images</p>
+          <Input type="file" @change="onImagesSelected"></Input>
+          <div class="input-group-prepend">
+            <button class="btn btn-outline-primary" type="submit">
+              UploadFiles
+            </button>
+          </div>
+          <p>{{ images.length }} files selected</p>
         </div>
-        
-        <div class="col d-flex justify-content-center">
-            <h1>Upload Image</h1>
-        </div>
-        <div class="row ">
-            <form>
-            <div class="col d-flex justify-content-around">              
-                <p>Upload Images</p>
-                    <Input type="file" @change="onImageSelected"></Input>
-                    <Submit @click="onUploadImage" > Upload</Submit>
-                <p>{{numberOfImages}} files selected</p>
-            </div>   
-            </form>         
-        </div>
-        <form>
-        <div class="table">
-            <table>
-                <tr>
-                    <th>#</th>              
-                    <th>Filename</th>
-                    <th>Title</th>
-                    <th>Category</th>
-                </tr>       
-                <tr v-for="i in 10" :key="i">
-                    <td>{{i}}</td>                
-                    <td>imagename.jpg</td>                
-                    <td>
-                       <Input  
-                           v-model="label"
-                           error=""
-                           type="text"
-                           model-value="Image Title"
-                           id="imagetitle"                               
-                       />
-                    </td>              
-                    <td>
-                       <Input                                                       
-                           error=""
-                           type="text"
-                           model-value="Category"
-                           id="category"                               
-                       />
-                    </td>
-                </tr>         
-            </table>
-        </div>
-        </form>      
-        </div>         
+      </form>
+    </div>
+    <div v-if="error.length > 2">
+      <p class="text-danger">{{ error }}</p>
+    </div>
+    <form>
+      <div class="table">
+        <table>
+          <tr>
+            <th>#</th>
+            <th>Filename</th>
+            <th>Title</th>
+            <th>Category</th>
+          </tr>
+          <tr v-for="i in images" :key="i.id">
+            <td>{{ i.id }}</td>
+            <td>{{ i.file.name }}</td>
+            <td>
+              <Input v-model="i.label" error="" type="text" id="imagetitle" />
+            </td>
+            <td>
+              <Input v-model="i.category" error="" type="text" id="category" />
+            </td>
+          </tr>
+        </table>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script lang="ts">
+import { defineComponent } from "vue";
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
-
-
-export class Image {
-    Image: string; //this is the image.
-    ImageName: string; // this is the name of the image.
-    ImageTitle: string; // this is the image title and also correct answere to the guess.
-    Category: string; 
-    ImageId: string;
-
-    constructor(image: string, imageName: string, imageTitle: string, category:string, imageId:string) {
-        this.Image = image;
-        this.ImageName = imageName;
-        this.ImageTitle = imageTitle;
-        this.Category = category;
-        this.ImageId = imageId;
-    }
-
-}
+import { ImageFile,Category } from "@/typings";
+import { fetchCategories } from "@/api/BackendGame";
 
 declare interface BaseComponentData {
-    images : Image[],
-    selectedImage: null,
-    label : string,
-    numberOfImages : number,
+  images: ImageFile[];
+  imagesSelected: any;
+  categories: Category[];
+  error: string;
 }
 
-export default {
-    name: "UploadImages",
-    components: {
-        Input,
-        Submit,
+export default defineComponent({
+  name: "UploadImages",
+  components: {
+    Input,
+    Submit,
+  },
+
+  data(): BaseComponentData {
+    return {
+      images: [],
+      imagesSelected: null,
+      categories: [],
+      error: "",
+    };
+  },
+  methods: {
+    onImagesSelected(event: any) {
+      console.log(event.target.files);
+      for (var i = 0; i < event.target.files.length; i++) {
+        this.images.push({
+          id: i,
+          file: event.target.files[i],
+          category: "",
+          label: "",
+        } as ImageFile);
+      }
+
+      //this.images.Image = event.target.files[0]
+      //this.selectedImage = event.target.files[0]
     },
-    
-    data() : BaseComponentData {
-        return {
-            images: [] as Image[],
-            selectedImage: null,
-            label: "",
-            numberOfImages: 0,
-        };
-    },
-    methods:{
-        onImageSelected(event: any) {
-            console.log(event)
-            //this.images.Image = event.target.files[0]
-            //this.selectedImage = event.target.files[0]
-        },
-        onUploadImage(){
-            // This is where we send the images to database.
+    onUploadImage() {
+      if (this.images.length < 1) {
+        this.error = "Upload at least one file!";
+      }
+      for (var i = 0; i < this.images.length; i++) {
+        if (this.images[i].category == "" || this.images[i].label == "") {
+          this.error = "Please fill in all fields!";
+          return;
         }
-    }
-};
-</script>
+      }
 
-<style scoped>
-.col {
-    margin: 1em;
-}
-</style>
+      //do the actual upload
+      console.log(this.images);
+    },
+
+    loadCategories() {
+      fetchCategories().then((categories) => {
+        // var categoryIds = categories.map(c => c.id);
+        this.categories = categories;
+      });
+    },
+  },
+});
+</script>
