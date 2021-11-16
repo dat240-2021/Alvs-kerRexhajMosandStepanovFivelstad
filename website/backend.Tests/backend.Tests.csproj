@@ -23,6 +23,10 @@
   <ItemGroup>
         <ProjectReference Include="..\backend\backend.csproj" />
     </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Infrastructure\Data\Images" />
+  </ItemGroup>
 
 
 </Project>

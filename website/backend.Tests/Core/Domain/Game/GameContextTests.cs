@@ -29,7 +29,7 @@ namespace backend.Tests.Core.Domain.Games
             var user = Guid.NewGuid();
             var game = new Game(
                 Guid.NewGuid(),
-                new List<Image>() { new Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test"))) },
+                new List<backend.Core.Domain.Images.Image>() { new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test"))) },
                 new List<Guesser>() { new Guesser(user) },
                 new Proposer(Guid.NewGuid())
             );
@@ -41,7 +41,7 @@ namespace backend.Tests.Core.Domain.Games
         public void Guessing_Succeeds_When_Guessers_Turn()
         {
             var user = Guid.NewGuid();
-            var image = new Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
+            var image = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
             image.AddImageSlice(new byte[2], 3);
 
             var game = new Game(
@@ -59,7 +59,7 @@ namespace backend.Tests.Core.Domain.Games
         public void SingleGuesser_SingleImage()
         {
             var user = Guid.NewGuid();
-            var image = new Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
+            var image = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
             image.AddImageSlice(new byte[2], 3);
 
             var game = new Game(
@@ -78,9 +78,9 @@ namespace backend.Tests.Core.Domain.Games
         public void SingleGuesser_MultipleImages()
         {
             var user = Guid.NewGuid();
-            var image1 = new Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
-            var image2 = new Image(Guid.NewGuid(), new ImageLabel("test2", new ImageCategory(2, "test")));
-            var image3 = new Image(Guid.NewGuid(), new ImageLabel("test3", new ImageCategory(2, "test")));
+            var image1 = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
+            var image2 = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test2", new ImageCategory(2, "test")));
+            var image3 = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test3", new ImageCategory(2, "test")));
             image1.AddImageSlice(new byte[2], 1);
             image2.AddImageSlice(new byte[2], 1);
             image3.AddImageSlice(new byte[2], 1);
@@ -121,7 +121,7 @@ namespace backend.Tests.Core.Domain.Games
         {
             var user1 = Guid.NewGuid();
             var user2 = Guid.NewGuid();
-            var image = new Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
+            var image = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
             image.AddImageSlice(new byte[2], 1);
 
             var game = new Game(
@@ -148,9 +148,9 @@ namespace backend.Tests.Core.Domain.Games
             var user1 = Guid.NewGuid();
             var user2 = Guid.NewGuid();
             var user3 = Guid.NewGuid();
-            var image1 = new Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
-            var image2 = new Image(Guid.NewGuid(), new ImageLabel("test2", new ImageCategory(2, "test")));
-            var image3 = new Image(Guid.NewGuid(), new ImageLabel("test3", new ImageCategory(2, "test")));
+            var image1 = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test")));
+            var image2 = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test2", new ImageCategory(2, "test")));
+            var image3 = new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test3", new ImageCategory(2, "test")));
             image1.AddImageSlice(new byte[2], 1);
             image2.AddImageSlice(new byte[2], 1);
             image3.AddImageSlice(new byte[2], 1);
