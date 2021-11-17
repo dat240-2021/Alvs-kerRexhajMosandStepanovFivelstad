@@ -1,44 +1,66 @@
 <template>
   <div class="container vh-100 py-5">
     <div class="row">
-      <div class="col d-flex justify-content-around">
+      <div class="col d-flex justify-content-around mb-5">
         <router-link class="btn btn-primary" to="/home">
           Return home
         </router-link>
-        <Submit>Start game</Submit>
+        <button class="btn btn-outline-primary" type="button" @click="clear">
+          Clear Input
+        </button>
       </div>
     </div>
 
-    <div class="col d-flex justify-content-center">
+    <div class="col d-flex justify-content-center mb-5">
       <h1>Upload Image</h1>
     </div>
     <div class="row">
       <form @submit.prevent="onUploadImage" class="form-control border-0">
-        <div class="col d-flex justify-content-around">
-          <p>Upload Images</p>
-          <Input type="file" @change="onImagesSelected"></Input>
+        <div class="col d-flex justify-content-around mb-5">
+          <Input
+            type="file"
+            error=""
+            @change="onImagesSelected"
+            id="inputUploadField"
+          ></Input>
           <div class="input-group-prepend">
             <button class="btn btn-outline-primary" type="submit">
               UploadFiles
             </button>
           </div>
-          <p>{{ images.length }} files selected</p>
+          <div v-if="loading == false">
+            <p v-if="images.length > 1">{{ images.length }} Files selected</p>
+          </div>
+          <div v-else class="d-flex">
+            <div
+              class="spinner-border text-primary align-self-center"
+              role="status"
+            ></div>
+            <div class="align-self-center">
+              <p class="m-2">Processing {{ images.length }} files</p>
+            </div>
+          </div>
         </div>
       </form>
     </div>
-    <div v-if="error.length > 2">
-      <p class="text-danger">{{ error }}</p>
+    <div>
+      <p v-if="successText.length > 2" class="text-success">
+        {{ successText }}
+      </p>
+      <p v-if="error.length > 2" class="text-danger">{{ error }}</p>
     </div>
-    <form>
-      <div class="table">
-        <table>
-          <tr>
-            <th>#</th>
-            <th>Filename</th>
-            <th>Title</th>
-            <th>Category</th>
+    <div>
+      <table class="table table-hover">
+        <thead>
+          <tr class="text-center">
+            <th scope="col">#</th>
+            <th scope="col">Filename</th>
+            <th scope="col">Solution</th>
+            <th scope="col">Category</th>
           </tr>
-          <tr v-for="i in images" :key="i.id">
+        </thead>
+        <tbody>
+          <tr v-for="i in images" :key="i.id" scope="row" class="table-hover">
             <td>{{ i.id }}</td>
             <td>{{ i.name }}</td>
             <td>
@@ -56,16 +78,15 @@
               </select>
             </td>
           </tr>
-        </table>
-      </div>
-    </form>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import Input from "@/components/Form/Input.vue";
-import Submit from "@/components/Form/Submit.vue";
 import { ImageFile, Category } from "@/typings";
 import { fetchCategories } from "@/api/BackendGame";
 import { uploadImages } from "@/api/Images";
@@ -75,13 +96,14 @@ declare interface BaseComponentData {
   imagesSelected: any;
   categories: Category[];
   error: string;
+  successText: string;
+  loading: boolean;
 }
 
 export default defineComponent({
   name: "ImageUpload",
   components: {
     Input,
-    Submit,
   },
 
   data(): BaseComponentData {
@@ -90,6 +112,8 @@ export default defineComponent({
       imagesSelected: null,
       categories: [],
       error: "",
+      loading: false,
+      successText: "",
     };
   },
   mounted() {
@@ -97,26 +121,28 @@ export default defineComponent({
   },
   methods: {
     onImagesSelected(event: any) {
-      console.log(event.target.files);
-      for (var i = 0; i < event.target.files.length; i++) {
-        var name = event.target.files[i].name;
-        var reader = new FileReader();
-        reader.onloadend = () => {
-          this.images.push({
-            id: i,
-            name: name,
-            file: reader.result,
-            category: "",
-            label: "",
-          } as ImageFile);
-        };
-        reader.readAsDataURL(event.target.files[i]);
-      }
+      this.error = "";
 
-      //this.images.Image = event.target.files[0]
-      //this.selectedImage = event.target.files[0]
+      for (var i = 0; i < event.target.files.length; i++) {
+        this.loadFile(event.target.files[i], i);
+      }
+      event.target.files = null;
     },
-    onUploadImage() {
+
+    loadFile(file: any, i: number) {
+      var reader = new FileReader();
+      reader.onloadend = () => {
+        this.images.push({
+          id: i,
+          name: file.name,
+          file: reader.result,
+          category: "",
+          label: "",
+        } as ImageFile);
+      };
+      reader.readAsDataURL(file);
+    },
+    async onUploadImage() {
       if (this.images.length < 1) {
         this.error = "Upload at least one file!";
       }
@@ -129,9 +155,17 @@ export default defineComponent({
 
       //do the actual upload
       console.log(this.images);
-      uploadImages(this.images);
+      this.loading = true;
+      await uploadImages(this.images);
+      this.successText = this.images.length + " files were uploaded";
+      this.clear();
     },
-
+    clear() {
+      this.loading = false;
+      this.images = [];
+      this.imagesSelected = null;
+      this.error = "";
+    },
     loadCategories() {
       fetchCategories().then((categories) => {
         // var categoryIds = categories.map(c => c.id);
