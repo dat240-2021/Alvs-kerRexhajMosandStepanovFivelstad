@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using backend.Core.Domain.Images.Utils;
 using Infrastructure.Data;
 using MediatR;
 
@@ -17,11 +18,13 @@ namespace backend.Core.Domain.Images.Pipelines
         {
             private readonly GameContext _db;
             private readonly IMediator _mediator;
+            private readonly IRandomNumberGenerator _rnd;
 
-            public Handler(GameContext db, IMediator mediator, Random rnd)
+            public Handler(GameContext db, IMediator mediator, IRandomNumberGenerator rnd)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
                 _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+                _rnd = rnd;
             }
 
             public async Task<List<int>> Handle(Request request, CancellationToken cancellationToken)
@@ -33,8 +36,7 @@ namespace backend.Core.Domain.Images.Pipelines
                     .ToList();
                 var ids = await _mediator.Send(new GetImageIdListByCategory.Request(categories, null), cancellationToken);
                 
-                var rnd = new Random();
-                var randomizedIds = ids.OrderBy(_ => rnd.Next()).ToList();
+                var randomizedIds = ids.OrderBy(_ => _rnd.Next()).ToList();
 
                 return request.ImagesCount is null ? 
                     randomizedIds : 
