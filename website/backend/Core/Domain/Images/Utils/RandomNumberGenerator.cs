@@ -15,9 +15,4 @@ namespace backend.Core.Domain.Images.Utils
             return Next();
         }
     }
-
-    public interface IRandomNumberGenerator
-    {
-        int Next();
-    }
 }
