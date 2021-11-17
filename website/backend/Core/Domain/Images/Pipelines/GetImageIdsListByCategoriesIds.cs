@@ -1,38 +1,41 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Data;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-// NEED TO REWRITE THIS. ITS A TEMP SOLUTION FOR THIS PR
 namespace backend.Core.Domain.Images.Pipelines
 {
-    public class GetImageIdsListByCategoriesIds
-    {
-        public record Request(List<int> CategoryIds) : IRequest<List<int>>;
+	public class GetImageIdsListByCategoriesIds
+	{
+		public record Request(List<int> Categories, Guid? UserId) : IRequest<List<int>>;
 
-        public class Handler : IRequestHandler<Request, List<int>>
-        {
-            private readonly GameContext _db;
-            private readonly IMediator _mediator;
+		public class Handler : IRequestHandler<Request, List<int>>
+		{
+			private readonly GameContext _db;
 
-            public Handler(GameContext db, IMediator mediator)
-            {
-                _db = db ?? throw new ArgumentNullException(nameof(db));
-                _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            }
+			public Handler(GameContext db) => _db = db ?? throw new ArgumentNullException(nameof(db));
 
-            public async Task<List<int>> Handle(Request request, CancellationToken cancellationToken)
-            {
-                var imageCategories = await _mediator.Send(new GetCategoryList.Request());
-                var categories = imageCategories
-                    .Where(ic => request.CategoryIds.Contains(ic.Id))
-                    .Select(c => c.Name)
-                    .ToList();
-                return await _mediator.Send(new GetImageIdListByCategory.Request(categories, null));
-            }
-        }
-    }
+			public async Task<List<int>> Handle(Request request, CancellationToken cancellationToken)
+			{
+				var categoryImageIdList = new List<int>();
+
+				foreach (var category in request.Categories)
+				{
+					if (request.UserId != null)
+					{
+						var userList = await _db.Images.Include(ic => ic.Category).Where(i => i.Label.Category.Id == category).Where(i => i.UserId == request.UserId).Select(i => i.Id).ToListAsync(cancellationToken);
+						categoryImageIdList.AddRange(userList);
+					}
+					
+					var defaultList = await _db.Images.Include(ic => ic.Category).Where(i => i.Label.Category.Id == category).Where(i => i.UserId == null).Select(i => i.Id).ToListAsync(cancellationToken);
+					categoryImageIdList.AddRange(defaultList);
+				}
+				return categoryImageIdList;
+			}
+		}
+	}
 }
