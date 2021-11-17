@@ -34,7 +34,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
                     .Where(g => g.State.Equals(GameState.Created))
                     .ToListAsync(cancellationToken);
 
-                return games.Select(game => new GameWithSlotInfo(game, _backendGameService.GetSlotInfo(game))
+                return games.Select(game => new GameWithSlotInfo(game, _backendGameService.GetSlotInfo(game.Id))
                 ).ToList();
             }
         }

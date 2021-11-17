@@ -44,7 +44,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
                 await _mediator.Publish(new GameStarted(game), cancellationToken);
 
                 var imageIds = await _mediator.Send(new GetImageIdsListByCategoriesIds.Request(game.Settings.CategoryIds));
-                var slotInfo = _backendGameService.GetSlotInfo(game);
+                var slotInfo = _backendGameService.GetSlotInfo(game.Id);
                 await _mediator.Send(new Games.Pipelines.StartGame.Request(new GameWithSlotInfo(game, slotInfo), imageIds), cancellationToken);
                 
                 return new Response(true);

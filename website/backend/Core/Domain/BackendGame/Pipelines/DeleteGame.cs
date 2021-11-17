@@ -30,7 +30,7 @@ namespace backend.Core.Domain.BackendGame.Pipelines
             {
                 _db.Games.Remove(request.Game);
                 await _db.SaveChangesAsync(cancellationToken);
-                _backendGameService.deleteGame(request.Game.Id);
+                _backendGameService.DeleteGame(request.Game.Id);
                 await _mediator.Publish(new GameDeleted(request.Game), cancellationToken);
                 return Unit.Value;
             }

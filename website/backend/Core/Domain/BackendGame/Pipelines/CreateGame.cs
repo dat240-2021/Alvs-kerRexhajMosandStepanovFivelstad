@@ -37,9 +37,10 @@ namespace backend.Core.Domain.BackendGame.Pipelines
                 _db.Games.Add(game);
                 
                 await _db.SaveChangesAsync(cancellationToken);
+                _backendGameService.StoreGame(game);
                 await _mediator.Publish(new GameCreated(game), cancellationToken);
                 await _mediator.Send(new JoinGame.Request(request.User, game.Id, creatorRole), cancellationToken);
-                return new GameWithSlotInfo(game, _backendGameService.GetSlotInfo(game));
+                return new GameWithSlotInfo(game, _backendGameService.GetSlotInfo(game.Id));
             }
         }
     }

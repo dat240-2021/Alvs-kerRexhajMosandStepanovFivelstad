@@ -33,8 +33,8 @@ namespace backend.Core.Domain.BackendGame.Pipelines
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
                 var game = await _db.Games.FirstOrDefaultAsync(g => g.Id.Equals(request.GameId), cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
-                await _backendGameService.JoinGame(game, request.User.Id, request.Role);
-                var gameSlotInfo = _backendGameService.GetSlotInfo(game);
+                _backendGameService.JoinGame(game.Id, request.User.Id, request.Role);
+                var gameSlotInfo = _backendGameService.GetSlotInfo(game.Id);
                 await _mediator.Publish(new UserJoinGame(new GameSlotNotification(game.Id, gameSlotInfo.GuessersIds.Count)), cancellationToken);
 
                 return Unit.Value;
