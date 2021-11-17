@@ -11,14 +11,14 @@ namespace backend.Core.Domain.Images.Pipelines
 {
     public class GetImageIdsListByCategoriesIds
     {
-        public record Request(List<int> CategoryIds) : IRequest<List<int>>;
+        public record Request(List<int> CategoryIds, int? ImagesCount) : IRequest<List<int>>;
 
         public class Handler : IRequestHandler<Request, List<int>>
         {
             private readonly GameContext _db;
             private readonly IMediator _mediator;
 
-            public Handler(GameContext db, IMediator mediator)
+            public Handler(GameContext db, IMediator mediator, Random rnd)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
                 _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -31,7 +31,14 @@ namespace backend.Core.Domain.Images.Pipelines
                     .Where(ic => request.CategoryIds.Contains(ic.Id))
                     .Select(c => c.Name)
                     .ToList();
-                return await _mediator.Send(new GetImageIdListByCategory.Request(categories, null));
+                var ids = await _mediator.Send(new GetImageIdListByCategory.Request(categories, null), cancellationToken);
+                
+                var rnd = new Random();
+                var randomizedIds = ids.OrderBy(_ => rnd.Next()).ToList();
+
+                return request.ImagesCount is null ? 
+                    randomizedIds : 
+                    randomizedIds.Take((int)request.ImagesCount).ToList();
             }
         }
     }
