@@ -12,6 +12,9 @@
     </div>
     <div class="row mt-3 justify-content-center">
       <div class="col d-flex justify-content-center">
+        <router-link class="btn btn-primary" to="/uploadImages">
+          Upload Images
+        </router-link>
         <router-link class="btn btn-primary" to="/game">
           Create game
         </router-link>
