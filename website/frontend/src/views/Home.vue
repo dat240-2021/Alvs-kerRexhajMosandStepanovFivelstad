@@ -129,7 +129,7 @@ export default defineComponent({
       });
     },
     startGame() {
-      this.$router.push({ name: "Game" });
+      this.$router.push({ name: "InGame" });
     },
     handleLogout() {
       logoutUser().then(() => this.$router.push({ name: "Index" }));

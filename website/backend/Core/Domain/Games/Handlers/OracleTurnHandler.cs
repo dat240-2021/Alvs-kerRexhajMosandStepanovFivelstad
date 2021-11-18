@@ -14,17 +14,13 @@ namespace backend.Core.Domain.Games.Handlers
 {
     public class OracleTurnHandler: INotificationHandler<OracleTurnEvent>
     {
-        private readonly GameContext _db;
         private readonly IGameService _service;
         private readonly IMediator _mediator;
-        private readonly IHubContext<GameHub> _hub;
 
-        public OracleTurnHandler(GameContext db, IGameService service, IMediator mediator, IHubContext<GameHub> hub)
+        public OracleTurnHandler(IGameService service, IMediator mediator)
         {
-            _db = db ?? throw new System.ArgumentException(nameof(db));
             _service = service ?? throw new System.ArgumentException(nameof(service));
             _mediator = mediator ?? throw new System.ArgumentException(nameof(mediator));
-            _hub = hub ?? throw new System.ArgumentException(nameof(hub));
         }
 
         public async Task Handle(OracleTurnEvent notification, CancellationToken cancellationToken)
@@ -32,7 +28,7 @@ namespace backend.Core.Domain.Games.Handlers
 
             var game = _service.Get(notification.GameId) ?? throw new System.ArgumentException(nameof(IGameService));
 
-            await _mediator.Send(new Propose.Request(game.Id,notification.Proposition));
+            await _mediator.Send(new Propose.Request(game.Id, notification.Proposition));
         }
     }
 }
