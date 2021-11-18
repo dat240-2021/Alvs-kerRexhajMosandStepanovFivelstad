@@ -18,7 +18,11 @@ namespace backend.Core.Domain.BackendGame.Services
                 throw new Exception($"Game with id {game.Id} already exists.");
             }
             
-            _games.TryAdd(game.Id, new GameSlotInfo{ MaxSlotsCount = game.Settings.GuessersCount });
+            _games.TryAdd(game.Id, new GameSlotInfo
+            {
+                MaxSlotsCount = game.Settings.ProposerType == "AI" ? game.Settings.GuessersCount : game.Settings.GuessersCount + 1,
+                ProposerType = game.Settings.ProposerType == "AI" ? ProposerType.AI : ProposerType.Player
+            });
         }
         
         public GameSlotInfo GetSlotInfo(Guid gameId)
@@ -47,11 +51,16 @@ namespace backend.Core.Domain.BackendGame.Services
         {
             if (!_games.ContainsKey(gameId))
             {
-                throw new Exception($"Game room with id { gameId } is not stored");
+                throw new Exception($"Game room with id {gameId} is not stored");
             }
 
             if (!_games.TryGetValue(gameId, out var gameSlotInfo)) return;
-            
+
+            if (gameSlotInfo.ProposerType.Equals(ProposerType.AI) && role.Equals(SlotRole.Proposer))
+            {
+                throw new Exception($"Trying to add proposer player in a game with configured proposer type AI");
+            }
+
             if (gameSlotInfo.MaxSlotsCount.Equals(gameSlotInfo.PlayerSlots.Count))
             {
                 throw new Exception($"Room with id { gameId } is full");

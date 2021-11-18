@@ -88,6 +88,40 @@ namespace backend.Tests.Core.Domain.BackendGame
         }
         
         
+        [Fact]
+        public void UserJoinsGameAsProposerLeavesAvailableSlotTest()
+        {
+            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "Player");
+            var user = new User();
+            var game = GetGame(settings, user);
+            
+            
+            var service = new BackendGameService();
+            service.StoreGame(game);
+            service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
+            
+            Assert.True(service.HasAvailableSlots(game.Id));
+        }
+        
+        
+        [Fact]
+        public void UserJoinsGameAsProposerWithAiProposerTypeWillFailTest()
+        {
+            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "AI");
+            var user = new User();
+            var game = GetGame(settings, user);
+            
+            
+            var service = new BackendGameService();
+            service.StoreGame(game);
+            
+            void Act() => service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
+            Assert.Throws<Exception>(Act);
+        }
+
+
+
+
         private static GameSettings GetGameSettings(List<int> categoryIds, int duration, int guessers, int images, string proposer)
         {
             return new()
