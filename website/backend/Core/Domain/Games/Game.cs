@@ -161,17 +161,19 @@ namespace backend.Core.Domain.Games{
                     //other guessers can keep guessing until time runs out.
                 }
 
-                if ( Guessers.All(x => x.Guessed) && CurrentImage.Slices.Count == SlicesShown.Count)
+                if ( Guessers.All(x => x.Guessed))
                 {
-                    NextImage();
-                }
-
-                if (Guessers.All(x => x.Guessed) && CurrentImage.Slices.Count != SlicesShown.Count)
-                {
-                    ProposersTurn = true;
-                    foreach (var g in Guessers)
+                    if (CurrentImage.Slices.Count == SlicesShown.Count)
                     {
-                        g.Guessed = false;
+                        NextImage();
+                    }
+                    else
+                    {
+                        ProposersTurn = true;
+                        foreach (var g in Guessers)
+                        {
+                            g.Guessed = false;
+                        }
                     }
                 }
 
