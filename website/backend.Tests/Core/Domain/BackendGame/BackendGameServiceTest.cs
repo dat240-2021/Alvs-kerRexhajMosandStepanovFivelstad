@@ -118,6 +118,29 @@ namespace backend.Tests.Core.Domain.BackendGame
             void Act() => service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
             Assert.Throws<Exception>(Act);
         }
+        
+        [Fact]
+        public void TwoUserJoinsGameAsProposerWillFailTest()
+        {
+            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "Player");
+            var user = new User()
+            {
+                Id = Guid.NewGuid()
+            };
+            var game = GetGame(settings, user);
+            
+            var service = new BackendGameService();
+            service.StoreGame(game);
+            
+            service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
+            
+            var user2 = new  User()
+            {
+                Id = Guid.NewGuid()
+            };
+            void Act() => service.JoinGame(game.Id, user2.Id, SlotRole.Proposer);
+            Assert.Throws<Exception>(Act);
+        }
 
 
 

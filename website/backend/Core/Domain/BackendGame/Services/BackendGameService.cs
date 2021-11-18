@@ -58,7 +58,12 @@ namespace backend.Core.Domain.BackendGame.Services
 
             if (gameSlotInfo.ProposerType.Equals(ProposerType.AI) && role.Equals(SlotRole.Proposer))
             {
-                throw new Exception($"Trying to add proposer player in a game with configured proposer type AI");
+                throw new Exception($"Trying to add proposer player in a game with configured proposer type AI and id { gameId }");
+            }
+
+            if (role.Equals(SlotRole.Proposer) && gameSlotInfo.ProposerId is not null)
+            {
+                throw new Exception($"A proposer has already joing the game with id { gameId }");
             }
 
             if (gameSlotInfo.MaxSlotsCount.Equals(gameSlotInfo.PlayerSlots.Count))
