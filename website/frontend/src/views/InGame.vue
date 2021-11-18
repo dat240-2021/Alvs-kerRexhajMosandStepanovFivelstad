@@ -225,8 +225,8 @@ export default defineComponent({
         ) as HTMLImageElement;
 
         let canvas = document.createElement("canvas");
-        canvas.width = img.height;
-        canvas.height = img.width;
+        canvas.width = img.width;
+        canvas.height = img.height;
         var ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, img.width, img.height);
 
