@@ -85,7 +85,6 @@ export interface newScore {
   score: number;
 }
 
-
 export interface Player {
   Name: string;
   Score: number;

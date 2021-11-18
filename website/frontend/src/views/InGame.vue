@@ -13,8 +13,8 @@
   <div class="container-fluid min-vh-100">
     <div class="row mt-3">
       
-      <div class='d-flex' v-if="!isProposer && started">
-        <div class='ms-auto'>
+      <div class="d-flex" v-if="!isProposer && started">
+        <div class="ms-auto">
           <p>
             <b>Playing as: </b>
             <i>Guesser</i>
@@ -29,7 +29,7 @@
               v-model="guess"
               aria-label=""
               aria-describedby="basic-addon1"
-              style='opacity: 0.3;'
+              style="opacity: 0.3"
               :disabled="!myTurn"
             />
             <div class="input-group-prepend">
@@ -40,9 +40,9 @@
           </div>
         </form>
       </div>
-      <div v-else class='d-flex ms-auto' />
+      <div v-else class="d-flex ms-auto" />
 
-      <h2 v-if="isProposer" class="text-center">{{this.label}}</h2>
+      <h2 v-if="isProposer" class="text-center">{{ this.label }}</h2>
 
       <div class="col-1">
         <table>
@@ -53,7 +53,7 @@
           </thead>
           <tbody>
             <tr v-for="g in guesses" :key="g">
-              <td>{{ g }}</td>
+              <td>{{ g.userId }}: {{ g.guess }}</td>
             </tr>
           </tbody>
         </table>
@@ -64,7 +64,7 @@
             <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;"/>
             <span class="ms-5">Waiting for game to start...</span>
           </div>
-          <div v-if="started && !isProposer && imageSlices.length == 0" class="d-flex justify-content-center m-5">
+          <div v-if="isResetGuesser" class="d-flex justify-content-center m-5">
             <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;"/>
             <span class="ms-5">Waiting for proposer...</span>
           </div>
@@ -89,7 +89,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="p in players.sort((a, b) => b.Score - a.Score)"
+              v-for="p in sortedPlayers"
               :key="p.PlayerId"
             >
               <td>{{ p.Name }}</td>
@@ -100,13 +100,9 @@
       </div>
     </div>
   </div>
-  <teleport to="body">
-    <GameAlertModal v-if="joinedGame" v-model:text="Test" :title="Alert"/>
-  </teleport>
 </template>
 
 <script lang="ts">
-import GameAlertModal from "@/components/Modal/GameAlertModal.vue";
 import { defineComponent } from "vue";
 import {
   subscribeToNewImageGuesser,
@@ -124,13 +120,12 @@ import {
   ImageSlice,
   Guess,
   Player,
-  Proposal,
   newScore,
 } from "@/typings";
 
 declare interface BaseComponentData {
   players: Player[];
-  guesses: string[];
+  guesses: Guess[];
   imageSlices: ImageSlice[];
   guess: string;
   label: string;
@@ -145,7 +140,7 @@ export default defineComponent({
     return {
       players: [] as Player[],
 
-      guesses: [],
+      guesses: [] as Guess[],
 
       isProposer: false,
       started: false,
@@ -157,6 +152,16 @@ export default defineComponent({
       myTurn: false,
       //player: '',
     };
+  },
+  computed: {
+    sortedPlayers: function (): Player[] {
+      return [...this.players].sort(
+        (a: Player, b: Player) => b.Score - a.Score
+      );
+    },
+    isResetGuesser: function (): boolean {
+      return this.started && !this.isProposer && this.imageSlices.length == 0;
+    },
   },
   created() {
     this.subscribeToActiveGame();
@@ -208,35 +213,34 @@ export default defineComponent({
     proposerSelectedSlice(event: any) {
       if (!this.myTurn) return;
 
-      var x = event.offsetX;
-      var y = event.offsetY;
-      let element = event.target;
+      let x = event.offsetX;
+      let y = event.offsetY;
+      var element = event.target;
       x -= element.offsetLeft;
       y -= element.offsetTop;
 
       for (let slice of this.imageSlices) {
-        var img = document.getElementById(slice.id.toString()) as HTMLImageElement;
-        let h1 = img?.clientHeight ?? 1;
-        let w1 = img?.clientWidth ?? 1;
+        var img = document.getElementById(
+          slice.id.toString()
+        ) as HTMLImageElement;
 
-        let canvas = document.createElement('canvas');
+        let canvas = document.createElement("canvas");
         canvas.width = img.height;
         canvas.height = img.width;
-        var ctx = canvas.getContext('2d');
+        var ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, img.width, img.height);
 
-        let data = ctx?.getImageData(x, y, 1, 1);
-        let alpha = data?.data[3];
+        let alpha = ctx?.getImageData(x, y, 1, 1)?.data[3];
         if (alpha && alpha > 5) {
           sendNewProposal(slice.sequenceNumber);
-          document.getElementById(slice.id.toString())?.classList.add("opacity-25");
+          img?.classList.add("opacity-25");
           break;
         }
       }
     },
 
     addIncomingGuess(guess: Guess) {
-      this.guesses.push(guess.guess);
+      this.guesses = [...this.guesses, guess];
     },
     updateScores(score: newScore) {
       var player = this.players.find((x) => x.PlayerId == score.userId);
