@@ -17,7 +17,13 @@ namespace backend.Core.Domain.Games{
         public DateTime StartTime;
         public TimeSpan RoundTime;
 
-        public Images.Image CurrentImage { get => Images.Peek(); }
+        public Images.Image CurrentImage {
+            get
+            {
+                Images.TryPeek(out var result);
+                return result;
+            }
+        }
 
 
         public IProposer Proposer;
@@ -98,8 +104,9 @@ namespace backend.Core.Domain.Games{
         }
 
         public void NextImage() {
-            var result = Images.TryDequeue(out _);
-            if (!result)
+            Images.Dequeue(out _);
+
+            if (CurrentImage is null)
             {
                 GameOver();
                 return;
