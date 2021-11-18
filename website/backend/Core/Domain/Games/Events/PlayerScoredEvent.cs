@@ -5,8 +5,9 @@ using System.Collections.Generic;
 
 namespace backend.Core.Domain.Games.Events
 {
-    public record ProposersTurnEvent: BaseDomainEvent
+    public record PlayerScoredEvent: BaseDomainEvent
     {
-        public List<string> PlayerIds;
+        public Guid UserId;
+        public int Score;
     }
 }
