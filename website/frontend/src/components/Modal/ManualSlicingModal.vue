@@ -27,7 +27,7 @@
               style="z-index: 2"
             ></canvas>
           </div>
-          <label for="customRange1" class="form-label">Example range</label>
+          <label for="customRange1" class="form-label">Brush Diameter: {{ lineWidth }}</label>
           <input
             type="range"
             v-model="lineWidth"
@@ -39,7 +39,7 @@
           />
           <div class="d-flex justify-content-start h-100">
             <button
-              type="button" 
+              type="button"
               class="btn btn-outline-primary"
               @click="
                 colorPicker = colorPicker != true;
@@ -57,16 +57,13 @@
 
             <button
               class="btn btn-primary"
-              @click="selectAnotherColor=true"
-              v-if="colorPicker==true"
+              @click="selectAnotherColor = true"
+              v-if="colorPicker == true"
             >
               Pick Again
             </button>
 
-            <button
-              class="btn btn-primary"
-              @click="saveAndExit"
-            >
+            <button class="btn btn-primary" @click="saveAndExit">
               Finished
             </button>
           </div>
@@ -137,7 +134,10 @@ export default defineComponent({
     },
     start(event: any) {
       var color = "";
-      if ((this.colorPicker == true && this.pickedColor == "") || this.selectAnotherColor) {
+      if (
+        (this.colorPicker == true && this.pickedColor == "") ||
+        this.selectAnotherColor
+      ) {
         this.reposition(event);
         var pixel = this.ctx.getImageData(
           this.coord.x,
@@ -184,22 +184,22 @@ export default defineComponent({
 
     newColor() {
       // const randomColor = () => {
-        return "#" + Math.floor(Math.random() * 16777215).toString(16);
+      return "#" + Math.floor(Math.random() * 16777215).toString(16);
       // };
 
       // var color = randomColor();
       //if we find the same color try a new one.
       // while (this.sliceColors.find((x) => x == color) != null) {
-        // color = randomColor();
+      // color = randomColor();
       // }
       // this.sliceColors.push(color);
       // return color;
     },
 
-    saveAndExit(){
-      var data = this.canvas.toDataURL('image/png', 1.0);
+    saveAndExit() {
+      var data = this.canvas.toDataURL("image/png", 1.0);
 
-      this.$emit("SaveAndExit", {id: this.modalImage.id , data: data });
+      this.$emit("SaveAndExit", { id: this.modalImage.id, data: data });
     },
     closeModal() {
       this.$emit("closeModal");
