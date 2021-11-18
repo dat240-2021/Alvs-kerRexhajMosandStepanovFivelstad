@@ -31,13 +31,13 @@
           <input
             type="range"
             v-model="lineWidth"
-            class="form-range"
+            class="form-range my-3"
             min="0"
             max="80"
             step="1"
             id="customRange1"
           />
-          <div class="d-flex justify-content-start h-100">
+          <div class="d-flex justify-content-between h-100">
             <button
               type="button"
               class="btn btn-outline-primary"
@@ -49,6 +49,9 @@
             >
               Color Picker
             </button>
+            <div v-if="colorPicker!=true">
+              <p>Color Picker Disabled</p>
+            </div>
 
             <div
               class="mx-5 bg col-md-3 col-sm-3 col-xs-3"
@@ -62,6 +65,7 @@
             >
               Pick Again
             </button>
+
 
             <button class="btn btn-primary" @click="saveAndExit">
               Finished
@@ -83,12 +87,10 @@ export default defineComponent({
     return {
       canvas: null as any,
       ctx: null as any,
-      path: null as any,
       slice: null as any,
       coord: { x: 0, y: 0 },
       leavingDisabled: false,
       lineWidth: 5,
-      pathColors: ["#171717", "#edf0ee"],
       colorToggler: false,
       sliceColors: [] as string[],
       colorPicker: false,
@@ -154,29 +156,19 @@ export default defineComponent({
         color = this.pickedColor;
       }
       document.addEventListener("mousemove", this.draw);
-      // this.slice = new Path2D();
-      // this.reposition(event);
       this.ctx.strokeStyle = color;
-      // this.slice.moveTo(this.coord.x, this.coord.y);
       this.reposition(event);
     },
     stop() {
-      // this.ctx.closePath(this.slice);
-
-      // this.ctx.fillStyle = this.newColor();
-      // this.ctx.fill(this.slice);
       document.removeEventListener("mousemove", this.draw);
     },
     draw(event: any) {
-      // this.colorToggler = this.colorToggler != true;
       this.ctx.beginPath();
       this.ctx.lineWidth = this.lineWidth;
       this.ctx.lineCap = "round";
 
-      // this.ctx.strokeStyle = this.pathColors[this.colorToggler ? 1 : 0];
       this.ctx.moveTo(this.coord.x, this.coord.y);
       this.reposition(event);
-      // this.slice.lineTo(this.coord.x, this.coord.y);
       this.ctx.lineTo(this.coord.x, this.coord.y);
       this.ctx.stroke();
     },
