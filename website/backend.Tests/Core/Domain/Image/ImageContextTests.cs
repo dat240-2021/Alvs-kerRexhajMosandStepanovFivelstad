@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using backend.Controllers.NewGame.Dto;
 using backend.Core.Domain.Images;
 using backend.Core.Domain.Images.Pipelines;
 using backend.Tests.Helpers;
@@ -26,37 +27,53 @@ namespace backend.Tests.Core.Domain.Image
         [Fact]
         public void AddNewImage_AddsTwoImages()
         {
+
             var UserId = Guid.NewGuid();
-            var ImageList = new List<(byte[], string, string)>();
-            var number = 1;
+            List<ImageFile> TestImageList = new List<ImageFile>();
+            var emptySliceColors = new List<string>().ToArray();
+
+            int index = 1;
 
             foreach (string file in Directory.GetFiles(Path.Join("..", "..", "..", "Infrastructure", "Data", "Images")))
             {
-                ImageList.Add((File.ReadAllBytes(file), $"Test Label {number}",$"Test Category {number}" ));
-                number++;
+                var tempImageFile = new ImageFile();
+                var image = File.ReadAllBytes(file);
+                var b64 = Convert.ToBase64String(image);
+                tempImageFile.Id = index;
+                tempImageFile.File = b64;
+                tempImageFile.Category = 1;
+                tempImageFile.Label = $"Test Label {index}";
+                tempImageFile.Name = $"Test Name {index}";
+                tempImageFile.SliceColors = emptySliceColors;
+                tempImageFile.SliceFile = "";
+                TestImageList.Add(tempImageFile);
+                index++;
+
             }
 
-            var request = new AddUserImage.Request(ImageList,UserId);
+            var request = new AddUserImage.Request(TestImageList.ToArray(), UserId);
 
             using (var context = new GameContext(ContextOptions, null))
             {
                 context.Database.Migrate();
 
+                context.ImageCategories.Add(new ImageCategory("Test Category 1"));
+                context.ImageCategories.Add(new ImageCategory("Test Category 2"));
+
                 var handler = new AddUserImage.Handler(context);
 
-                _ = handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
-            }
-            using (var context = new GameContext(ContextOptions, null))
-            {
-                context.Images.Count().ShouldBe(2);
+                var result = handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
+
                 context.ImageCategories.Count().ShouldBe(2);
-                var actCategory = context.Images.Select(i => i.Label.Category.Name);
+                var categoryId = context.ImageCategories.Select(i => i.Id).FirstOrDefault();
+                Assert.Equal(1, categoryId);
+                var actImageSliceList = context.Images.Select(i => i.Slices);
+                Assert.Equal(result.Success.ToString(), true.ToString());
+                actImageSliceList.First().Count().ShouldBe(49);
                 var actLabel = context.Images.Select(i => i.Label.Label);
-                var actImageList = context.Images.Select(i => i.Slices);
-                Assert.Equal("Test Category 1",actCategory.First());
-                Assert.Equal("Test Label 1",actLabel.First());
-                Assert.Equal(49, actImageList.First().Count());
+                Assert.Equal("Test Label 1", actLabel.First());
             }
+
         }
         
         //Test GetCategoryList pipeline by adding 3 categories and retrieving list. 

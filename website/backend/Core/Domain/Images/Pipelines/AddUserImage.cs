@@ -27,8 +27,16 @@ namespace backend.Core.Domain.Images.Pipelines
 				foreach (var item in request.ImageList)
 				{
 
-					string StripB64String(string fileString){
-						var ret = fileString.Remove(0, fileString.IndexOf("base64,")+"base64,".Length );
+					string StripB64String(string fileString)
+					{
+
+						var ret = fileString;
+						int b64Start = item.File.IndexOf(";base64,") + 8;
+						if (b64Start > 8)
+						{
+							ret = fileString.Remove(0, fileString.IndexOf("base64,")+"base64,".Length );
+						}
+						//var ret = fileString.Remove(0, fileString.IndexOf("base64,")+"base64,".Length );
 						return ret;
 					}
 
