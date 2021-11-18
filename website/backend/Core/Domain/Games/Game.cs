@@ -104,7 +104,7 @@ namespace backend.Core.Domain.Games{
         }
 
         public void NextImage() {
-            Images.Dequeue(out _);
+            Images.TryDequeue(out _);
 
             if (CurrentImage is null)
             {
