@@ -90,7 +90,7 @@ export default defineComponent({
       lineWidth: 5,
       pathColors: ["#171717", "#edf0ee"],
       colorToggler: false,
-      // sliceColors: [] as string[],
+      sliceColors: [] as string[],
       colorPicker: false,
       selectAnotherColor: false,
       pickedColor: "",
@@ -110,7 +110,6 @@ export default defineComponent({
     },
   },
   mounted: function () {
-    // console.log(this.modalImage.file);
     this.canvas = document.getElementById("canvas_modal");
     this.ctx = this.canvas.getContext("2d");
     document.addEventListener("mousedown", this.start);
@@ -183,23 +182,29 @@ export default defineComponent({
     },
 
     newColor() {
-      // const randomColor = () => {
-      return "#" + Math.floor(Math.random() * 16777215).toString(16);
-      // };
+      const randomColor = () => {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        console.log(color);
+        return color;
+      };
 
-      // var color = randomColor();
-      //if we find the same color try a new one.
-      // while (this.sliceColors.find((x) => x == color) != null) {
-      // color = randomColor();
-      // }
-      // this.sliceColors.push(color);
-      // return color;
+      var color = randomColor();
+      // if we find the same color try a new one.
+      while (this.sliceColors.find((x) => x == color) != null) {
+      color = randomColor();
+      }
+      this.sliceColors.push(color);
+      return color;
     },
 
     saveAndExit() {
       var data = this.canvas.toDataURL("image/png", 1.0);
 
-      this.$emit("SaveAndExit", { id: this.modalImage.id, data: data });
+      this.$emit("SaveAndExit", { id: this.modalImage.id, data: data,colors: this.sliceColors });
     },
     closeModal() {
       this.$emit("closeModal");

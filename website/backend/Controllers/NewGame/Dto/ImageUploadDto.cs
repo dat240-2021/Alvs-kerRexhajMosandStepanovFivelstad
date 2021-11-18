@@ -22,6 +22,8 @@ namespace backend.Controllers.NewGame.Dto
         public string Label { get; set; }
         [Required]
         public string File { get; set; }
+        public string SliceFile { get; set; }
+        public string[] SliceColors { get; set; }
     }
 
 }

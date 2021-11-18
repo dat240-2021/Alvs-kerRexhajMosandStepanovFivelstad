@@ -26,21 +26,31 @@ namespace backend.Core.Domain.Images.Pipelines
 			{
 				foreach (var item in request.ImageList)
 				{
-					// var tempCategory = _db.ImageCategories.SingleOrDefault(i => i.Name == item.Item3);
-					// if (tempCategory is null)
-					// {
-					// 	tempCategory = new ImageCategory(item.Item3);
-					// 	_db.ImageCategories.Add(tempCategory);
-					// }
 
-					//file conversion to blob...
+					string StripB64String(string fileString){
+						var ret = fileString.Remove(0, fileString.IndexOf("base64,")+"base64,".Length );
+						return ret;
+					}
+
 
 					var cat = _db.ImageCategories.Where(x=> x.Id == item.Category).FirstOrDefault();
-                    // Console.WriteLine(item.File);
 
-					var b64 = item.File.Remove(0,"data:image/jpeg;base64,".Length);
+					List<byte[]> slicedList = null;
+					if (item.SliceColors.Length>0 && item.SliceFile.Length>1){
 
-					var slicedList = new SliceImage().Slice(Convert.FromBase64String(b64));
+
+						slicedList = new ManualSlicer().ManualSlice(
+							Convert.FromBase64String(StripB64String(item.File)),
+							Convert.FromBase64String(StripB64String(item.SliceFile)),
+							item.SliceColors
+							);
+
+					} else{
+
+						slicedList = new SliceImage().Slice(Convert.FromBase64String(StripB64String(item.File)));
+
+					}
+
 					var image = new Image(request.UserId,new ImageLabel(item.Label,cat));
 					var sequenceNumber = 0;
 					foreach (var slice in slicedList)
@@ -57,7 +67,10 @@ namespace backend.Core.Domain.Images.Pipelines
 				return new Response(Success: true);
 
 			}
+
 		}
+
+
 	}
 }
 

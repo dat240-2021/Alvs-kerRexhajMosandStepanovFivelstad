@@ -159,6 +159,7 @@ export default defineComponent({
           name: file.name,
           file: reader.result,
           sliceFile: "",
+          sliceColors: [],
           category: "",
           label: "",
         } as ImageFile);
@@ -177,7 +178,6 @@ export default defineComponent({
       }
 
       //do the actual upload
-      console.log(this.images);
       this.loading = true;
       await uploadImages(this.images);
       this.successText = this.images.length + " files were uploaded";
@@ -196,22 +196,15 @@ export default defineComponent({
       });
     },
     manualSlicing(image: ImageFile) {
-      console.log(image);
-      // var image = this.images.find(x => x.id==id);
-      // if (image==null){ return }
       this.modalImage = image;
       this.showModal = true;
     },
     saveSlicesData(object: any) {
-      console.log(object);
       this.showModal = false;
       var image = this.images.find((x) => x.id == object.id);
       if (image != null) {
         image.sliceFile = object.data;
-      }
-
-      for (var i = 0; i < this.images.length; i++) {
-        console.log(this.images[i].sliceFile);
+        image.sliceColors = object.colors;
       }
     },
   },
