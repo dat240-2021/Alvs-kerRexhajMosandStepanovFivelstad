@@ -23,6 +23,15 @@ namespace backend.Core.Domain.Games{
 
         public IProposer Proposer;
         public List<Guesser> Guessers;
+
+        public List<string> PlayerIds {
+            get
+            {
+                var list = Guessers.Select(g => g.Id.ToString()).ToList();
+                list.Add(Proposer.GetId());
+                return list;
+            }
+        }
         public List<Images.Image> Images;
         public List<int> SlicesShown = new();
         public int nProposes { get => SlicesShown.Count(); }
@@ -33,10 +42,14 @@ namespace backend.Core.Domain.Games{
         private bool ProposersTurn { get => _proposersTurn ; set {
                 if (value)
                 {
-                    Proposer.NotifyTurn();
+                        Events.Add(new ProposersTurnEvent() { PlayerIds = PlayerIds });
+                    if (Proposer is Oracle)
+                    {
+                        Events.Add(new OracleTurnEvent() { GameId = Id, Proposition = ((Oracle)Proposer).Proposal });
+                    }
                 } else
                 {
-                    Events.Add( new GuessersTurnEvent(){GuesserIds = Guessers.Select( g => g.Id.ToString()).ToList() });
+                    Events.Add(new GuessersTurnEvent() { PlayerIds = PlayerIds });
                 }
                 _proposersTurn = value;
             }
@@ -55,8 +68,25 @@ namespace backend.Core.Domain.Games{
                     ImageId = CurrentImage.Id,
                     GuesserIds = Guessers.Select(g => g.Id.ToString()).ToList(),
                     ProposerId = Proposer.GetId()
-                }
-            );
+                });
+
+            if (Proposer is Oracle)
+            {
+                ((Oracle)Proposer).HandleNewImage(CurrentImage.Slices.Select(slice => slice.SequenceNumber).ToList());
+            }
+            ProposersTurn = true;
+        }
+
+        public void RemoveUser(Guid userId)
+        {
+            if (Proposer is Proposer && Proposer.GetId() == userId.ToString())
+            {
+                Proposer = new Oracle(Id);
+            }
+            else
+            {
+                Guessers.RemoveAll(g => g.Id == userId);
+            }
         }
 
         public void Update() {
@@ -94,6 +124,16 @@ namespace backend.Core.Domain.Games{
                 g.Guessed = false;
             }
             SlicesShown.Clear();
+            if (Proposer is Oracle)
+            {
+                ((Oracle)Proposer).HandleNewImage(CurrentImage.Slices.Select(slice => slice.SequenceNumber).ToList());
+            }
+            Events.Add(new NewImageEvent()
+                {
+                    ImageId = CurrentImage.Id,
+                    GuesserIds = Guessers.Select(g => g.Id.ToString()).ToList(),
+                    ProposerId = Proposer.GetId()
+                });
             ProposersTurn = true;
         }
 
@@ -126,6 +166,15 @@ namespace backend.Core.Domain.Games{
                     NextImage();
                 }
 
+                if (Guessers.All(x => x.Guessed) && CurrentImage.Slices.Count != SlicesShown.Count)
+                {
+                    ProposersTurn = true;
+                    foreach (var g in Guessers)
+                    {
+                        g.Guessed = false;
+                    }
+                }
+
                 // Implies valid guess -> broadcasted by hub
                 return true;
             }
@@ -141,6 +190,9 @@ namespace backend.Core.Domain.Games{
                 if ( ( ! SlicesShown.Contains(proposition) )  && (CurrentImage.Slices.Exists(x => x.SequenceNumber == proposition) ))
                 {
                     StartTime = DateTime.Now;
+                    foreach( var g in Guessers){
+                        g.Guessed = false;
+                    }
                     ProposersTurn = false;
                     SlicesShown.Add(proposition);
                     return CurrentImage.Slices.Find(i => i.SequenceNumber == proposition);

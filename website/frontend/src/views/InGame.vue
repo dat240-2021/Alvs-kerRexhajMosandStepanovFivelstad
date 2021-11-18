@@ -2,7 +2,7 @@
   <div class="d-flex">
     <div class="ms-auto m-2">
       <button
-        class="btn btn-outline-primary mb-5"
+        class="btn btn-outline-primary"
         type="button"
         @click="leaveGame"
       >
@@ -11,17 +11,26 @@
     </div>
   </div>
   <div class="container-fluid min-vh-100">
-    <div class="row mt-5">
-      <div v-if="!isProposer">
+    <div class="row mt-3">
+      
+      <div class='d-flex' v-if="!isProposer && started">
+        <div class='ms-auto'>
+          <p>
+            <b>Playing as: </b>
+            <i>Guesser</i>
+          </p>
+        </div>
         <form @submit.prevent="sendGuess" class="form-control border-0">
           <div class="input-group mb-3">
             <input
               type="text"
               class="form-control"
               placeholder="Your Guess"
-              v-model="newGuess"
+              v-model="guess"
               aria-label=""
               aria-describedby="basic-addon1"
+              style='opacity: 0.3;'
+              :disabled="!myTurn"
             />
             <div class="input-group-prepend">
               <button class="btn btn-outline-primary" type="submit">
@@ -31,8 +40,9 @@
           </div>
         </form>
       </div>
+      <div v-else class='d-flex ms-auto' />
 
-      <h2 v-if="isProposer" class="text-center">Solution Text</h2>
+      <h2 v-if="isProposer" class="text-center">{{this.label}}</h2>
 
       <div class="col-1">
         <table>
@@ -50,11 +60,21 @@
       </div>
       <div class="col position-relative" id="canvas-div">
         <div class="position-relative">
+          <div v-if="!started" class="d-flex justify-content-center m-5">
+            <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;"/>
+            <span class="ms-5">Waiting for game to start...</span>
+          </div>
+          <div v-if="started && !isProposer && imageSlices.length == 0" class="d-flex justify-content-center m-5">
+            <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;"/>
+            <span class="ms-5">Waiting for proposer...</span>
+          </div>
           <img
+            v-on:click="proposerSelectedSlice"
             v-for="im in imageSlices"
             :key="im.id"
             :src="'data:image/png;base64,' + im.imageData"
-            style="width: 70%"
+            style="width: 100%"
+            :id="im.id"
             class="position-absolute top-0 start-0"
           />
         </div>
@@ -80,9 +100,13 @@
       </div>
     </div>
   </div>
+  <teleport to="body">
+    <GameAlertModal v-if="joinedGame" v-model:text="Test" :title="Alert"/>
+  </teleport>
 </template>
 
 <script lang="ts">
+import GameAlertModal from "@/components/Modal/GameAlertModal.vue";
 import { defineComponent } from "vue";
 import {
   subscribeToNewImageGuesser,
@@ -96,7 +120,7 @@ import {
   subscribeToPlayerScores,
 } from "@/api/InGame";
 import {
-  Image,
+  Image as GameImage,
   ImageSlice,
   Guess,
   Player,
@@ -108,40 +132,28 @@ declare interface BaseComponentData {
   players: Player[];
   guesses: string[];
   imageSlices: ImageSlice[];
-  imageSlicesConverted: {
-    sequenceNumber: number;
-    DataBytes: Uint8Array;
-  }[];
-  newGuess: string;
-  correct: string;
+  guess: string;
+  label: string;
+  started: boolean;
   isProposer: boolean;
   myTurn: boolean;
-  imageSize: {
-    width: number;
-    height: number;
-  };
 }
 
 export default defineComponent({
   name: "InGame",
   data(): BaseComponentData {
     return {
-      imageSize: {
-        width: 0,
-        height: 0,
-      },
       players: [] as Player[],
 
-      imageSlicesConverted: [],
-
-      guesses: ["test1", "ship", "helloworld", "i am testing"],
+      guesses: [],
 
       isProposer: false,
+      started: false,
 
       imageSlices: [],
       //incorrect: true,
-      correct: "Fish",
-      newGuess: "",
+      label: "",
+      guess: "",
       myTurn: false,
       //player: '',
     };
@@ -154,7 +166,8 @@ export default defineComponent({
       console.log("hello world");
     },
     sendGuess() {
-      sendNewGuess(this.newGuess);
+      sendNewGuess(this.guess);
+      this.guess = "";
     },
     newProposal(i: number) {
       sendNewProposal(i);
@@ -164,126 +177,63 @@ export default defineComponent({
     },
 
     newImageGuesser() {
-      //clear variables
-      //get scores
+      this.imageSlices = [];
+      this.guesses = [];
+      this.started = true;
     },
 
-    newImageProposer(image: Image) {
+    newImageProposer(image: GameImage) {
       this.isProposer = true;
-      console.log("Adding new image as proposer");
+      this.myTurn = true;
+      this.started = true;
 
-      for (var i = 0; i < image.slices.length; i++) {
-        this.AddSlice(image.slices[i]);
-      }
+      this.imageSlices = image.slices;
+      this.label = image.label.label;
+      this.guesses = [];
     },
 
-    AddSlice(slice: ImageSlice) {
+    addSlice(slice: ImageSlice) {
+      console.log("Adding slice");
       this.imageSlices.push(slice);
-
-      if (this.imageSize.width == 0) {
-        var image = new Image();
-        image.src = slice.imageData;
-        image.onload = () => {
-          return;
-        };
-      }
-
-      this.imageSlicesConverted.push({
-        sequenceNumber: slice.sequenceNumber,
-        DataBytes: this._base64ToArrayBuffer(slice.imageData),
-      });
-    },
-
-    _base64ToArrayBuffer(base64: string) {
-      var binary_string = window.atob(base64);
-      var len = binary_string.length;
-      var bytes = new Uint8Array(len);
-      for (var i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
-      }
-      return bytes;
     },
 
     proposersTurn() {
-      this.myTurn = true;
+      this.myTurn = this.isProposer;
     },
 
     guessersTurn() {
-      this.myTurn = true;
+      this.myTurn = !this.isProposer;
     },
 
     proposerSelectedSlice(event: any) {
-      if (!this.isProposer) {
-        return;
-      }
+      if (!this.myTurn) return;
 
-      //these need to be scaled
-      var x: number = event.offsetX;
-      var y: number = event.offsetY;
-      var slices_len = this.imageSlicesConverted.length;
+      var x = event.offsetX;
+      var y = event.offsetY;
+      let element = event.target;
+      x -= element.offsetLeft;
+      y -= element.offsetTop;
 
-      //need visible image size to scale down mouse position
-      var img = document.getElementById(this.imageSlices[0].id.toString());
-      var h1 = img?.clientHeight;
-      var w1 = img?.clientWidth;
+      for (let slice of this.imageSlices) {
+        var img = document.getElementById(slice.id.toString()) as HTMLImageElement;
+        let h1 = img?.clientHeight ?? 1;
+        let w1 = img?.clientWidth ?? 1;
 
-      if (h1 == null || w1 == null) {
-        return;
-      }
+        let canvas = document.createElement('canvas');
+        canvas.width = img.height;
+        canvas.height = img.width;
+        var ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, img.width, img.height);
 
-      //original size of the image
-      var h0 = this.imageSize.width;
-      var w0 = this.imageSize.height;
-
-      var yScaled = Math.floor((h0 * y) / h1);
-      var xScaled = Math.floor((w0 * x) / w1);
-      let index = (yScaled * w0 + xScaled) * 4;
-
-      //check all the image alpha values and return on the first one thats not transparent.
-      for (let i = 0; i < slices_len; i++) {
-        var data = this.imageSlicesConverted[i].DataBytes;
-        let alpha = data[index + 3];
-
-        if (alpha > 5) {
-          return i;
+        let data = ctx?.getImageData(x, y, 1, 1);
+        let alpha = data?.data[3];
+        if (alpha && alpha > 5) {
+          sendNewProposal(slice.sequenceNumber);
+          document.getElementById(slice.id.toString())?.classList.add("opacity-25");
+          break;
         }
       }
-
-      return;
     },
-
-    //old ----- to be deleted, kept for refrence
-    // proposerSelectedSlice(event: any) {
-    //   var x = event.offsetX;
-    //   var y = event.offsetY;
-
-    //   var children = document.getElementById("canvas-div")?.children;
-    //   if (children == null) {
-    //     return;
-    //   }
-
-    //   for (let i = 0; i < children.length; i++) {
-    //     var cnvs = children.item(i);
-    //     if (!(cnvs instanceof HTMLCanvasElement)) {
-    //       return;
-    //     }
-    //     var canvas: HTMLCanvasElement = cnvs;
-    //     var context = canvas.getContext("2d");
-    //     if (context == null) {
-    //       return;
-    //     }
-
-    //     var data = context.getImageData(0, 0, canvas.width, canvas.height);
-    //     let index = (y * data.width + x) * 4;
-    //     let alpha = data?.data[index + 3];
-    //     if (alpha > 5) {
-    //       console.log(i);
-    //       canvas.style.filter = "brightness(100%)";
-    //       sendNewProposal(i);
-    //       return;
-    //     }
-    //   }
-    // },
 
     addIncomingGuess(guess: Guess) {
       this.guesses.push(guess.guess);
@@ -299,7 +249,7 @@ export default defineComponent({
       /// Received by guesser
       //
       subscribeToGuessersTurn(this.guessersTurn);
-      subscribeToNewProposal(this.AddSlice);
+      subscribeToNewProposal(this.addSlice);
       subscribeToNewImageGuesser(this.newImageGuesser);
 
       /// Received by proposer

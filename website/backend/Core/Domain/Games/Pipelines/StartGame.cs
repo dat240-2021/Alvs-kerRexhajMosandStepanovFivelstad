@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Models;
 using backend.Core.Domain.Games.Events;
 using Infrastructure.Data;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
 
 namespace backend.Core.Domain.Games.Pipelines
 {
@@ -18,13 +18,11 @@ namespace backend.Core.Domain.Games.Pipelines
         {
             private readonly GameContext _db;
             private readonly IGameService _service;
-            private readonly IMediator _mediator;
 
-            public Handler(GameContext db, IGameService service, IMediator mediator)
+            public Handler(GameContext db, IGameService service)
             {
                 _db = db;
                 _service = service;
-                _mediator = mediator;
             }
 
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
@@ -52,13 +50,6 @@ namespace backend.Core.Domain.Games.Pipelines
                     ) {
                     RoundTime = TimeSpan.FromTicks(request.Game.Game.Settings.Duration)
                 };
-
-                await _mediator.Publish(new NewImageEvent()
-                {
-                    ImageId = game.CurrentImage.Id,
-                    GuesserIds = game.Guessers.Select(g => g.Id.ToString()).ToList(),
-                    ProposerId = game.Proposer.GetId()
-                });
 
                 _service.Add(game);
                 return Unit.Value;

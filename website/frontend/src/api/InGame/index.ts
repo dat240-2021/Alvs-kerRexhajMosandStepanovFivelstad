@@ -109,5 +109,5 @@ export const sendNewGuess = (val: string): void => {
 }
 
 export const sendNewProposal = (val: number): void => {
-  connection.invoke("Proposal", val);
+  connection.invoke("Propose", val);
 }

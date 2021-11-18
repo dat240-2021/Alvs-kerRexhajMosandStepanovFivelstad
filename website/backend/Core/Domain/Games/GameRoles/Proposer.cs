@@ -23,7 +23,6 @@ namespace backend.Core.Domain.Games
         }
 
         public void NotifyTurn(){
-            Events.Add( new ProposersTurnEvent(){ProposerId = Id.ToString()});
         }
 
         public string GetId() => Id.ToString();

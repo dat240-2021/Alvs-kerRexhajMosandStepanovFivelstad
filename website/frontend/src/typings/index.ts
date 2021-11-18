@@ -62,6 +62,7 @@ export interface Image {
   importId: string;
   userId: string;
   label: ImageLabel;
+  category: string;
   slices: ImageSlice[];
 }
 
