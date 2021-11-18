@@ -17,8 +17,7 @@ namespace backend.Core.Domain.Games{
         public DateTime StartTime;
         public TimeSpan RoundTime;
 
-        private int _currentImage { get; set; }
-        public Images.Image CurrentImage { get => Images.ElementAtOrDefault(_currentImage); }
+        public Images.Image CurrentImage { get => Images.Peek(); }
 
 
         public IProposer Proposer;
@@ -32,7 +31,7 @@ namespace backend.Core.Domain.Games{
                 return list;
             }
         }
-        public List<Images.Image> Images;
+        public Queue<Images.Image> Images;
         public List<int> SlicesShown = new();
         public int nProposes { get => SlicesShown.Count(); }
 
@@ -56,9 +55,8 @@ namespace backend.Core.Domain.Games{
         }
 
         public Game(Guid id, List<Image> images, List<Guesser> guessers, IProposer proposer) {
-            _currentImage = 0;
             _proposersTurn = true;
-            Images = images;
+            Images = new Queue<Image>(images);
             Id = id;
             Proposer = proposer;
             Guessers = guessers;
@@ -75,6 +73,7 @@ namespace backend.Core.Domain.Games{
                 ((Oracle)Proposer).HandleNewImage(CurrentImage.Slices.Select(slice => slice.SequenceNumber).ToList());
             }
             ProposersTurn = true;
+            StartTime = DateTime.Now;
         }
 
         public void RemoveUser(Guid userId)
@@ -90,32 +89,17 @@ namespace backend.Core.Domain.Games{
         }
 
         public void Update() {
-            // what to do when we update.
-            //checks if state has changed, and if so, sends an event.
-
-            //If guesser time runs out of time.
             if (!ProposersTurn) {
-                if (( StartTime + RoundTime) >= DateTime.Now) {
+                if (( StartTime + RoundTime) <= DateTime.Now) {
                     //Toggle role turn
                     ProposersTurn = true;
                 }
-
-                //If all the players have guessed
-                
             }
-
-
-            //if proposer times out
-            // if () {
-            //     Events.Add( new GuessersTurnEvent(){GuesserIds = Guessers.Select( g => g.Id.ToString()).ToList() });
-            // }
         }
 
-        //reset vars getting ready for next image.
         public void NextImage() {
-            _currentImage++;
-            //Console.WriteLine(_currentImage);
-            if (_currentImage>=Images.Count)
+            var result = Images.TryDequeue(out _);
+            if (!result)
             {
                 GameOver();
                 return;

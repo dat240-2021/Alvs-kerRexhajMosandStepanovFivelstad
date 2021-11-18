@@ -48,7 +48,7 @@ namespace backend.Core.Domain.Games.Pipelines
                     request.Game.SlotInfo.GuessersIds.Select(g => new Guesser(g)).ToList(),
                     proposer
                     ) {
-                    RoundTime = TimeSpan.FromTicks(request.Game.Game.Settings.Duration)
+                    RoundTime = TimeSpan.FromSeconds(request.Game.Game.Settings.Duration)
                 };
 
                 _service.Add(game);
