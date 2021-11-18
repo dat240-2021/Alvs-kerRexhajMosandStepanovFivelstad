@@ -57,6 +57,7 @@
             <th scope="col">Filename</th>
             <th scope="col">Solution</th>
             <th scope="col">Category</th>
+            <th scope="col">Manual Slicing</th>
           </tr>
         </thead>
         <tbody>
@@ -77,11 +78,26 @@
                 </option>
               </select>
             </td>
+            <td>
+              <button
+                class="btn btn-outline-primary"
+                type="button"
+                @click="manualSlicing(i)"
+              >
+                Slice
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
+  <ManualSlicingModal
+    v-on:closeModal="showModal = false"
+    v-on:saveAndExit="saveSlicesData"
+    v-if="showModal == true"
+    :modalImage="modalImage"
+  />
 </template>
 
 <script lang="ts">
@@ -90,6 +106,7 @@ import Input from "@/components/Form/Input.vue";
 import { ImageFile, Category } from "@/typings";
 import { fetchCategories } from "@/api/BackendGame";
 import { uploadImages } from "@/api/Images";
+import ManualSlicingModal from "@/components/Modal/ManualSlicingModal.vue";
 
 declare interface BaseComponentData {
   images: ImageFile[];
@@ -98,12 +115,15 @@ declare interface BaseComponentData {
   error: string;
   successText: string;
   loading: boolean;
+  showModal: boolean;
+  modalImage: ImageFile | null;
 }
 
 export default defineComponent({
   name: "ImageUpload",
   components: {
     Input,
+    ManualSlicingModal,
   },
 
   data(): BaseComponentData {
@@ -114,6 +134,8 @@ export default defineComponent({
       error: "",
       loading: false,
       successText: "",
+      showModal: false,
+      modalImage: null,
     };
   },
   mounted() {
@@ -136,6 +158,7 @@ export default defineComponent({
           id: i,
           name: file.name,
           file: reader.result,
+          sliceFile: "",
           category: "",
           label: "",
         } as ImageFile);
@@ -171,6 +194,25 @@ export default defineComponent({
         // var categoryIds = categories.map(c => c.id);
         this.categories = categories;
       });
+    },
+    manualSlicing(image: ImageFile) {
+      console.log(image);
+      // var image = this.images.find(x => x.id==id);
+      // if (image==null){ return }
+      this.modalImage = image;
+      this.showModal = true;
+    },
+    saveSlicesData(object: any) {
+      console.log(object);
+      this.showModal = false;
+      var image = this.images.find((x) => x.id == object.id);
+      if (image != null) {
+        image.sliceFile = object.data;
+      }
+
+      for (var i = 0; i < this.images.length; i++) {
+        console.log(this.images[i].sliceFile);
+      }
     },
   },
 });
