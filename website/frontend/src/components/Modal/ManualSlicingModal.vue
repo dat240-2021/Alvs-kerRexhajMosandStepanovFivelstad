@@ -6,21 +6,20 @@
     aria-hidden="true"
     id="manSlicingModal"
   >
-    <div class="modal-dialog modal-xl" id="slicingModal">
+    <div class="modal-dialog" id="slicingModal" style="display:table;">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Manual Slicing</h5>
+          <h5 class="modal-title text-center w-100" id="exampleModalLabel">Manual Slicing</h5>
           <h5 class="modal-title" id="exampleModalLabel"></h5>
           <button type="button" class="btn-close" @click="closeModal"></button>
         </div>
         <div class="modal-body" id="slicingModalBody">
-          <div class="position-relative">
+          <div class="position-relative w-100 h-100">
             <img
               :src="modalImage.file"
-              style="width: 100%; z-index: 1"
               id="original_image"
               zindex-dropdown
-              :onload="resize"
+              :onload="imageLoaded"
             />
             <canvas
               id="canvas_modal"
@@ -28,7 +27,7 @@
               style="z-index: 2"
             ></canvas>
           </div>
-          <label for="customRange1" class="form-label"
+          <label for="customRange1" class="form-label mt-1"
             >Brush Diameter: {{ lineWidth }}</label
           >
           <input
@@ -123,6 +122,17 @@ export default defineComponent({
     this.modal.addEventListener("resize", this.resize);
   },
   methods: {
+    imageLoaded(event: any){
+      // document.getElementById("canvas_modal").style();
+      if (event.target.width > event.target.height){
+        // if the image is wider than its tall,
+        // 80 vh should ensure it won't exceed window height
+        event.target.style = "width:80vh;"
+      } else{
+        event.target.style = "height:50vh;"
+      }
+      this.resize();
+    },
     resize() {
       let oImage = document.getElementById("original_image");
       this.ctx.canvas.width = oImage?.clientWidth;
