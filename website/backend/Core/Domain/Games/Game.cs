@@ -46,14 +46,12 @@ namespace backend.Core.Domain.Games{
 
         //When _proposersTurn is changed we have to send an event.
         private bool ProposersTurn { get => _proposersTurn ; set {
-            if (State != GameState.Active)
-            {
-                return;
-            }
+            if (State != GameState.Active) return;
 
             if (value)
             {
-                    Events.Add(new ProposersTurnEvent() { PlayerIds = PlayerIds });
+                Events.Add(new ProposersTurnEvent() { PlayerIds = PlayerIds });
+                
                 if (Proposer is Oracle)
                 {
                     Events.Add(new OracleTurnEvent() { GameId = Id, Proposition = ((Oracle)Proposer).Proposal });
