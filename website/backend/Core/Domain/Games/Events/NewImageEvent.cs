@@ -8,7 +8,7 @@ namespace backend.Core.Domain.Games.Events
     {
         public int ImageId;
         public List<string> GuesserIds;
-        public string? ProposerId;
+        public string ProposerId;
 
     }
 

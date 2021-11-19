@@ -11,13 +11,13 @@ namespace backend.Core.Domain.Games
 
         public Guid GameId;
         private Queue<int> _proposals;
-        
         public int Proposal { get
             {
                 return _proposals.Dequeue();
             }
         }
-        private int _index;
+        // never used
+        // private int _index;
         public Oracle(Guid id) {
             GameId = id;
         }
