@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0
 COPY website/ /data/
 
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get -y update && apt-get -y upgrade && apt-get install nodejs
+RUN apt-get -y update && apt-get -y upgrade && apt-get install nodejs && apt-get -y install unzip
 
 WORKDIR /data/frontend
 RUN npm install -g npm@latest
