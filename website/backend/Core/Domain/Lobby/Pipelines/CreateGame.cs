@@ -19,13 +19,13 @@ namespace backend.Core.Domain.Lobby.Pipelines
 
             private GameContext _db;
             private readonly IMediator _mediator;
-            private readonly IBackendGameService _backendGameService;
+            private readonly ILobbyService _LobbyService;
 
-            public Handler(GameContext db, IMediator mediator, IBackendGameService backendGameService)
+            public Handler(GameContext db, IMediator mediator, ILobbyService LobbyService)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
                 _mediator = mediator;
-                _backendGameService = backendGameService;
+                _LobbyService = LobbyService;
             }
 
             
@@ -37,9 +37,10 @@ namespace backend.Core.Domain.Lobby.Pipelines
                 _db.Games.Add(game);
                 
                 await _db.SaveChangesAsync(cancellationToken);
+                _LobbyService.StoreGame(game);
                 await _mediator.Publish(new GameCreated(game), cancellationToken);
                 await _mediator.Send(new JoinGame.Request(request.User, game.Id, creatorRole), cancellationToken);
-                return new GameWithSlotInfo(game, _backendGameService.GetSlotInfo(game));
+                return new GameWithSlotInfo(game, _LobbyService.GetSlotInfo(game.Id));
             }
         }
     }
