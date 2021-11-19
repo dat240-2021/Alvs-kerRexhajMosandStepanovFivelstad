@@ -6,10 +6,12 @@
     aria-hidden="true"
     id="manSlicingModal"
   >
-    <div class="modal-dialog" id="slicingModal" style="display:table;">
+    <div class="modal-dialog" id="slicingModal" style="display: table">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title text-center w-100" id="exampleModalLabel">Manual Slicing</h5>
+          <h5 class="modal-title text-center w-100" id="exampleModalLabel">
+            Manual Slicing
+          </h5>
           <h5 class="modal-title" id="exampleModalLabel"></h5>
           <button type="button" class="btn-close" @click="closeModal"></button>
         </div>
@@ -108,6 +110,7 @@ export default defineComponent({
         id: 0,
         name: "",
         file: null,
+        sliceFile: "",
         category: "",
         label: "",
       } as ImageFile,
@@ -119,24 +122,36 @@ export default defineComponent({
     this.ctx = this.canvas.getContext("2d");
     this.modal.addEventListener("mousedown", this.start);
     this.modal.addEventListener("mouseup", this.stop);
-    this.modal.addEventListener("resize", this.resize);
+    window.addEventListener("resize", this.resize);
   },
   methods: {
-    imageLoaded(event: any){
+    imageLoaded(event: any) {
       // document.getElementById("canvas_modal").style();
-      if (event.target.width > event.target.height){
+      if (event.target.width > event.target.height) {
         // if the image is wider than its tall,
         // 80 vh should ensure it won't exceed window height
-        event.target.style = "width:80vh;"
-      } else{
-        event.target.style = "height:50vh;"
+        event.target.style = "width:80vh;";
+      } else {
+        event.target.style = "height:50vh;";
+      }
+      if (this.modalImage.sliceFile != "") {
+        this.reloadData(this.modalImage.sliceFile);
       }
       this.resize();
     },
+    reloadData(data: string) {
+      let image = new Image();
+      image.src = data;
+      image.onload = () => {
+        this.ctx.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
+      };
+    },
     resize() {
+      let data = this.canvas.toDataURL("image/png", 1.0);
       let oImage = document.getElementById("original_image");
       this.ctx.canvas.width = oImage?.clientWidth;
       this.ctx.canvas.height = oImage?.clientHeight;
+      this.reloadData(data);
     },
     reposition(event: any) {
       let rel = document.getElementById("slicingModal");
@@ -222,11 +237,11 @@ export default defineComponent({
       this.clearEventListeners();
       this.$emit("closeModal");
     },
-    clearEventListeners(){
-      document.removeEventListener("mousedown", this.start);
-      document.removeEventListener("mouseup", this.stop);
+    clearEventListeners() {
+      this.modal.removeEventListener("mousedown", this.start);
+      this.modal.removeEventListener("mouseup", this.stop);
       window.removeEventListener("resize", this.resize);
-      document.removeEventListener("mousemove", this.draw);
+      this.modal.removeEventListener("mousemove", this.draw);
     },
     rgbToHex(r: number, g: number, b: number) {
       const componentToHex = (c: number) => {
