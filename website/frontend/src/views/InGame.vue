@@ -59,9 +59,9 @@
             </div>
             <div v-else>
               <tr v-for="g in guesses.slice(guesses.length-10)" :key="g">
-                <td>
+                <tr>
                   <td>{{ g.userId }}: {{ g.guess }}</td>
-                </td>
+                </tr>
               </tr>
             </div>
           </tbody>
@@ -271,7 +271,7 @@ export default defineComponent({
 
       /// Received by all
       subscribeToPlayerScores(this.updateScores);
-      subscribeToNewGuess(this.addIncomingGuess);      
+      subscribeToNewGuess(this.addIncomingGuess);
     },
   },
 });
