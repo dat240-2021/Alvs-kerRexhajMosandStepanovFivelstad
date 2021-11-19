@@ -27,6 +27,8 @@ export interface ImageFile {
   id: number;
   name: string;
   file: any;
+  sliceFile: string;
+  sliceColors: string[];
   category: string;
   label: string;
 }

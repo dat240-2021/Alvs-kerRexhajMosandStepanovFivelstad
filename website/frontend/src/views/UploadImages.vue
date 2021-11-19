@@ -28,7 +28,7 @@
               UploadFiles
             </button>
           </div>
-          <div v-if="loading == false">
+          <div v-if="!loading">
             <p v-if="images.length > 1">{{ images.length }} Files selected</p>
           </div>
           <div v-else class="d-flex">
@@ -57,6 +57,7 @@
             <th scope="col">Filename</th>
             <th scope="col">Solution</th>
             <th scope="col">Category</th>
+            <th scope="col">Manual Slicing</th>
           </tr>
         </thead>
         <tbody>
@@ -77,11 +78,26 @@
                 </option>
               </select>
             </td>
+            <td>
+              <button
+                class="btn btn-outline-primary"
+                type="button"
+                @click="manualSlicing(i)"
+              >
+                Slice
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
+  <ManualSlicingModal
+    v-on:closeModal="showModal = false"
+    v-on:saveAndExit="saveSlicesData"
+    v-if="showModal"
+    :modalImage="modalImage"
+  />
 </template>
 
 <script lang="ts">
@@ -90,6 +106,7 @@ import Input from "@/components/Form/Input.vue";
 import { ImageFile, Category } from "@/typings";
 import { fetchCategories } from "@/api/BackendGame";
 import { uploadImages } from "@/api/Images";
+import ManualSlicingModal from "@/components/Modal/ManualSlicingModal.vue";
 
 declare interface BaseComponentData {
   images: ImageFile[];
@@ -98,12 +115,15 @@ declare interface BaseComponentData {
   error: string;
   successText: string;
   loading: boolean;
+  showModal: boolean;
+  modalImage: ImageFile | null;
 }
 
 export default defineComponent({
   name: "ImageUpload",
   components: {
     Input,
+    ManualSlicingModal,
   },
 
   data(): BaseComponentData {
@@ -114,6 +134,8 @@ export default defineComponent({
       error: "",
       loading: false,
       successText: "",
+      showModal: false,
+      modalImage: null,
     };
   },
   mounted() {
@@ -123,22 +145,27 @@ export default defineComponent({
     onImagesSelected(event: any) {
       this.error = "";
 
-      for (var i = 0; i < event.target.files.length; i++) {
+      for (let i = 0; i < event.target.files.length; i++) {
         this.loadFile(event.target.files[i], i);
       }
       event.target.files = null;
     },
 
     loadFile(file: any, i: number) {
-      var reader = new FileReader();
+      let reader = new FileReader();
       reader.onloadend = () => {
-        this.images.push({
-          id: i,
-          name: file.name,
-          file: reader.result,
-          category: "",
-          label: "",
-        } as ImageFile);
+        this.images = [
+          ...this.images,
+          {
+            id: i,
+            name: file.name,
+            file: reader.result,
+            sliceFile: "",
+            sliceColors: [],
+            category: "",
+            label: "",
+          } as ImageFile,
+        ];
       };
       reader.readAsDataURL(file);
     },
@@ -146,15 +173,15 @@ export default defineComponent({
       if (this.images.length < 1) {
         this.error = "Upload at least one file!";
       }
-      for (var i = 0; i < this.images.length; i++) {
-        if (this.images[i].category == "" || this.images[i].label == "") {
-          this.error = "Please fill in all fields!";
-          return;
-        }
+      let imagesContainEmptyfields = this.images.find(
+        (x) => x.label == "" && x.category == ""
+      );
+      if (imagesContainEmptyfields != undefined) {
+        this.error = "Please fill in all fields!";
+        return;
       }
 
       //do the actual upload
-      console.log(this.images);
       this.loading = true;
       await uploadImages(this.images);
       this.successText = this.images.length + " files were uploaded";
@@ -168,9 +195,21 @@ export default defineComponent({
     },
     loadCategories() {
       fetchCategories().then((categories) => {
-        // var categoryIds = categories.map(c => c.id);
+        // let categoryIds = categories.map(c => c.id);
         this.categories = categories;
       });
+    },
+    manualSlicing(image: ImageFile) {
+      this.modalImage = image;
+      this.showModal = true;
+    },
+    saveSlicesData(object: any) {
+      this.showModal = false;
+      let image = this.images.find((x) => x.id == object.id);
+      if (image != null) {
+        image.sliceFile = object.data;
+        image.sliceColors = object.colors;
+      }
     },
   },
 });

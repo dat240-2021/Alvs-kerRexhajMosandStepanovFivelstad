@@ -30,6 +30,7 @@ namespace backend.Tests.Core.Domain.Images
 
             var UserId = Guid.NewGuid();
             List<ImageFile> TestImageList = new List<ImageFile>();
+            var emptySliceColors = new List<string>().ToArray();
 
             int index = 1;
 
@@ -43,6 +44,8 @@ namespace backend.Tests.Core.Domain.Images
                 tempImageFile.Category = 1;
                 tempImageFile.Label = $"Test Label {index}";
                 tempImageFile.Name = $"Test Name {index}";
+                tempImageFile.SliceColors = emptySliceColors;
+                tempImageFile.SliceFile = "";
                 TestImageList.Add(tempImageFile);
                 index++;
 
