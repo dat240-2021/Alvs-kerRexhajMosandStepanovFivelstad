@@ -22,13 +22,13 @@ namespace backend.Core.Domain.Lobby.Pipelines
 
             private readonly GameContext _db;
             private readonly IMediator _mediator;
-            private readonly IBackendGameService _backendGameService;
+            private readonly ILobbyService _LobbyService;
 
-            public Handler(GameContext db, IMediator mediator, IBackendGameService backendGameService)
+            public Handler(GameContext db, IMediator mediator, ILobbyService LobbyService)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
                 _mediator = mediator;
-                _backendGameService = backendGameService;
+                _LobbyService = LobbyService;
             }
 
             public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
@@ -41,9 +41,9 @@ namespace backend.Core.Domain.Lobby.Pipelines
                 game.State = GameState.Active;
                 await _db.SaveChangesAsync(cancellationToken);
                 await _mediator.Publish(new GameStarted(game), cancellationToken);
-
+                
                 var imageIds = await _mediator.Send(new GetImageIdsListByCategoriesIds.Request(game.Settings.CategoryIds, game.Settings.ImagesCount));
-                var slotInfo = _backendGameService.GetSlotInfo(game);
+                var slotInfo = _LobbyService.GetSlotInfo(game.Id);
                 await _mediator.Send(new Games.Pipelines.StartGame.Request(new GameWithSlotInfo(game, slotInfo), imageIds), cancellationToken);
                 
                 return new Response(true);
