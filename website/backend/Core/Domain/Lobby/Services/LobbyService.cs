@@ -6,7 +6,7 @@ using MediatR;
 
 namespace backend.Core.Domain.Lobby.Services
 {
-    public class BackendGameService : IBackendGameService
+    public class LobbyService : ILobbyService
     {
         private readonly ConcurrentDictionary<Guid, GameSlotInfo> _games = new ();
 

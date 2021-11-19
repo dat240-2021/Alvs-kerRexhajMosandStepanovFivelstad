@@ -19,13 +19,13 @@ namespace backend.Core.Domain.Lobby.Pipelines
         {
 
             private readonly GameContext _db;
-            private readonly IBackendGameService _backendGameService;
+            private readonly ILobbyService _LobbyService;
             private readonly IMediator _mediator;
 
-            public Handler(GameContext db, IBackendGameService backendGameService, IMediator mediator)
+            public Handler(GameContext db, ILobbyService LobbyService, IMediator mediator)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
-                _backendGameService = backendGameService;
+                _LobbyService = LobbyService;
                 _mediator = mediator;
             }
 
@@ -33,8 +33,8 @@ namespace backend.Core.Domain.Lobby.Pipelines
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
                 var game = await _db.Games.FirstOrDefaultAsync(g => g.Id.Equals(request.GameId), cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
-                _backendGameService.JoinGame(game.Id, request.User.Id, request.Role);
-                var gameSlotInfo = _backendGameService.GetSlotInfo(game.Id);
+                _LobbyService.JoinGame(game.Id, request.User.Id, request.Role);
+                var gameSlotInfo = _LobbyService.GetSlotInfo(game.Id);
                 await _mediator.Publish(new UserJoinGame(new GameSlotNotification(game.Id, gameSlotInfo.GuessersIds.Count)), cancellationToken);
 
                 return Unit.Value;

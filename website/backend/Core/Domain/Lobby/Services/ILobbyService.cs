@@ -4,7 +4,7 @@ using backend.Core.Domain.Lobby.Models;
 
 namespace backend.Core.Domain.Lobby.Services
 {
-    public interface IBackendGameService
+    public interface ILobbyService
     {
         void StoreGame(Game game);
         void JoinGame(Guid gameId, Guid userId, SlotRole role);

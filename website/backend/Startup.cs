@@ -44,7 +44,7 @@ namespace backend
 
             services.AddScoped<IAuthenticationService,AuthenticationService>();
             services.AddScoped<IRandomNumberGenerator, RandomNumberGenerator>();
-            services.AddSingleton<IBackendGameService, BackendGameService>();
+            services.AddSingleton<ILobbyService, LobbyService>();
             services.AddSingleton<IGameService, GameService>();
             
 
