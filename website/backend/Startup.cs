@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Core.Domain.BackendGame;
-using backend.Core.Domain.BackendGame.Services;
 using backend.Hubs;
 using Infrastructure.Data;
 using MediatR;
@@ -18,6 +16,8 @@ using Microsoft.Extensions.Hosting;
 using Domain.Authentication;
 using Domain.Authentication.Services;
 using backend.Core.Domain.Games;
+using backend.Core.Domain.Images.Utils;
+using backend.Core.Domain.Lobby.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace backend
@@ -43,8 +43,10 @@ namespace backend
             });
 
             services.AddScoped<IAuthenticationService,AuthenticationService>();
-            services.AddSingleton<IBackendGameService, BackendGameService>();
+            services.AddScoped<IRandomNumberGenerator, RandomNumberGenerator>();
+            services.AddSingleton<ILobbyService, LobbyService>();
             services.AddSingleton<IGameService, GameService>();
+            
 
 
 

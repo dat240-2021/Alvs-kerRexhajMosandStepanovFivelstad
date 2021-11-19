@@ -14,7 +14,9 @@ namespace backend.Core.Domain.Images
 
         public ImageLabel Label { get; protected set; }
         // public string Label { get=> _lbl.Label; protected set {} }
+
         public string Category { get=> Label.Category.Name; }
+
 
         public List<ImageSlice> Slices { get; protected set; } = new List<ImageSlice>();
 
