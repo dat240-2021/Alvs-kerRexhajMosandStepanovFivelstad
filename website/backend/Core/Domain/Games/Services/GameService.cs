@@ -3,11 +3,15 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Timers;
+using MediatR;
 
 namespace backend.Core.Domain.Games {
     public interface IGameService {
         Game Get(Guid gameId);
         Game GetByUserId(Guid userId);
+        void RemoveUser(Guid userId);
         bool Add(Game game);
         bool Remove(Guid gameId);
     }
@@ -15,13 +19,13 @@ namespace backend.Core.Domain.Games {
     public class GameService : IGameService{
         private ConcurrentDictionary<Guid, Game> Games = new();
         private ConcurrentDictionary<Guid, Guid> GameIdsByUsers = new();
+        private readonly IMediator _mediator;
 
-        private Thread Ticker ;
+        private System.Timers.Timer Timer;
 
-        // Cleanup statements, preventing memory leaks etc.
-        ~GameService()  // finalizer
-        {
-            Ticker.Abort();
+        public GameService(IMediator mediator){
+            _mediator = mediator;
+            StartTicker();
         }
 
         //This is run when an event for a new game is handled...
@@ -31,28 +35,43 @@ namespace backend.Core.Domain.Games {
             Games.TryGetValue(gameId, out active_game);
             return active_game;
         }
-        private void UpdateGames() {
-            foreach (var game in Games.Values){
+        private async void UpdateGames(Object _, ElapsedEventArgs e) 
+        {
+            foreach (var game in Games.Values)
+            {
                 game.Update();
+
+                var events = game.Events.ToArray();
+                game.Events.Clear();
+                foreach (var domainEvent in events)
+                {
+                    await _mediator.Publish(domainEvent);
+                }
+                
             }
         }
-        private void StartTicker(string[] args) {
-                Ticker = new Thread(() => {
-                    while (true) {
-                        UpdateGames();
-                        Thread.Sleep(1000);
-                    }
-                } )
-                {
-                    IsBackground = true
-                };
-                Ticker.Start();
+
+        private void StartTicker() {
+                Timer = new System.Timers.Timer(500);
+                Timer.Elapsed += UpdateGames;
+                Timer.Enabled = true;
             }
 
         public Game GetByUserId(Guid userId)
         {
-            Games.TryGetValue(userId, out var game);
+            GameIdsByUsers.TryGetValue(userId, out var gameId);
+            Games.TryGetValue(gameId, out var game);
             return game;
+        }
+
+        public void RemoveUser(Guid userId)
+        {
+            GameIdsByUsers.TryRemove(userId, out var gameId);
+            Game game = Get(gameId);
+            if (game is not null)
+            {
+                game.RemoveUser(userId);
+            }
         }
 
         public bool Add(Game game){
@@ -60,6 +79,11 @@ namespace backend.Core.Domain.Games {
             {
                 /// Test that a user cannot already exist here.
                 GameIdsByUsers.TryAdd(guesser.Id, game.Id);
+            }
+
+            if (game.Proposer is Proposer)
+            {
+                GameIdsByUsers.TryAdd(((Proposer)game.Proposer).Id, game.Id);
             }
             return Games.TryAdd(game.Id,game);
         }

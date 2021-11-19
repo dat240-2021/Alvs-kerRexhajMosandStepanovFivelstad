@@ -32,11 +32,11 @@ namespace backend.Core.Domain.Games.Pipelines
 
                 if (game is not null)
                 {
-                    var result = game.Guess(new GuessDto(){User = request.User, Guess = request.Guess});
+                    var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
 
                     if (result)
                     {
-                        _hub.Clients.All.SendAsync("Guess", request, cancellationToken);
+                        _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", request, cancellationToken);
                     }
                 }
 

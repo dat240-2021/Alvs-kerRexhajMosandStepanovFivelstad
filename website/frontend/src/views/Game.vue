@@ -1,5 +1,7 @@
 <template>
+<div>
   Yej, we are in a game
+</div>
 </template>
 
 <script>
