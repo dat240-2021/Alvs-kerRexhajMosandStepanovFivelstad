@@ -19,12 +19,12 @@ namespace backend.Core.Domain.Lobby.Pipelines
         {
 
             private readonly GameContext _db;
-            private readonly IBackendGameService _backendGameService;
+            private readonly ILobbyService _LobbyService;
 
-            public Handler(GameContext db, IBackendGameService backendGameService)
+            public Handler(GameContext db, ILobbyService LobbyService)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
-                _backendGameService = backendGameService;
+                _LobbyService = LobbyService;
             }
 
             
@@ -34,7 +34,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
                     .Where(g => g.State.Equals(GameState.Created))
                     .ToListAsync(cancellationToken);
 
-                return games.Select(game => new GameWithSlotInfo(game, _backendGameService.GetSlotInfo(game.Id))
+                return games.Select(game => new GameWithSlotInfo(game, _LobbyService.GetSlotInfo(game.Id))
                 ).ToList();
             }
         }
