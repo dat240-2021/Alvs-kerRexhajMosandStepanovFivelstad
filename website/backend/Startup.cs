@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using backend.Core.Domain.BackendGame;
-using backend.Core.Domain.BackendGame.Services;
 using backend.Hubs;
 using Infrastructure.Data;
 using MediatR;
@@ -19,6 +17,7 @@ using Domain.Authentication;
 using Domain.Authentication.Services;
 using backend.Core.Domain.Games;
 using backend.Core.Domain.Images.Utils;
+using backend.Core.Domain.Lobby.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace backend
