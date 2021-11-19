@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using backend.Core.Domain.BackendGame.Models;
 using backend.Core.Domain.Games.Events;
+using backend.Core.Domain.Lobby.Models;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
@@ -48,7 +48,7 @@ namespace backend.Core.Domain.Games.Pipelines
                     request.Game.SlotInfo.GuessersIds.Select(g => new Guesser(g)).ToList(),
                     proposer
                     ) {
-                    RoundTime = TimeSpan.FromTicks(request.Game.Game.Settings.Duration)
+                    RoundTime = TimeSpan.FromSeconds(request.Game.Game.Settings.Duration)
                 };
 
                 _service.Add(game);
