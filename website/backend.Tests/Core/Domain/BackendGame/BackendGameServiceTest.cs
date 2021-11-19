@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
-using backend.Core.Domain.BackendGame.Models;
-using backend.Core.Domain.BackendGame.Services;
+using backend.Core.Domain.Lobby.Models;
+using backend.Core.Domain.Lobby.Services;
 using backend.Tests.Helpers;
 using Domain.Authentication;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace backend.Tests.Core.Domain.BackendGame
+namespace backend.Tests.Core.Domain.Lobby
 {
-    public class BackendGameServiceTest: DbTest
+    public class LobbyServiceTest: DbTest
     {
-        public BackendGameServiceTest(ITestOutputHelper output) : base(output)
+        public LobbyServiceTest(ITestOutputHelper output) : base(output)
         {
         }
 
@@ -23,7 +23,7 @@ namespace backend.Tests.Core.Domain.BackendGame
 
             var game = GetGame(settings, user);
             
-            var service = new BackendGameService();
+            var service = new LobbyService();
 
             void Act() => service.JoinGame(game.Id, user.Id, SlotRole.Guesser);
             Assert.Throws<Exception>(Act);
@@ -41,7 +41,7 @@ namespace backend.Tests.Core.Domain.BackendGame
             
             var game = GetGame(settings, user);
 
-            var service = new BackendGameService();
+            var service = new LobbyService();
             service.StoreGame(game);
             
             Assert.True(service.HasAvailableSlots(game.Id));
@@ -61,7 +61,7 @@ namespace backend.Tests.Core.Domain.BackendGame
             var user = new User();
             var game = GetGame(settings, user);
             
-            var service = new BackendGameService();
+            var service = new LobbyService();
             service.StoreGame(game);
 
             void Act() => service.LeaveGame(game.Id, user.Id);
@@ -75,7 +75,7 @@ namespace backend.Tests.Core.Domain.BackendGame
             var user = new User();
             var game = GetGame(settings, user);
             
-            var service = new BackendGameService();
+            var service = new LobbyService();
             service.StoreGame(game);
             
             service.JoinGame(game.Id, user.Id, SlotRole.Guesser);
@@ -94,7 +94,7 @@ namespace backend.Tests.Core.Domain.BackendGame
             var game = GetGame(settings, user);
             
             
-            var service = new BackendGameService();
+            var service = new LobbyService();
             service.StoreGame(game);
             service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
             
@@ -110,7 +110,7 @@ namespace backend.Tests.Core.Domain.BackendGame
             var game = GetGame(settings, user);
             
             
-            var service = new BackendGameService();
+            var service = new LobbyService();
             service.StoreGame(game);
             
             void Act() => service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
@@ -127,7 +127,7 @@ namespace backend.Tests.Core.Domain.BackendGame
             };
             var game = GetGame(settings, user);
             
-            var service = new BackendGameService();
+            var service = new LobbyService();
             service.StoreGame(game);
             
             service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
