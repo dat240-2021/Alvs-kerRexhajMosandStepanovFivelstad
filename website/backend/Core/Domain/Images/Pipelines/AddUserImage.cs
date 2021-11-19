@@ -53,7 +53,7 @@ namespace backend.Core.Domain.Images.Pipelines
 							item.SliceColors
 							);
 
-					} else{
+					} else {
 
 						slicedList = new SliceImage().Slice(Convert.FromBase64String(StripB64String(item.File)));
 

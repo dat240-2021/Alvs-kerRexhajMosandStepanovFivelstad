@@ -51,11 +51,14 @@ const routes: Array<RouteRecordRaw> = [
     component: UploadImages,
   },
   {
+<<<<<<< HEAD
     path: "/game",
     name: "Game",
     component: Game,
   },
   {
+=======
+>>>>>>> main
     path: "/ingame/",
     name: "InGame",
     component: InGame,

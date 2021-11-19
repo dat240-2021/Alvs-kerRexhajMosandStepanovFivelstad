@@ -15,7 +15,7 @@ using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace backend.Tests.Core.Domain.Image
+namespace backend.Tests.Core.Domain.Images
 {
     public class ImageContextTests : DbTest
     {
@@ -30,7 +30,10 @@ namespace backend.Tests.Core.Domain.Image
 
             var UserId = Guid.NewGuid();
             List<ImageFile> TestImageList = new List<ImageFile>();
+<<<<<<< HEAD
             var emptySliceColors = new List<string>().ToArray();
+=======
+>>>>>>> main
 
             int index = 1;
 
@@ -75,7 +78,7 @@ namespace backend.Tests.Core.Domain.Image
             }
 
         }
-        
+
         //Test GetCategoryList pipeline by adding 3 categories and retrieving list. 
         [Fact]
         public void AddCategories_And_Get_CategoryList()
@@ -83,7 +86,7 @@ namespace backend.Tests.Core.Domain.Image
             string cat1 = "Famous People";
             string cat2 = "Movies";
             string cat3 = "Landscapes";
-                
+
             var request = new GetCategoryList.Request();
 
             using (var context = new GameContext(ContextOptions, null))
@@ -101,6 +104,90 @@ namespace backend.Tests.Core.Domain.Image
                 Assert.True(result[1].Name.Equals(cat2));
                 Assert.True(result[2].Name.Equals(cat3));
                 Assert.False(result[2].Name.Equals(cat1));
+            }
+        }
+        
+        //Test GetImageIdsByCategoryDefaultImages pipeline by adding 2 Images and retrieving list. 
+        [Fact]
+        public void GetImageIdsByCategory_DefaultList()
+        {
+
+            List<int> CategoryIds = new List<int>();
+            CategoryIds.Add(1);
+
+            var request = new GetImageIdsByCategoryDefaultImages.Request(CategoryIds);
+
+            using (var context = new GameContext(ContextOptions, null))
+            {
+                context.Database.Migrate();
+                
+                var Category1 = new ImageCategory(1, "Test Category 1");
+                var Category2 = new ImageCategory(2, "Test Category 2");
+                //context.ImageCategories.Add(new ImageCategory("Test Category 1"));
+                //context.ImageCategories.Add(new ImageCategory("Test Category 2"));
+                var Label1 = new ImageLabel("Test Label 1",Category1);
+                var Label2 = new ImageLabel("Test Label 2",Category1);
+                var Label3 = new ImageLabel("Test Label 3",Category2);
+                var Image1 = new Image();
+                var Image2 = new Image();
+                var Image3 = new Image();
+                Image1.SetLabel(Label1);
+                Image2.SetLabel(Label2);
+                Image3.SetLabel(Label3);
+                context.Images.Add(Image1);
+                context.Images.Add(Image2);
+                context.Images.Add(Image3);
+                context.SaveChanges();
+ 
+
+                var handler = new GetImageIdsByCategoryDefaultImages.Handler(context);
+
+                var result = handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
+
+                context.ImageCategories.Count().ShouldBe(2);
+                Assert.Equal(1,result.First());
+                Assert.Equal(2,result.Last());
+            }
+        }
+        
+        //Test GetImageIdsByCategoryDefaultImages pipeline by adding 2 Images and retrieving list. 
+        [Fact]
+        public void GetImageIdsByCategory_UserList()
+        {
+
+            var UserId = new Guid();
+            List<int> CategoryIds = new List<int>();
+            CategoryIds.Add(1);
+            
+            var request = new GetImageIdsByCategoryUserImages.Request(CategoryIds,UserId);
+
+            using (var context = new GameContext(ContextOptions, null))
+            {
+                context.Database.Migrate();
+                
+                var Category1 = new backend.Core.Domain.Images.ImageCategory(1, "Test Category 1");
+                var Category2 = new backend.Core.Domain.Images.ImageCategory(2, "Test Category 2");
+                //context.ImageCategories.Add(new ImageCategory("Test Category 1"));
+                //context.ImageCategories.Add(new ImageCategory("Test Category 2"));
+                var Label1 = new backend.Core.Domain.Images.ImageLabel("Test Label 1",Category1);
+                var Label2 = new backend.Core.Domain.Images.ImageLabel("Test Label 2",Category1);
+                var Label3 = new backend.Core.Domain.Images.ImageLabel("Test Label 3",Category2);
+                var Image1 = new backend.Core.Domain.Images.Image(UserId,Label1);
+                var Image2 = new backend.Core.Domain.Images.Image(UserId,Label2);
+                var Image3 = new backend.Core.Domain.Images.Image(UserId,Label3);
+                context.Images.Add(Image1);
+                context.Images.Add(Image2);
+                context.Images.Add(Image3);
+                context.SaveChanges();
+ 
+
+                var handler = new GetImageIdsByCategoryUserImages.Handler(context);
+
+                var result = handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
+
+                context.ImageCategories.Count().ShouldBe(2);
+                Assert.Equal(1,result.First());
+                Assert.Equal(2,result.Last());
             }
         }
     }
