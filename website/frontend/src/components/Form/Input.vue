@@ -14,6 +14,7 @@
       :placeholder="this.placeholder"
       :max="max"
       :min="min"
+      multiple
     />
     <div class="invalid-feedback">{{ error }}</div>
   </div>
