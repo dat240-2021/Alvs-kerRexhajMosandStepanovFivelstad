@@ -235,7 +235,7 @@ export default defineComponent({
       return this.images.sort((a, b) => a.id - b.id);
     },
     deleteImage(id: number) {
-      this.images = [...this.images.filter((x) => x.id != id)];
+      this.images = this.images.filter((x) => x.id != id);
     },
   },
 });
