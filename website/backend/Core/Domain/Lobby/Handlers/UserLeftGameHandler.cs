@@ -16,14 +16,14 @@ namespace backend.Core.Domain.Lobby.Handlers
         private readonly GameContext _db;
         private readonly IHubContext<GamesHub> _hubContext;
         private readonly IMediator _mediator;
-        private readonly IBackendGameService _backendGameService;
+        private readonly ILobbyService _LobbyService;
 
-        public UserLeftGameHandler(GameContext db, IHubContext<GamesHub> hubContext, IMediator mediator, IBackendGameService backendGameService)
+        public UserLeftGameHandler(GameContext db, IHubContext<GamesHub> hubContext, IMediator mediator, ILobbyService LobbyService)
         {
             _db = db ?? throw new System.ArgumentException(nameof(db));
             _hubContext = hubContext;
             _mediator = mediator;
-            _backendGameService = backendGameService;
+            _LobbyService = LobbyService;
         }
         
         public async Task Handle(UserLeftGame domainEvent, CancellationToken cancellationToken)

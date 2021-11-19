@@ -23,6 +23,16 @@ export interface Game {
   occupiedSlotsCount: number;
 }
 
+export interface ImageFile {
+  id: number;
+  name: string;
+  file: any;
+  sliceFile: string;
+  sliceColors: string[];
+  category: string;
+  label: string;
+}
+
 export interface Category {
   id: number;
   name: string;

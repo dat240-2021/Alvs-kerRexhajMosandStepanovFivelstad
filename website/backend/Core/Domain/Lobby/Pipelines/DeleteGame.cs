@@ -17,20 +17,20 @@ namespace backend.Core.Domain.Lobby.Pipelines
         {
             private readonly GameContext _db;
             private readonly IMediator _mediator;
-            private readonly IBackendGameService _backendGameService;
+            private readonly ILobbyService _LobbyService;
 
-            public Handler(GameContext db, IMediator mediator, IBackendGameService backendGameService)
+            public Handler(GameContext db, IMediator mediator, ILobbyService LobbyService)
             {
                 _db = db ?? throw new ArgumentNullException(nameof(db));
                 _mediator = mediator;
-                _backendGameService = backendGameService;
+                _LobbyService = LobbyService;
             }
 
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
                 _db.Games.Remove(request.Game);
                 await _db.SaveChangesAsync(cancellationToken);
-                _backendGameService.deleteGame(request.Game.Id);
+                _LobbyService.DeleteGame(request.Game.Id);
                 await _mediator.Publish(new GameDeleted(request.Game), cancellationToken);
                 return Unit.Value;
             }
