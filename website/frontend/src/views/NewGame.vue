@@ -149,8 +149,12 @@ export default defineComponent({
       }
       this.createdGame.occupiedSlotsCount = data.occupiedSlotsCount;
     },
+    startGame() {
+      this.$router.push({ name: "InGame" });
+    },
     subscribeToGames() {
       ws.subscribeToGameRoomsUpdates(this.updateGameRoom);
+      ws.subscribeToGameStart(this.startGame);
     },
   },
 });

@@ -6,38 +6,39 @@ using backend.Core.Domain.Images;
 using SharedKernel;
 
 namespace backend.Core.Domain.Games{
-    // internal enum GameState
-    // {
-    //     Propose,
-    //     Guess,
-    // }
+    public enum GameState
+    {
+        Created,
+        Active,
+        Ended,
+    }
     public class Game : BaseEntity {
         public Guid Id { get; protected set; }
-        // public GameSettings Settings { get; protected set; }
-        public DateTime StartTime;
+        private GameState State = GameState.Created;
+        public DateTime StartTime = DateTime.Now;
         public TimeSpan RoundTime;
 
-        public Images.Image CurrentImage {
-            get
-            {
-                Images.TryPeek(out var result);
-                return result;
-            }
-        }
+        public Image CurrentImage;
 
 
         public IProposer Proposer;
         public List<Guesser> Guessers;
+        public List<String> GuesserIds {
+            get
+            {
+                return Guessers.Where(g => g.Connected).Select(g => g.Id.ToString()).ToList();
+            }
+        }
 
         public List<string> PlayerIds {
             get
             {
-                var list = Guessers.Select(g => g.Id.ToString()).ToList();
+                var list = GuesserIds;
                 list.Add(Proposer.GetId());
                 return list;
             }
         }
-        public Queue<Images.Image> Images;
+        public Queue<Image> Images;
         public List<int> SlicesShown = new();
         public int nProposes { get => SlicesShown.Count(); }
 
@@ -45,20 +46,25 @@ namespace backend.Core.Domain.Games{
 
         //When _proposersTurn is changed we have to send an event.
         private bool ProposersTurn { get => _proposersTurn ; set {
-                if (value)
-                {
-                        Events.Add(new ProposersTurnEvent() { PlayerIds = PlayerIds });
-                    if (Proposer is Oracle)
-                    {
-                        Events.Add(new OracleTurnEvent() { GameId = Id, Proposition = ((Oracle)Proposer).Proposal });
-                    }
-                } else
-                {
-                    Events.Add(new GuessersTurnEvent() { PlayerIds = PlayerIds });
-                }
-                _proposersTurn = value;
+            if (State != GameState.Active)
+            {
+                return;
             }
-        }
+
+            if (value)
+            {
+                    Events.Add(new ProposersTurnEvent() { PlayerIds = PlayerIds });
+                if (Proposer is Oracle)
+                {
+                    Events.Add(new OracleTurnEvent() { GameId = Id, Proposition = ((Oracle)Proposer).Proposal });
+                }
+            }
+            else
+            {
+                Events.Add(new GuessersTurnEvent() { PlayerIds = PlayerIds });
+            }
+            _proposersTurn = value;
+        }}
 
         public Game(Guid id, List<Image> images, List<Guesser> guessers, IProposer proposer) {
             _proposersTurn = true;
@@ -66,23 +72,14 @@ namespace backend.Core.Domain.Games{
             Id = id;
             Proposer = proposer;
             Guessers = guessers;
-
-            Events.Add(new NewImageEvent()
-                {
-                    ImageId = CurrentImage.Id,
-                    GuesserIds = Guessers.Select(g => g.Id.ToString()).ToList(),
-                    ProposerId = Proposer.GetId()
-                });
-
-            if (Proposer is Oracle)
-            {
-                ((Oracle)Proposer).HandleNewImage(CurrentImage.Slices.Select(slice => slice.SequenceNumber).ToList());
-            }
-            ProposersTurn = true;
-            StartTime = DateTime.Now;
         }
 
-        public void RemoveUser(Guid userId)
+        public void ConnectUser(Guid userId)
+        {
+            Guessers.Find(g => g.Id == userId).Connected = true;
+        }
+
+        public void DisconnectUser(Guid userId)
         {
             if (Proposer is Proposer && Proposer.GetId() == userId.ToString())
             {
@@ -90,12 +87,19 @@ namespace backend.Core.Domain.Games{
             }
             else
             {
-                Guessers.RemoveAll(g => g.Id == userId);
+                Guessers.Find(g => g.Id == userId).Connected = false;
             }
         }
 
         public void Update() {
-            if (!ProposersTurn) {
+            if (State == GameState.Created && (Guessers.All(g => g.Connected) || (StartTime + TimeSpan.FromSeconds(10)) <= DateTime.Now ))
+            {
+                State = GameState.Active;
+                NextImage();
+                return;
+            }
+
+            if (!ProposersTurn && State == GameState.Active) {
                 if (( StartTime + RoundTime) <= DateTime.Now) {
                     //Toggle role turn
                     ProposersTurn = true;
@@ -104,31 +108,37 @@ namespace backend.Core.Domain.Games{
         }
 
         public void NextImage() {
-            Images.TryDequeue(out _);
+            Images.TryDequeue(out CurrentImage);
 
             if (CurrentImage is null)
             {
                 GameOver();
                 return;
             }
-            foreach( var g in Guessers){
+
+            foreach (var g in Guessers){
                 g.Guessed = false;
             }
+
             SlicesShown.Clear();
+
             if (Proposer is Oracle)
             {
                 ((Oracle)Proposer).HandleNewImage(CurrentImage.Slices.Select(slice => slice.SequenceNumber).ToList());
             }
+
             Events.Add(new NewImageEvent()
-                {
+            {
                     ImageId = CurrentImage.Id,
-                    GuesserIds = Guessers.Select(g => g.Id.ToString()).ToList(),
+                    GuesserIds = GuesserIds,
                     ProposerId = Proposer.GetId()
-                });
+            });
+            
             ProposersTurn = true;
         }
 
         public void GameOver(){
+            State = GameState.Ended;
             Events.Add(new GameOverEvent(){GameId = Id});
         }
 
@@ -136,7 +146,7 @@ namespace backend.Core.Domain.Games{
         //returns bool, which implies this guess should be broadcast to all players
         public bool Guess(GuessDto guess)
         {
-            Guesser guesser = Guessers.Find(g => g.Id == guess.User);
+            Guesser guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
 
             if (!ProposersTurn && !guesser.Guessed && CurrentImage is not null)
             {

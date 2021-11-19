@@ -13,7 +13,7 @@ namespace backend.Core.Domain.Games {
         Game GetByUserId(Guid userId);
         void RemoveUser(Guid userId);
         bool Add(Game game);
-        bool Remove(Guid gameId);
+        Game Remove(Guid gameId);
     }
 
     public class GameService : IGameService{
@@ -43,6 +43,7 @@ namespace backend.Core.Domain.Games {
 
                 var events = game.Events.ToArray();
                 game.Events.Clear();
+                
                 foreach (var domainEvent in events)
                 {
                     await _mediator.Publish(domainEvent);
@@ -70,7 +71,7 @@ namespace backend.Core.Domain.Games {
             Game game = Get(gameId);
             if (game is not null)
             {
-                game.RemoveUser(userId);
+                game.DisconnectUser(userId);
             }
         }
 
@@ -89,13 +90,15 @@ namespace backend.Core.Domain.Games {
         }
 
 
-        public bool Remove(Guid gameId){
+        public Game Remove(Guid gameId){
             foreach (Guid guesser in GameIdsByUsers.Where(g => g.Value == gameId).Select(g => g.Key))
             {
                 GameIdsByUsers.TryRemove(guesser, out _);
             }
 
-            return Games.TryRemove(gameId, out _);
+            Games.TryRemove(gameId, out var game);
+
+            return game;
         }
     }
 }
