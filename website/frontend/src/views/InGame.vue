@@ -111,6 +111,7 @@ import {
   subscribeToNewGuess,
   sendNewProposal,
   sendNewGuess,
+  sendConnect,
   subscribeToGuessersTurn,
   subscribeToProposersTurn,
   subscribeToPlayerScores,
@@ -165,11 +166,9 @@ export default defineComponent({
   },
   created() {
     this.subscribeToActiveGame();
+    sendConnect();
   },
   methods: {
-    mounted() {
-      console.log("hello world");
-    },
     sendGuess() {
       sendNewGuess(this.guess);
       this.guess = "";
@@ -263,7 +262,7 @@ export default defineComponent({
 
       /// Received by all
       subscribeToPlayerScores(this.updateScores);
-      subscribeToNewGuess(this.addIncomingGuess);
+      subscribeToNewGuess(this.addIncomingGuess);      
     },
   },
 });

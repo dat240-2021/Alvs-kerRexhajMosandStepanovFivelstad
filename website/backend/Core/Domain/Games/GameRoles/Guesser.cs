@@ -8,6 +8,7 @@ namespace backend.Core.Domain.Games
     {
         public Guid Id { get; set; }
         public bool Guessed { get; set; }
+        public bool Connected { get; set; } = false;
 
         public Guesser(Guid id)
         {

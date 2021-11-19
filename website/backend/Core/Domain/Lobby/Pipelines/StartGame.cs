@@ -40,12 +40,13 @@ namespace backend.Core.Domain.Lobby.Pipelines
                 }
                 game.State = GameState.Active;
                 await _db.SaveChangesAsync(cancellationToken);
-                await _mediator.Publish(new GameStarted(game), cancellationToken);
-                
+
                 var imageIds = await _mediator.Send(new GetImageIdsListByCategoriesIds.Request(game.Settings.CategoryIds, game.Settings.ImagesCount));
                 var slotInfo = _LobbyService.GetSlotInfo(game.Id);
+              
                 await _mediator.Send(new Games.Pipelines.StartGame.Request(new GameWithSlotInfo(game, slotInfo), imageIds), cancellationToken);
-
+                await _mediator.Publish(new GameStarted(game), cancellationToken);
+                
                 return new Response(true);
             }
         }

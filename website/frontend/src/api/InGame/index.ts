@@ -111,3 +111,7 @@ export const sendNewGuess = (val: string): void => {
 export const sendNewProposal = (val: number): void => {
   connection.invoke("Propose", val);
 }
+
+export const sendConnect = (): void => {
+  connection.invoke("Connect");
+}
