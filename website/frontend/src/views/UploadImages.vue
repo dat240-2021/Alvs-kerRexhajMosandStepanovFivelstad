@@ -80,7 +80,11 @@
             </td>
             <td>
               <button
-                class="btn btn-outline-primary"
+                :class="
+                  i.sliceFile == ''
+                    ? 'btn btn-outline-primary'
+                    : 'btn btn-success'
+                "
                 type="button"
                 @click="manualSlicing(i)"
               >
