@@ -1,13 +1,18 @@
 <template>
   <div class="d-flex">
     <div class="ms-auto m-2">
-      <button class="btn btn-outline-primary" type="button" @click="leaveGame">
+      <button
+        class="btn btn-outline-primary"
+        type="button"
+        @click="leaveGame"
+      >
         Leave Game
       </button>
     </div>
   </div>
   <div class="container-fluid min-vh-100">
     <div class="row mt-3">
+      
       <div class="d-flex" v-if="!isProposer && started">
         <div class="ms-auto">
           <p>
@@ -65,19 +70,11 @@
       <div class="col position-relative" id="canvas-div">
         <div class="position-relative">
           <div v-if="!started" class="d-flex justify-content-center m-5">
-            <div
-              class="spinner-border"
-              role="status"
-              style="width: 3rem; height: 3rem"
-            />
+            <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;"/>
             <span class="ms-5">Waiting for game to start...</span>
           </div>
           <div v-if="isResetGuesser" class="d-flex justify-content-center m-5">
-            <div
-              class="spinner-border"
-              role="status"
-              style="width: 3rem; height: 3rem"
-            />
+            <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;"/>
             <span class="ms-5">Waiting for proposer...</span>
           </div>
           <img
@@ -100,7 +97,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="p in sortedPlayers" :key="p.PlayerId">
+            <tr
+              v-for="p in sortedPlayers"
+              :key="p.PlayerId"
+            >
               <td>{{ p.Name }}</td>
               <td>{{ p.Score }}</td>
             </tr>
@@ -271,7 +271,7 @@ export default defineComponent({
 
       /// Received by all
       subscribeToPlayerScores(this.updateScores);
-      subscribeToNewGuess(this.addIncomingGuess);
+      subscribeToNewGuess(this.addIncomingGuess);      
     },
   },
 });
