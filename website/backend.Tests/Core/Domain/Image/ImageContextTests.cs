@@ -30,10 +30,7 @@ namespace backend.Tests.Core.Domain.Images
 
             var UserId = Guid.NewGuid();
             List<ImageFile> TestImageList = new List<ImageFile>();
-<<<<<<< HEAD
             var emptySliceColors = new List<string>().ToArray();
-=======
->>>>>>> main
 
             int index = 1;
 
