@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Core.Domain.Images.Pipelines
 {
-	public class GetImageIdListByCategory
+	public class GetImageIdsByCategoryDefaultImages
 	{
-		public record Request(List<string> Categories, Guid? UserId) : IRequest<List<int>>;
+		public record Request(List<int> Categories) : IRequest<List<int>>;
 
 		public class Handler : IRequestHandler<Request, List<int>>
 		{
@@ -25,17 +25,8 @@ namespace backend.Core.Domain.Images.Pipelines
 
 				foreach (var category in request.Categories)
 				{
-					if (request.UserId != null && category == "My Images")
-					{
-						var userList = await _db.Images.Include(ic => ic.Category).Where(i => i.Category == "My Images").Where(i => i.UserId == request.UserId).Select(i => i.Id).ToListAsync(cancellationToken);
-						categoryImageIdList.AddRange(userList);
-					}
-
-					if (category != "My Images")
-					{
-						var tempList = await _db.Images.Include(ic => ic.Category).Where(i => i.Category == category).Select(i => i.Id).ToListAsync(cancellationToken);
-						categoryImageIdList.AddRange(tempList);
-					}
+					var defaultList = await _db.Images.Where(i => i.Label.Category.Id == category).Where(i => i.UserId == null).Select(i => i.Id).ToListAsync(cancellationToken);
+					categoryImageIdList.AddRange(defaultList);
 				}
 				return categoryImageIdList;
 			}
