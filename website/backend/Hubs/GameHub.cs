@@ -11,6 +11,13 @@ namespace backend.Hubs
         private readonly IMediator _mediator;
 
         public GameHub(IMediator mediator) => _mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
+        
+        public override async Task OnDisconnectedAsync(Exception e)
+        {
+            string user = Context.UserIdentifier;
+            await _mediator.Send(new Disconnect.Request(Guid.Parse(user)));
+            await base.OnDisconnectedAsync(e);
+        }
         public async Task Guess(string guess)
         {
             string user = Context.UserIdentifier;
@@ -20,7 +27,7 @@ namespace backend.Hubs
         public async Task Propose(int proposition)
         {
             string user = Context.UserIdentifier;
-            await _mediator.Send(new Propose.Request(Guid.Parse(user), proposition));
+            await _mediator.Send(new UserPropose.Request(Guid.Parse(user), proposition));
         }
     }
 }

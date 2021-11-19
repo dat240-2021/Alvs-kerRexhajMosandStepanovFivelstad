@@ -43,10 +43,10 @@ namespace backend.Core.Domain.BackendGame.Pipelines
                 await _db.SaveChangesAsync(cancellationToken);
                 await _mediator.Publish(new GameStarted(game), cancellationToken);
 
-                var imageIds = await _mediator.Send(new GetImageIdsByCategoryDefaultImages.Request(game.Settings.CategoryIds));
+                var imageIds = await _mediator.Send(new GetImageIdsListByCategoriesIds.Request(game.Settings.CategoryIds, game.Settings.ImagesCount));
                 var slotInfo = _backendGameService.GetSlotInfo(game);
                 await _mediator.Send(new Games.Pipelines.StartGame.Request(new GameWithSlotInfo(game, slotInfo), imageIds), cancellationToken);
-                
+
                 return new Response(true);
             }
         }

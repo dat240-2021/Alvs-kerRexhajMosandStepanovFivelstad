@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Domain.Authentication;
 using Domain.Authentication.Services;
 using backend.Core.Domain.Games;
+using backend.Core.Domain.Images.Utils;
 using Microsoft.AspNetCore.Http;
 
 namespace backend
@@ -43,8 +44,10 @@ namespace backend
             });
 
             services.AddScoped<IAuthenticationService,AuthenticationService>();
+            services.AddScoped<IRandomNumberGenerator, RandomNumberGenerator>();
             services.AddSingleton<IBackendGameService, BackendGameService>();
             services.AddSingleton<IGameService, GameService>();
+            
 
 
 

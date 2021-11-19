@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using backend.Core.Domain.BackendGame.Models;
+using backend.Core.Domain.Games.Events;
 using Infrastructure.Data;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
 
 namespace backend.Core.Domain.Games.Pipelines
 {
@@ -34,7 +35,12 @@ namespace backend.Core.Domain.Games.Pipelines
                     proposer = new Proposer((Guid)proposerId);
                 }
 
-                var images = await _db.Images.Where(i => request.ImageIds.Contains(i.Id)).ToListAsync(cancellationToken);
+                var images = await _db.Images
+                    .Where(i => request.ImageIds.Contains(i.Id))
+                    .Include(images => images.Slices)
+                    .Include(images => images.Label)
+                    .ThenInclude(label => label.Category)
+                    .ToListAsync(cancellationToken);
 
                 var game = new Game(
                     request.Game.Game.Id,

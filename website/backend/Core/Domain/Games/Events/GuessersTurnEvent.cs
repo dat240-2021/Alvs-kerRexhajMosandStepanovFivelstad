@@ -7,6 +7,6 @@ namespace backend.Core.Domain.Games.Events
 {
     public record GuessersTurnEvent: BaseDomainEvent
     {
-        public List<string> GuesserIds;
+        public List<string> PlayerIds;
     }
 }
