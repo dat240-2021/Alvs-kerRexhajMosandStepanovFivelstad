@@ -15,7 +15,7 @@ using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace backend.Tests.Core.Domain.Image
+namespace backend.Tests.Core.Domain.Images
 {
     public class ImageContextTests : DbTest
     {
@@ -115,16 +115,16 @@ namespace backend.Tests.Core.Domain.Image
             {
                 context.Database.Migrate();
                 
-                var Category1 = new backend.Core.Domain.Images.ImageCategory(1, "Test Category 1");
-                var Category2 = new backend.Core.Domain.Images.ImageCategory(2, "Test Category 2");
+                var Category1 = new ImageCategory(1, "Test Category 1");
+                var Category2 = new ImageCategory(2, "Test Category 2");
                 //context.ImageCategories.Add(new ImageCategory("Test Category 1"));
                 //context.ImageCategories.Add(new ImageCategory("Test Category 2"));
-                var Label1 = new backend.Core.Domain.Images.ImageLabel("Test Label 1",Category1);
-                var Label2 = new backend.Core.Domain.Images.ImageLabel("Test Label 2",Category1);
-                var Label3 = new backend.Core.Domain.Images.ImageLabel("Test Label 3",Category2);
-                var Image1 = new backend.Core.Domain.Images.Image();
-                var Image2 = new backend.Core.Domain.Images.Image();
-                var Image3 = new backend.Core.Domain.Images.Image();
+                var Label1 = new ImageLabel("Test Label 1",Category1);
+                var Label2 = new ImageLabel("Test Label 2",Category1);
+                var Label3 = new ImageLabel("Test Label 3",Category2);
+                var Image1 = new Image();
+                var Image2 = new Image();
+                var Image3 = new Image();
                 Image1.SetLabel(Label1);
                 Image2.SetLabel(Label2);
                 Image3.SetLabel(Label3);
