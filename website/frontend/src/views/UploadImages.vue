@@ -154,15 +154,18 @@ export default defineComponent({
     loadFile(file: any, i: number) {
       let reader = new FileReader();
       reader.onloadend = () => {
-        this.images.push({
-          id: i,
-          name: file.name,
-          file: reader.result,
-          sliceFile: "",
-          sliceColors: [],
-          category: "",
-          label: "",
-        } as ImageFile);
+        this.images = [
+          ...this.images,
+          {
+            id: i,
+            name: file.name,
+            file: reader.result,
+            sliceFile: "",
+            sliceColors: [],
+            category: "",
+            label: "",
+          } as ImageFile,
+        ];
       };
       reader.readAsDataURL(file);
     },
@@ -170,8 +173,10 @@ export default defineComponent({
       if (this.images.length < 1) {
         this.error = "Upload at least one file!";
       }
-      let imagesContainEmptyfields = this.images.find(x => x.label=="" && x.category=="");
-      if (imagesContainEmptyfields!=undefined) {
+      let imagesContainEmptyfields = this.images.find(
+        (x) => x.label == "" && x.category == ""
+      );
+      if (imagesContainEmptyfields != undefined) {
         this.error = "Please fill in all fields!";
         return;
       }
