@@ -49,7 +49,7 @@
             >
               Color Picker
             </button>
-            <div v-if="colorPicker!=true">
+            <div v-if="!colorPicker">
               <p>Color Picker Disabled</p>
             </div>
 
@@ -61,7 +61,7 @@
             <button
               class="btn btn-primary"
               @click="selectAnotherColor = true"
-              v-if="colorPicker == true"
+              v-if="colorPicker"
             >
               Pick Again
             </button>
@@ -120,13 +120,13 @@ export default defineComponent({
   },
   methods: {
     resize() {
-      var oImage = document.getElementById("original_image");
+      let oImage = document.getElementById("original_image");
       this.ctx.canvas.width = oImage?.clientWidth;
       this.ctx.canvas.height = oImage?.clientHeight;
     },
     reposition(event: any) {
-      var rel = document.getElementById("slicingModal");
-      var rel2 = document.getElementById("slicingModalBody");
+      let rel = document.getElementById("slicingModal");
+      let rel2 = document.getElementById("slicingModalBody");
       if (rel == null || rel2 == null) {
         return;
       }
@@ -134,13 +134,13 @@ export default defineComponent({
       this.coord.y = event.clientY - (rel.offsetTop + rel2.offsetTop + 16);
     },
     start(event: any) {
-      var color = "";
+      let color = "";
       if (
-        (this.colorPicker == true && this.pickedColor == "") ||
+        (this.colorPicker && this.pickedColor == "") ||
         this.selectAnotherColor
       ) {
         this.reposition(event);
-        var pixel = this.ctx.getImageData(
+        let pixel = this.ctx.getImageData(
           this.coord.x,
           this.coord.y,
           this.canvas.width,
@@ -175,16 +175,16 @@ export default defineComponent({
 
     newColor() {
       const randomColor = () => {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
+        let letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
           color += letters[Math.floor(Math.random() * 16)];
         }
         console.log(color);
         return color;
       };
 
-      var color = randomColor();
+      let color = randomColor();
       // if we find the same color try a new one.
       while (this.sliceColors.find((x) => x == color) != null) {
       color = randomColor();
@@ -194,7 +194,7 @@ export default defineComponent({
     },
 
     saveAndExit() {
-      var data = this.canvas.toDataURL("image/png", 1.0);
+      let data = this.canvas.toDataURL("image/png", 1.0);
 
       this.$emit("SaveAndExit", { id: this.modalImage.id, data: data,colors: this.sliceColors });
     },
@@ -203,7 +203,7 @@ export default defineComponent({
     },
     rgbToHex(r: number, g: number, b: number) {
       const componentToHex = (c: number) => {
-        var hex = c.toString(16);
+        let hex = c.toString(16);
         return hex.length == 1 ? "0" + hex : hex;
       };
       return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);

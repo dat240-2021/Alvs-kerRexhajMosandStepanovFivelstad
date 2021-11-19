@@ -28,7 +28,7 @@
               UploadFiles
             </button>
           </div>
-          <div v-if="loading == false">
+          <div v-if="!loading">
             <p v-if="images.length > 1">{{ images.length }} Files selected</p>
           </div>
           <div v-else class="d-flex">
@@ -95,7 +95,7 @@
   <ManualSlicingModal
     v-on:closeModal="showModal = false"
     v-on:saveAndExit="saveSlicesData"
-    v-if="showModal == true"
+    v-if="showModal"
     :modalImage="modalImage"
   />
 </template>
@@ -145,14 +145,14 @@ export default defineComponent({
     onImagesSelected(event: any) {
       this.error = "";
 
-      for (var i = 0; i < event.target.files.length; i++) {
+      for (let i = 0; i < event.target.files.length; i++) {
         this.loadFile(event.target.files[i], i);
       }
       event.target.files = null;
     },
 
     loadFile(file: any, i: number) {
-      var reader = new FileReader();
+      let reader = new FileReader();
       reader.onloadend = () => {
         this.images.push({
           id: i,
@@ -170,11 +170,10 @@ export default defineComponent({
       if (this.images.length < 1) {
         this.error = "Upload at least one file!";
       }
-      for (var i = 0; i < this.images.length; i++) {
-        if (this.images[i].category == "" || this.images[i].label == "") {
-          this.error = "Please fill in all fields!";
-          return;
-        }
+      let imagesContainEmptyfields = this.images.find(x => x.label=="" && x.category=="");
+      if (imagesContainEmptyfields!=undefined) {
+        this.error = "Please fill in all fields!";
+        return;
       }
 
       //do the actual upload
@@ -191,7 +190,7 @@ export default defineComponent({
     },
     loadCategories() {
       fetchCategories().then((categories) => {
-        // var categoryIds = categories.map(c => c.id);
+        // let categoryIds = categories.map(c => c.id);
         this.categories = categories;
       });
     },
@@ -201,7 +200,7 @@ export default defineComponent({
     },
     saveSlicesData(object: any) {
       this.showModal = false;
-      var image = this.images.find((x) => x.id == object.id);
+      let image = this.images.find((x) => x.id == object.id);
       if (image != null) {
         image.sliceFile = object.data;
         image.sliceColors = object.colors;
