@@ -30,9 +30,10 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new List<backend.Core.Domain.Images.Image>() { new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test"))) },
-                new List<Guesser>() { new Guesser(user) },
+                new List<Guesser>() { new Guesser(user) { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
+            game.Update();
 
             Assert.False(game.Guess(new GuessDto() { User = user, Guess = "guess" }));
         }
@@ -47,9 +48,10 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image },
-                new List<Guesser>() { new Guesser(user) },
+                new List<Guesser>() { new Guesser(user) { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
+            game.Update();
 
             game.Propose(3);
             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "guess" }));
@@ -65,9 +67,10 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image },
-                new List<Guesser>() { new Guesser(user) },
+                new List<Guesser>() { new Guesser(user) { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
+            game.Update();
 
             game.Propose(3);
             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
@@ -88,9 +91,10 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image1, image2, image3 },
-                new List<Guesser>() { new Guesser(user) },
+                new List<Guesser>() { new Guesser(user) { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
+            game.Update();
 
             // Propose tile 1 of image1
             game.Propose(1);
@@ -110,7 +114,7 @@ namespace backend.Tests.Core.Domain.Games
             game.Propose(1);
 
             // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test"}));
+            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
 
             // No more tiles to propose. Game ends.
             Assert.True(game.Events.Any(x => x is GameOverEvent));
@@ -127,9 +131,10 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image },
-                new List<Guesser>() { new Guesser(user1), new Guesser(user2) },
+                new List<Guesser>() { new Guesser(user1) { Connected = true }, new Guesser(user2) { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
+            game.Update();
 
             // Propose tile 1 of image1
             game.Propose(1);
@@ -158,9 +163,10 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image1, image2, image3 },
-                new List<Guesser>() { new Guesser(user1), new Guesser(user2), new Guesser(user3) },
+                new List<Guesser>() { new Guesser(user1) { Connected = true }, new Guesser(user2) { Connected = true }, new Guesser(user3) { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
+            game.Update();
 
             // Propose tile 1 of image1
             game.Propose(1);
@@ -185,7 +191,7 @@ namespace backend.Tests.Core.Domain.Games
             Assert.True(game.Guess(new GuessDto() { User = user3, Guess = "test2" }));
 
             // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test"}));
+            Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test" }));
 
             // No more tiles to propose. Game ends.
             Assert.True(game.Propose(1) is null);
