@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Core.Domain.Images.Pipelines
 {
-	public class GetImageIdListByCategory
+	public class GetImageIdsByCategoryUserImages
 	{
-		public record Request(List<string> Categories, Guid? UserId) : IRequest<List<int>>;
+		public record Request(List<int> Categories, Guid? UserId) : IRequest<List<int>>;
 
 		public class Handler : IRequestHandler<Request, List<int>>
 		{
@@ -25,16 +25,10 @@ namespace backend.Core.Domain.Images.Pipelines
 
 				foreach (var category in request.Categories)
 				{
-					if (request.UserId != null && category == "My Images")
+					if (request.UserId != null)
 					{
-						var userList = await _db.Images.Include(ic => ic.Label).ThenInclude(l => l.Category).Where(i => i.Label.Category.Name == "My Images").Where(i => i.UserId == request.UserId).Select(i => i.Id).ToListAsync(cancellationToken);
+						var userList = await _db.Images.Where(i => i.Label.Category.Id == category).Where(i => i.UserId == request.UserId).Select(i => i.Id).ToListAsync(cancellationToken);
 						categoryImageIdList.AddRange(userList);
-					}
-
-					if (category != "My Images")
-					{
-						var tempList = await _db.Images.Include(ic => ic.Label).ThenInclude(l => l.Category).Where(i => i.Label.Category.Name == category).Select(i => i.Id).ToListAsync(cancellationToken);
-						categoryImageIdList.AddRange(tempList);
 					}
 				}
 				return categoryImageIdList;

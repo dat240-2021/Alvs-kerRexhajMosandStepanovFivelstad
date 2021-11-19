@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using backend.Controllers.NewGame.Dto;
 using backend.Core.Domain.Images.ImageSliceHelpers;
 using Infrastructure.Data;
 using MediatR;
@@ -11,7 +12,7 @@ namespace backend.Core.Domain.Images.Pipelines
 {
 	public class AddUserImage
 	{
-		public record Request(List<(byte[],string, string)> ImageList, Guid UserId) : IRequest<Response>;
+		public record Request(ImageFile[] ImageList, Guid UserId) : IRequest<Response>;
 
 		public record Response(bool Success);
 
@@ -25,15 +26,20 @@ namespace backend.Core.Domain.Images.Pipelines
 			{
 				foreach (var item in request.ImageList)
 				{
-					var tempCategory = _db.ImageCategories.SingleOrDefault(i => i.Name == item.Item3);
-					if (tempCategory is null)
+
+					var cat = _db.ImageCategories.Where(x=> x.Id == item.Category).FirstOrDefault();
+
+					var b64 = item.File;
+					int b64Start = item.File.IndexOf(";base64,") + 8;
+					if (b64Start > 8)
 					{
-						tempCategory = new ImageCategory(item.Item3);
-						_db.ImageCategories.Add(tempCategory);
+						b64 = item.File.Substring(b64Start);
 					}
-					
-					var slicedList = new SliceImage().Slice(item.Item1);
-					var image = new Image(request.UserId,new ImageLabel(item.Item2,tempCategory));
+
+					//var b64 = item.File.Remove(0,"data:image/jpeg;base64,".Length);
+
+					var slicedList = new SliceImage().Slice(Convert.FromBase64String(b64));
+					var image = new Image(request.UserId,new ImageLabel(item.Label,cat));
 					var sequenceNumber = 0;
 					foreach (var slice in slicedList)
 					{
@@ -41,9 +47,9 @@ namespace backend.Core.Domain.Images.Pipelines
 						sequenceNumber++;
 					}
 					_db.Add(image);
-					
+
 				}
-				
+
 				await _db.SaveChangesAsync();
 
 				return new Response(Success: true);
