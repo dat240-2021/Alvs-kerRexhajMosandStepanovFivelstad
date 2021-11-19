@@ -169,7 +169,6 @@ export default defineComponent({
       for (let i = 0; i < event.target.files.length; i++) {
         this.loadFile(event.target.files[i], this.images.length+i)
       }
-      // event.target.files = null;
     },
 
     loadFile(file: any, i: number) {
