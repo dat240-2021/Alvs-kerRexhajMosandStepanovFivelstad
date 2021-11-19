@@ -32,14 +32,13 @@ namespace backend.Core.Domain.Images.Pipelines
                 var imageCategories = await _mediator.Send(new GetCategoryList.Request());
                 var categories = imageCategories
                     .Where(ic => request.CategoryIds.Contains(ic.Id))
-                    .Select(c => c.Name)
+                    .Select(c => c.Id)
                     .ToList();
-                var ids = await _mediator.Send(new GetImageIdListByCategory.Request(categories, null), cancellationToken);
-                
+                var ids = await _mediator.Send(new GetImageIdsByCategoryDefaultImages.Request(categories), cancellationToken);
                 var randomizedIds = ids.OrderBy(_ => _rnd.Next()).ToList();
 
-                return request.ImagesCount is null ? 
-                    randomizedIds : 
+                return request.ImagesCount is null ?
+                    randomizedIds :
                     randomizedIds.Take((int)request.ImagesCount).ToList();
             }
         }
