@@ -99,8 +99,18 @@ export default defineComponent({
       colorPicker: false,
       selectAnotherColor: false,
       pickedColor: "",
+      currentColor: "",
       modal: null as any,
     };
+  },
+  watch: {
+    currentColor: function (newColor: string) {
+      if (!this.sliceColors.includes(newColor)) {
+        this.sliceColors = [...this.sliceColors, newColor];
+        console.log(this.sliceColors);
+        console.log(newColor);
+      }
+    },
   },
   props: {
     modalImage: {
@@ -185,6 +195,7 @@ export default defineComponent({
         color = this.pickedColor;
       }
       this.modal.addEventListener("mousemove", this.draw);
+      this.currentColor = color;
       this.ctx.strokeStyle = color;
       this.reposition(event);
     },
@@ -217,7 +228,6 @@ export default defineComponent({
       while (this.sliceColors.find((x) => x == color) != null) {
         color = randomColor();
       }
-      this.sliceColors.push(color);
       return color;
     },
 
