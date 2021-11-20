@@ -546,455 +546,455 @@
 852:tennis ball:8
 890:volleyball:8
 981:ballplayer:8
-403:aircraft carrier:8
-404:airliner:8
-405:airship:8
-407:ambulance:8
-466:bullet train:8
-468:cab:8
-484:catamaran:8
-510:container ship:8
-511:convertible:8
-517:crane:8
-540:drilling platform:8
-547:electric locomotive:8
-554:fireboat:8
-555:fire engine:8
-561:forklift:8
-565:freight car:8
-569:garbage truck:8
-576:gondola:8
-586:half track:8
-595:harvester:8
-609:jeep:8
-621:lawn mower:8
-625:lifeboat:8
-627:limousine:8
-654:minibus:8
-656:minivan:8
-660:mobile home:8
-661:Model T:8
-665:moped:8
-670:motor scooter:8
-675:moving van:8
-705:passenger car:8
-717:pickup:8
-726:plane:8
-734:police van:8
-757:recreational vehicle:8
-779:school bus:8
-780:schooner:8
-802:snowmobile:8
-803:snowplow:8
-812:space shuttle:8
-814:speedboat:8
-817:sports car:8
-820:steam locomotive:8
-829:streetcar:8
-833:submarine:8
-847:tank:8
-864:tow truck:8
-866:tractor:8
-867:trailer truck:8
-871:trimaran:8
-874:trolleybus:8
-895:warplane:8
-914:yawl:8
-0:tench:9
-1:goldfish:9
-10:brambling:9
-100:black swan:9
-101:tusker:9
-102:echidna:9
-103:platypus:9
-104:wallaby:9
-105:koala:9
-106:wombat:9
-107:jellyfish:9
-108:sea anemone:9
-109:brain coral:9
-11:goldfinch:9
-110:flatworm:9
-111:nematode:9
-112:conch:9
-113:snail:9
-114:slug:9
-115:sea slug:9
-116:chiton:9
-117:chambered nautilus:9
-118:Dungeness crab:9
-119:rock crab:9
-12:house finch:9
-120:fiddler crab:9
-121:king crab:9
-122:American lobster:9
-123:spiny lobster:9
-124:crayfish:9
-125:hermit crab:9
-126:isopod:9
-127:white stork:9
-128:black stork:9
-129:spoonbill:9
-13:junco:9
-130:flamingo:9
-131:little blue heron:9
-132:American egret:9
-133:bittern:9
-134:crane:9
-135:limpkin:9
-136:European gallinule:9
-137:American coot:9
-138:bustard:9
-139:ruddy turnstone:9
-14:indigo bunting:9
-140:red-backed sandpiper:9
-141:redshank:9
-142:dowitcher:9
-143:oystercatcher:9
-144:pelican:9
-145:king penguin:9
-146:albatross:9
-147:grey whale:9
-148:killer whale:9
-149:dugong:9
-15:robin:9
-150:sea lion:9
-151:Chihuahua:9
-152:Japanese spaniel:9
-153:Maltese dog:9
-154:Pekinese:9
-155:Shih-Tzu:9
-156:Blenheim spaniel:9
-157:papillon:9
-158:toy terrier:9
-159:Rhodesian ridgeback:9
-16:bulbul:9
-160:Afghan hound:9
-161:basset:9
-162:beagle:9
-163:bloodhound:9
-164:bluetick:9
-165:black-and-tan coonhound:9
-166:Walker hound:9
-167:English foxhound:9
-168:redbone:9
-169:borzoi:9
-17:jay:9
-170:Irish wolfhound:9
-171:Italian greyhound:9
-172:whippet:9
-173:Ibizan hound:9
-174:Norwegian elkhound:9
-175:otterhound:9
-176:Saluki:9
-177:Scottish deerhound:9
-178:Weimaraner:9
-179:Staffordshire bullterrier:9
-18:magpie:9
-180:American Staffordshire terrier:9
-181:Bedlington terrier:9
-182:Border terrier:9
-183:Kerry blue terrier:9
-184:Irish terrier:9
-185:Norfolk terrier:9
-186:Norwich terrier:9
-187:Yorkshire terrier:9
-188:wire-haired fox terrier:9
-189:Lakeland terrier:9
-19:chickadee:9
-190:Sealyham terrier:9
-191:Airedale:9
-192:cairn:9
-193:Australian terrier:9
-194:Dandie Dinmont:9
-195:Boston bull:9
-196:miniature schnauzer:9
-197:giant schnauzer:9
-198:standard schnauzer:9
-199:Scotch terrier:9
-2:great white shark:9
-20:water ouzel:9
-200:Tibetan terrier:9
-201:silky terrier:9
-202:soft-coated wheaten terrier:9
-203:West Highland white terrier:9
-204:Lhasa:9
-205:flat-coated retriever:9
-206:curly-coated retriever:9
-207:golden retriever:9
-208:Labrador retriever:9
-209:Chesapeake Bay retriever:9
-21:kite:9
-210:German short-haired pointer:9
-211:vizsla:9
-212:English setter:9
-213:Irish setter:9
-214:Gordon setter:9
-215:Brittany spaniel:9
-216:clumber:9
-217:English springer:9
-218:Welsh springer spaniel:9
-219:cocker spaniel:9
-22:bald eagle:9
-220:Sussex spaniel:9
-221:Irish water spaniel:9
-222:kuvasz:9
-223:schipperke:9
-224:groenendael:9
-225:malinois:9
-226:briard:9
-227:kelpie:9
-228:komondor:9
-229:Old English sheepdog:9
-23:vulture:9
-230:Shetland sheepdog:9
-231:collie:9
-232:Border collie:9
-233:Bouvier des Flandres:9
-234:Rottweiler:9
-235:German shepherd:9
-236:Doberman:9
-237:miniature pinscher:9
-238:Greater Swiss Mountain dog:9
-239:Bernese mountain dog:9
-24:great grey owl:9
-240:Appenzeller:9
-241:EntleBucher:9
-242:boxer:9
-243:bull mastiff:9
-244:Tibetan mastiff:9
-245:French bulldog:9
-246:Great Dane:9
-247:Saint Bernard:9
-248:Eskimo dog:9
-249:malamute:9
-25:European fire salamander:9
-250:Siberian husky:9
-251:dalmatian:9
-252:affenpinscher:9
-253:basenji:9
-254:pug:9
-255:Leonberg:9
-256:Newfoundland:9
-257:Great Pyrenees:9
-258:Samoyed:9
-259:Pomeranian:9
-26:common newt:9
-260:chow:9
-261:keeshond:9
-262:Brabancon griffon:9
-263:Pembroke:9
-264:Cardigan:9
-265:toy poodle:9
-266:miniature poodle:9
-267:standard poodle:9
-268:Mexican hairless:9
-269:timber wolf:9
-27:eft:9
-270:white wolf:9
-271:red wolf:9
-272:coyote:9
-273:dingo:9
-274:dhole:9
-275:African hunting dog:9
-276:hyena:9
-277:red fox:9
-278:kit fox:9
-279:Arctic fox:9
-28:spotted salamander:9
-280:grey fox:9
-281:tabby:9
-282:tiger cat:9
-283:Persian cat:9
-284:Siamese cat:9
-285:Egyptian cat:9
-286:cougar:9
-287:lynx:9
-288:leopard:9
-289:snow leopard:9
-29:axolotl:9
-290:jaguar:9
-291:lion:9
-292:tiger:9
-293:cheetah:9
-294:brown bear:9
-295:American black bear:9
-296:ice bear:9
-297:sloth bear:9
-298:mongoose:9
-299:meerkat:9
-3:tiger shark:9
-30:bullfrog:9
-300:tiger beetle:9
-301:ladybug:9
-302:ground beetle:9
-303:long-horned beetle:9
-304:leaf beetle:9
-305:dung beetle:9
-306:rhinoceros beetle:9
-307:weevil:9
-308:fly:9
-309:bee:9
-31:tree frog:9
-310:ant:9
-311:grasshopper:9
-312:cricket:9
-313:walking stick:9
-314:cockroach:9
-315:mantis:9
-316:cicada:9
-317:leafhopper:9
-318:lacewing:9
-319:dragonfly:9
-32:tailed frog:9
-320:damselfly:9
-321:admiral:9
-322:ringlet:9
-323:monarch:9
-324:cabbage butterfly:9
-325:sulphur butterfly:9
-326:lycaenid:9
-327:starfish:9
-328:sea urchin:9
-329:sea cucumber:9
-33:loggerhead:9
-330:wood rabbit:9
-331:hare:9
-332:Angora:9
-333:hamster:9
-334:porcupine:9
-335:fox squirrel:9
-336:marmot:9
-337:beaver:9
-338:guinea pig:9
-339:sorrel:9
-34:leatherback turtle:9
-340:zebra:9
-341:hog:9
-342:wild boar:9
-343:warthog:9
-344:hippopotamus:9
-345:ox:9
-346:water buffalo:9
-347:bison:9
-348:ram:9
-349:bighorn:9
-35:mud turtle:9
-350:ibex:9
-351:hartebeest:9
-352:impala:9
-353:gazelle:9
-354:Arabian camel:9
-355:llama:9
-356:weasel:9
-357:mink:9
-358:polecat:9
-359:black-footed ferret:9
-36:terrapin:9
-360:otter:9
-361:skunk:9
-362:badger:9
-363:armadillo:9
-364:three-toed sloth:9
-365:orangutan:9
-366:gorilla:9
-367:chimpanzee:9
-368:gibbon:9
-369:siamang:9
-37:box turtle:9
-370:guenon:9
-371:patas:9
-372:baboon:9
-373:macaque:9
-374:langur:9
-375:colobus:9
-376:proboscis monkey:9
-377:marmoset:9
-378:capuchin:9
-379:howler monkey:9
-38:banded gecko:9
-380:titi:9
-381:spider monkey:9
-382:squirrel monkey:9
-383:Madagascar cat:9
-384:indri:9
-385:Indian elephant:9
-386:African elephant:9
-387:lesser panda:9
-388:giant panda:9
-389:barracouta:9
-39:common iguana:9
-390:eel:9
-391:coho:9
-392:rock beauty:9
-393:anemone fish:9
-394:sturgeon:9
-395:gar:9
-396:lionfish:9
-397:puffer:9
-4:hammerhead:9
-40:American chameleon:9
-41:whiptail:9
-42:agama:9
-43:frilled lizard:9
-44:alligator lizard:9
-45:Gila monster:9
-46:green lizard:9
-47:African chameleon:9
-48:Komodo dragon:9
-49:African crocodile:9
-5:electric ray:9
-50:American alligator:9
-51:triceratops:9
-52:thunder snake:9
-53:ringneck snake:9
-54:hognose snake:9
-55:green snake:9
-56:king snake:9
-57:garter snake:9
-58:water snake:9
-59:vine snake:9
-6:stingray:9
-60:night snake:9
-61:boa constrictor:9
-62:rock python:9
-63:Indian cobra:9
-64:green mamba:9
-65:sea snake:9
-66:horned viper:9
-67:diamondback:9
-68:sidewinder:9
-69:trilobite:9
-7:cock:9
-70:harvestman:9
-71:scorpion:9
-72:black and gold garden spider:9
-73:barn spider:9
-74:garden spider:9
-75:black widow:9
-76:tarantula:9
-77:wolf spider:9
-78:tick:9
-79:centipede:9
-8:hen:9
-80:black grouse:9
-81:ptarmigan:9
-82:ruffed grouse:9
-83:prairie chicken:9
-84:peacock:9
-85:quail:9
-86:partridge:9
-87:African grey:9
-88:macaw:9
-89:sulphur-crested cockatoo:9
-9:ostrich:9
-90:lorikeet:9
-91:coucal:9
-92:bee eater:9
-93:hornbill:9
-94:hummingbird:9
-95:jacamar:9
-96:toucan:9
-97:drake:9
-98:red-breasted merganser:9
-99:goose:9::
+403:aircraft carrier:9
+404:airliner:9
+405:airship:9
+407:ambulance:9
+466:bullet train:9
+468:cab:9
+484:catamaran:9
+510:container ship:9
+511:convertible:9
+517:crane:9
+540:drilling platform:9
+547:electric locomotive:9
+554:fireboat:9
+555:fire engine:9
+561:forklift:9
+565:freight car:9
+569:garbage truck:9
+576:gondola:9
+586:half track:9
+595:harvester:9
+609:jeep:9
+621:lawn mower:9
+625:lifeboat:9
+627:limousine:9
+654:minibus:9
+656:minivan:9
+660:mobile home:9
+661:Model T:9
+665:moped:9
+670:motor scooter:9
+675:moving van:9
+705:passenger car:9
+717:pickup:9
+726:plane:9
+734:police van:9
+757:recreational vehicle:9
+779:school bus:9
+780:schooner:9
+802:snowmobile:9
+803:snowplow:9
+812:space shuttle:9
+814:speedboat:9
+817:sports car:9
+820:steam locomotive:9
+829:streetcar:9
+833:submarine:9
+847:tank:9
+864:tow truck:9
+866:tractor:9
+867:trailer truck:9
+871:trimaran:9
+874:trolleybus:9
+895:warplane:9
+914:yawl:9
+0:tench:10
+1:goldfish:10
+10:brambling:10
+100:black swan:10
+101:tusker:10
+102:echidna:10
+103:platypus:10
+104:wallaby:10
+105:koala:10
+106:wombat:10
+107:jellyfish:10
+108:sea anemone:10
+109:brain coral:10
+11:goldfinch:10
+110:flatworm:10
+111:nematode:10
+112:conch:10
+113:snail:10
+114:slug:10
+115:sea slug:10
+116:chiton:10
+117:chambered nautilus:10
+118:Dungeness crab:10
+119:rock crab:10
+12:house finch:10
+120:fiddler crab:10
+121:king crab:10
+122:American lobster:10
+123:spiny lobster:10
+124:crayfish:10
+125:hermit crab:10
+126:isopod:10
+127:white stork:10
+128:black stork:10
+129:spoonbill:10
+13:junco:10
+130:flamingo:10
+131:little blue heron:10
+132:American egret:10
+133:bittern:10
+134:crane:10
+135:limpkin:10
+136:European gallinule:10
+137:American coot:10
+138:bustard:10
+139:ruddy turnstone:10
+14:indigo bunting:10
+140:red-backed sandpiper:10
+141:redshank:10
+142:dowitcher:10
+143:oystercatcher:10
+144:pelican:10
+145:king penguin:10
+146:albatross:10
+147:grey whale:10
+148:killer whale:10
+149:dugong:10
+15:robin:10
+150:sea lion:10
+151:Chihuahua:10
+152:Japanese spaniel:10
+153:Maltese dog:10
+154:Pekinese:10
+155:Shih-Tzu:10
+156:Blenheim spaniel:10
+157:papillon:10
+158:toy terrier:10
+159:Rhodesian ridgeback:10
+16:bulbul:10
+160:Afghan hound:10
+161:basset:10
+162:beagle:10
+163:bloodhound:10
+164:bluetick:10
+165:black-and-tan coonhound:10
+166:Walker hound:10
+167:English foxhound:10
+168:redbone:10
+169:borzoi:10
+17:jay:10
+170:Irish wolfhound:10
+171:Italian greyhound:10
+172:whippet:10
+173:Ibizan hound:10
+174:Norwegian elkhound:10
+175:otterhound:10
+176:Saluki:10
+177:Scottish deerhound:10
+178:Weimaraner:10
+179:Staffordshire bullterrier:10
+18:magpie:10
+180:American Staffordshire terrier:10
+181:Bedlington terrier:10
+182:Border terrier:10
+183:Kerry blue terrier:10
+184:Irish terrier:10
+185:Norfolk terrier:10
+186:Norwich terrier:10
+187:Yorkshire terrier:10
+188:wire-haired fox terrier:10
+189:Lakeland terrier:10
+19:chickadee:10
+190:Sealyham terrier:10
+191:Airedale:10
+192:cairn:10
+193:Australian terrier:10
+194:Dandie Dinmont:10
+195:Boston bull:10
+196:miniature schnauzer:10
+197:giant schnauzer:10
+198:standard schnauzer:10
+199:Scotch terrier:10
+2:great white shark:10
+20:water ouzel:10
+200:Tibetan terrier:10
+201:silky terrier:10
+202:soft-coated wheaten terrier:10
+203:West Highland white terrier:10
+204:Lhasa:10
+205:flat-coated retriever:10
+206:curly-coated retriever:10
+207:golden retriever:10
+208:Labrador retriever:10
+209:Chesapeake Bay retriever:10
+21:kite:10
+210:German short-haired pointer:10
+211:vizsla:10
+212:English setter:10
+213:Irish setter:10
+214:Gordon setter:10
+215:Brittany spaniel:10
+216:clumber:10
+217:English springer:10
+218:Welsh springer spaniel:10
+219:cocker spaniel:10
+22:bald eagle:10
+220:Sussex spaniel:10
+221:Irish water spaniel:10
+222:kuvasz:10
+223:schipperke:10
+224:groenendael:10
+225:malinois:10
+226:briard:10
+227:kelpie:10
+228:komondor:10
+229:Old English sheepdog:10
+23:vulture:10
+230:Shetland sheepdog:10
+231:collie:10
+232:Border collie:10
+233:Bouvier des Flandres:10
+234:Rottweiler:10
+235:German shepherd:10
+236:Doberman:10
+237:miniature pinscher:10
+238:Greater Swiss Mountain dog:10
+239:Bernese mountain dog:10
+24:great grey owl:10
+240:Appenzeller:10
+241:EntleBucher:10
+242:boxer:10
+243:bull mastiff:10
+244:Tibetan mastiff:10
+245:French bulldog:10
+246:Great Dane:10
+247:Saint Bernard:10
+248:Eskimo dog:10
+249:malamute:10
+25:European fire salamander:10
+250:Siberian husky:10
+251:dalmatian:10
+252:affenpinscher:10
+253:basenji:10
+254:pug:10
+255:Leonberg:10
+256:Newfoundland:10
+257:Great Pyrenees:10
+258:Samoyed:10
+259:Pomeranian:10
+26:common newt:10
+260:chow:10
+261:keeshond:10
+262:Brabancon griffon:10
+263:Pembroke:10
+264:Cardigan:10
+265:toy poodle:10
+266:miniature poodle:10
+267:standard poodle:10
+268:Mexican hairless:10
+269:timber wolf:10
+27:eft:10
+270:white wolf:10
+271:red wolf:10
+272:coyote:10
+273:dingo:10
+274:dhole:10
+275:African hunting dog:10
+276:hyena:10
+277:red fox:10
+278:kit fox:10
+279:Arctic fox:10
+28:spotted salamander:10
+280:grey fox:10
+281:tabby:10
+282:tiger cat:10
+283:Persian cat:10
+284:Siamese cat:10
+285:Egyptian cat:10
+286:cougar:10
+287:lynx:10
+288:leopard:10
+289:snow leopard:10
+29:axolotl:10
+290:jaguar:10
+291:lion:10
+292:tiger:10
+293:cheetah:10
+294:brown bear:10
+295:American black bear:10
+296:ice bear:10
+297:sloth bear:10
+298:mongoose:10
+299:meerkat:10
+3:tiger shark:10
+30:bullfrog:10
+300:tiger beetle:10
+301:ladybug:10
+302:ground beetle:10
+303:long-horned beetle:10
+304:leaf beetle:10
+305:dung beetle:10
+306:rhinoceros beetle:10
+307:weevil:10
+308:fly:10
+309:bee:10
+31:tree frog:10
+310:ant:10
+311:grasshopper:10
+312:cricket:10
+313:walking stick:10
+314:cockroach:10
+315:mantis:10
+316:cicada:10
+317:leafhopper:10
+318:lacewing:10
+319:dragonfly:10
+32:tailed frog:10
+320:damselfly:10
+321:admiral:10
+322:ringlet:10
+323:monarch:10
+324:cabbage butterfly:10
+325:sulphur butterfly:10
+326:lycaenid:10
+327:starfish:10
+328:sea urchin:10
+329:sea cucumber:10
+33:loggerhead:10
+330:wood rabbit:10
+331:hare:10
+332:Angora:10
+333:hamster:10
+334:porcupine:10
+335:fox squirrel:10
+336:marmot:10
+337:beaver:10
+338:guinea pig:10
+339:sorrel:10
+34:leatherback turtle:10
+340:zebra:10
+341:hog:10
+342:wild boar:10
+343:warthog:10
+344:hippopotamus:10
+345:ox:10
+346:water buffalo:10
+347:bison:10
+348:ram:10
+349:bighorn:10
+35:mud turtle:10
+350:ibex:10
+351:hartebeest:10
+352:impala:10
+353:gazelle:10
+354:Arabian camel:10
+355:llama:10
+356:weasel:10
+357:mink:10
+358:polecat:10
+359:black-footed ferret:10
+36:terrapin:10
+360:otter:10
+361:skunk:10
+362:badger:10
+363:armadillo:10
+364:three-toed sloth:10
+365:orangutan:10
+366:gorilla:10
+367:chimpanzee:10
+368:gibbon:10
+369:siamang:10
+37:box turtle:10
+370:guenon:10
+371:patas:10
+372:baboon:10
+373:macaque:10
+374:langur:10
+375:colobus:10
+376:proboscis monkey:10
+377:marmoset:10
+378:capuchin:10
+379:howler monkey:10
+38:banded gecko:10
+380:titi:10
+381:spider monkey:10
+382:squirrel monkey:10
+383:Madagascar cat:10
+384:indri:10
+385:Indian elephant:10
+386:African elephant:10
+387:lesser panda:10
+388:giant panda:10
+389:barracouta:10
+39:common iguana:10
+390:eel:10
+391:coho:10
+392:rock beauty:10
+393:anemone fish:10
+394:sturgeon:10
+395:gar:10
+396:lionfish:10
+397:puffer:10
+4:hammerhead:10
+40:American chameleon:10
+41:whiptail:10
+42:agama:10
+43:frilled lizard:10
+44:alligator lizard:10
+45:Gila monster:10
+46:green lizard:10
+47:African chameleon:10
+48:Komodo dragon:10
+49:African crocodile:10
+5:electric ray:10
+50:American alligator:10
+51:triceratops:10
+52:thunder snake:10
+53:ringneck snake:10
+54:hognose snake:10
+55:green snake:10
+56:king snake:10
+57:garter snake:10
+58:water snake:10
+59:vine snake:10
+6:stingray:10
+60:night snake:10
+61:boa constrictor:10
+62:rock python:10
+63:Indian cobra:10
+64:green mamba:10
+65:sea snake:10
+66:horned viper:10
+67:diamondback:10
+68:sidewinder:10
+69:trilobite:10
+7:cock:10
+70:harvestman:10
+71:scorpion:10
+72:black and gold garden spider:10
+73:barn spider:10
+74:garden spider:10
+75:black widow:10
+76:tarantula:10
+77:wolf spider:10
+78:tick:10
+79:centipede:10
+8:hen:10
+80:black grouse:10
+81:ptarmigan:10
+82:ruffed grouse:10
+83:prairie chicken:10
+84:peacock:10
+85:quail:10
+86:partridge:10
+87:African grey:10
+88:macaw:10
+89:sulphur-crested cockatoo:10
+9:ostrich:10
+90:lorikeet:10
+91:coucal:10
+92:bee eater:10
+93:hornbill:10
+94:hummingbird:10
+95:jacamar:10
+96:toucan:10
+97:drake:10
+98:red-breasted merganser:10
+99:goose:10::
