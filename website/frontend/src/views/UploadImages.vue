@@ -53,6 +53,7 @@
       <table class="table table-hover">
         <thead>
           <tr class="text-center">
+            <th scope="col">Delete</th>
             <th scope="col">#</th>
             <th scope="col">Filename</th>
             <th scope="col">Solution</th>
@@ -61,7 +62,22 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="i in images" :key="i.id" scope="row" class="table-hover">
+          <tr
+            v-for="i in imagesSorted()"
+            :key="i.id"
+            scope="row"
+            class="table-hover"
+          >
+            <td>
+              <button
+                class="btn btn-outline-danger"
+                style="width: 100%"
+                type="button"
+                @click="deleteImage(i.id)"
+              >
+                Delete
+              </button>
+            </td>
             <td>{{ i.id }}</td>
             <td>{{ i.name }}</td>
             <td>
@@ -80,7 +96,12 @@
             </td>
             <td>
               <button
-                class="btn btn-outline-primary"
+                :class="
+                  i.sliceFile == ''
+                    ? 'btn btn-outline-primary'
+                    : 'btn btn-success'
+                "
+                style="width: 100%"
                 type="button"
                 @click="manualSlicing(i)"
               >
@@ -146,9 +167,8 @@ export default defineComponent({
       this.error = "";
 
       for (let i = 0; i < event.target.files.length; i++) {
-        this.loadFile(event.target.files[i], i);
+        this.loadFile(event.target.files[i], this.images.length+i)
       }
-      event.target.files = null;
     },
 
     loadFile(file: any, i: number) {
@@ -210,6 +230,12 @@ export default defineComponent({
         image.sliceFile = object.data;
         image.sliceColors = object.colors;
       }
+    },
+    imagesSorted() {
+      return this.images.sort((a, b) => a.id - b.id);
+    },
+    deleteImage(id: number) {
+      this.images = this.images.filter((x) => x.id != id);
     },
   },
 });
