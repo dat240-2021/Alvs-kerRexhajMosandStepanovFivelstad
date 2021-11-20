@@ -37,7 +37,7 @@ namespace backend.Core.Domain.Games
         {
             get
             {
-                var list = GuesserIds;
+                return GuesserIds.Concat(Pro)
                 list.Add(Proposer.GetId());
                 return list;
             }
@@ -98,6 +98,11 @@ namespace backend.Core.Domain.Games
                         .ToList()
                 );
                 Proposer = oracle;
+
+                if (ProposersTurn)
+                {
+                    Events.Add(new OracleTurnEvent() { GameId = Id, Proposition = ((Oracle)Proposer).Proposal });
+                }
             }
             else
             {
@@ -188,7 +193,7 @@ namespace backend.Core.Domain.Games
                     //other guessers can keep guessing until time runs out.
                 }
 
-                if (Guessers.All(x => x.Guessed))
+                if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
                 {
                     if (CurrentImage.Slices.Count == SlicesShown.Count)
                     {
