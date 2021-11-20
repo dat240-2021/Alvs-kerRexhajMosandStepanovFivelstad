@@ -125,7 +125,7 @@
 import { defineComponent } from "vue";
 import Input from "@/components/Form/Input.vue";
 import { ImageFile, Category } from "@/typings";
-import { fetchCategories } from "@/api/BackendGame";
+import { fetchCategories } from "@/api/Lobby";
 import { uploadImages } from "@/api/Images";
 import ManualSlicingModal from "@/components/Modal/ManualSlicingModal.vue";
 

@@ -19,6 +19,12 @@ namespace backend.Hubs
             await base.OnDisconnectedAsync(e);
         }
 
+        public async Task Disconnect()
+        {
+            string user = Context.UserIdentifier;
+            await _mediator.Send(new Disconnect.Request(Guid.Parse(user)));
+        }
+
         public async Task Connect()
         {
             string user = Context.UserIdentifier;

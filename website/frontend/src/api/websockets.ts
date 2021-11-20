@@ -1,5 +1,7 @@
-import { gameHubConnection } from "./BackendGame";
+import { lobbyHubConnection } from "./Lobby";
+import { gameHubConnection } from "./Game";
 
 export default () => {
+  lobbyHubConnection.start();
   gameHubConnection.start();
 };

@@ -28,8 +28,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { Game } from "@/typings";
-import { leaveGameRoom, startGame } from "@/api/BackendGame";
-import * as ws from "@/api/BackendGame/subscriptions";
+import { leaveGameRoom, startGame } from "@/api/Lobby";
+import * as ws from "@/api/Lobby/subscriptions";
 
 export default defineComponent({
   name: "LoadingGameModal",
