@@ -216,7 +216,7 @@ namespace backend.Core.Domain.Games
         }
 
 
-        public ImageSlice? Propose(int proposition)
+        public ImageSlice Propose(int proposition)
         {
             if (ProposersTurn)
             {
