@@ -63,8 +63,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { fetchWaitingRooms, joinGameRoom, startGame } from "@/api/BackendGame";
-import * as ws from "@/api/BackendGame/subscriptions";
+import { fetchWaitingRooms, joinGameRoom, startGame } from "@/api/Lobby";
+import * as ws from "@/api/Lobby/subscriptions";
 import {
   Game,
   GameSlotUpdateNotification
@@ -132,7 +132,7 @@ export default defineComponent({
       });
     },
     startGame() {
-      this.$router.push({ name: "InGame" });
+      this.$router.push({ name: "Game" });
     },
     handleLogout() {
       logoutUser().then(() => this.$router.push({ name: "Index" }));

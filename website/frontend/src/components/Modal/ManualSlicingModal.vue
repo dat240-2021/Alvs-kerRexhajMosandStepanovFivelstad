@@ -4,22 +4,24 @@
     tabindex="-1"
     aria-labelledby="exampleModalLabel"
     aria-hidden="true"
+    id="manSlicingModal"
   >
-    <div class="modal-dialog modal-xl" id="slicingModal">
+    <div class="modal-dialog" id="slicingModal" style="display: table">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Manual Slicing</h5>
+          <h5 class="modal-title text-center w-100" id="exampleModalLabel">
+            Manual Slicing
+          </h5>
           <h5 class="modal-title" id="exampleModalLabel"></h5>
           <button type="button" class="btn-close" @click="closeModal"></button>
         </div>
         <div class="modal-body" id="slicingModalBody">
-          <div class="position-relative">
+          <div class="position-relative w-100 h-100">
             <img
               :src="modalImage.file"
-              style="width: 100%; z-index: 1"
               id="original_image"
               zindex-dropdown
-              :onload="resize"
+              :onload="imageLoaded"
             />
             <canvas
               id="canvas_modal"
@@ -27,7 +29,9 @@
               style="z-index: 2"
             ></canvas>
           </div>
-          <label for="customRange1" class="form-label">Brush Diameter: {{ lineWidth }}</label>
+          <label for="customRange1" class="form-label mt-1"
+            >Brush Diameter: {{ lineWidth }}</label
+          >
           <input
             type="range"
             v-model="lineWidth"
@@ -66,7 +70,6 @@
               Pick Again
             </button>
 
-
             <button class="btn btn-primary" @click="saveAndExit">
               Finished
             </button>
@@ -96,6 +99,7 @@ export default defineComponent({
       colorPicker: false,
       selectAnotherColor: false,
       pickedColor: "",
+      modal: null as any,
     };
   },
   props: {
@@ -106,6 +110,7 @@ export default defineComponent({
         id: 0,
         name: "",
         file: null,
+        sliceFile: "",
         category: "",
         label: "",
       } as ImageFile,
@@ -113,16 +118,40 @@ export default defineComponent({
   },
   mounted: function () {
     this.canvas = document.getElementById("canvas_modal");
+    this.modal = document.getElementById("manSlicingModal");
     this.ctx = this.canvas.getContext("2d");
-    document.addEventListener("mousedown", this.start);
-    document.addEventListener("mouseup", this.stop);
+    this.modal.addEventListener("mousedown", this.start);
+    this.modal.addEventListener("mouseup", this.stop);
     window.addEventListener("resize", this.resize);
   },
   methods: {
+    imageLoaded(event: any) {
+      // document.getElementById("canvas_modal").style();
+      if (event.target.width > event.target.height) {
+        // if the image is wider than its tall,
+        // 80 vh should ensure it won't exceed window height
+        event.target.style = "width:80vh;";
+      } else {
+        event.target.style = "height:50vh;";
+      }
+      if (this.modalImage.sliceFile != "") {
+        this.reloadData(this.modalImage.sliceFile);
+      }
+      this.resize();
+    },
+    reloadData(data: string) {
+      let image = new Image();
+      image.src = data;
+      image.onload = () => {
+        this.ctx.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
+      };
+    },
     resize() {
+      let data = this.canvas.toDataURL("image/png", 1.0);
       let oImage = document.getElementById("original_image");
       this.ctx.canvas.width = oImage?.clientWidth;
       this.ctx.canvas.height = oImage?.clientHeight;
+      this.reloadData(data);
     },
     reposition(event: any) {
       let rel = document.getElementById("slicingModal");
@@ -155,12 +184,12 @@ export default defineComponent({
       } else {
         color = this.pickedColor;
       }
-      document.addEventListener("mousemove", this.draw);
+      this.modal.addEventListener("mousemove", this.draw);
       this.ctx.strokeStyle = color;
       this.reposition(event);
     },
     stop() {
-      document.removeEventListener("mousemove", this.draw);
+      this.modal.removeEventListener("mousemove", this.draw);
     },
     draw(event: any) {
       this.ctx.beginPath();
@@ -175,31 +204,43 @@ export default defineComponent({
 
     newColor() {
       const randomColor = () => {
-        let letters = '0123456789ABCDEF';
-        let color = '#';
+        let letters = "0123456789ABCDEF";
+        let color = "#";
         for (let i = 0; i < 6; i++) {
           color += letters[Math.floor(Math.random() * 16)];
         }
-        console.log(color);
         return color;
       };
 
       let color = randomColor();
       // if we find the same color try a new one.
       while (this.sliceColors.find((x) => x == color) != null) {
-      color = randomColor();
+        color = randomColor();
       }
       this.sliceColors.push(color);
       return color;
     },
 
     saveAndExit() {
+      this.clearEventListeners();
+
       let data = this.canvas.toDataURL("image/png", 1.0);
 
-      this.$emit("SaveAndExit", { id: this.modalImage.id, data: data,colors: this.sliceColors });
+      this.$emit("SaveAndExit", {
+        id: this.modalImage.id,
+        data: data,
+        colors: this.sliceColors,
+      });
     },
     closeModal() {
+      this.clearEventListeners();
       this.$emit("closeModal");
+    },
+    clearEventListeners() {
+      this.modal.removeEventListener("mousedown", this.start);
+      this.modal.removeEventListener("mouseup", this.stop);
+      window.removeEventListener("resize", this.resize);
+      this.modal.removeEventListener("mousemove", this.draw);
     },
     rgbToHex(r: number, g: number, b: number) {
       const componentToHex = (c: number) => {

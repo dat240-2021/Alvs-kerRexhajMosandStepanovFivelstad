@@ -28,7 +28,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { Game } from "@/typings";
-import { leaveGameRoom, startGame } from "@/api/BackendGame";
+import { leaveGameRoom, startGame } from "@/api/Lobby";
+import * as ws from "@/api/Lobby/subscriptions";
 
 export default defineComponent({
   name: "LoadingGameModal",
@@ -54,9 +55,7 @@ export default defineComponent({
       leaveGameRoom(this.game.id).then(() => this.$emit("update:game", null));
     },
     handleStartGame() {
-      //startGame(this.game.id).then(() => this.$router.push({ name: "InGame" }));
       startGame(this.game.id);
-      this.$router.push({ name: "InGame" });
     }
   },
   emits: ['update:game'],

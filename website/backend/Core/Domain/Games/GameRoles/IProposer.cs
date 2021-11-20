@@ -10,7 +10,7 @@ namespace backend.Core.Domain.Games
         void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers);
         void NotifyTurn();
         void HandleNewImage() {}
-        string? GetId();
+        string GetId();
 
     }
 }

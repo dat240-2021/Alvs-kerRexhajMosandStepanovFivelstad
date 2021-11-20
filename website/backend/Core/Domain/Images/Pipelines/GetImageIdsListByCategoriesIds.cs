@@ -12,7 +12,7 @@ namespace backend.Core.Domain.Images.Pipelines
 {
     public class GetImageIdsListByCategoriesIds
     {
-        public record Request(List<int> CategoryIds, int? ImagesCount) : IRequest<List<int>>;
+        public record Request(List<int> CategoryIds, int? ImagesCount, Guid UserId) : IRequest<List<int>>;
 
         public class Handler : IRequestHandler<Request, List<int>>
         {
@@ -34,7 +34,7 @@ namespace backend.Core.Domain.Images.Pipelines
                     .Where(ic => request.CategoryIds.Contains(ic.Id))
                     .Select(c => c.Id)
                     .ToList();
-                var ids = await _mediator.Send(new GetImageIdsByCategoryDefaultImages.Request(categories), cancellationToken);
+                var ids = await _mediator.Send(new GetImageIdsByCategory.Request(categories, request.UserId), cancellationToken);
                 var randomizedIds = ids.OrderBy(_ => _rnd.Next()).ToList();
 
                 return request.ImagesCount is null ?

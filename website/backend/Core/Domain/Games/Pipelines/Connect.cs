@@ -9,11 +9,11 @@ using backend.Hubs;
 
 namespace backend.Core.Domain.Games.Pipelines
 {
-    public class Propose
+    public class Connect
     {
-        public record Request(Guid GameId, int SliceNumber): IRequest<Unit> {}
+        public record Request(Guid User): IRequest<Unit> {}
 
-        public class Handler: IRequestHandler<Request,Unit>
+        public class Handler: IRequestHandler<Request, Unit>
         {
 
             private IGameService _service;
@@ -26,14 +26,17 @@ namespace backend.Core.Domain.Games.Pipelines
 
             public Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
+                Game game = _service.GetByUserId(request.User);
 
-            var game =  _service.Get(request.GameId);
+                if (game is not null)
+                {
+                    game.ConnectUser(request.User);
+                }
+                else
+                {
+                    _hub.Clients.User(request.User.ToString()).SendAsync("InvalidGame");
+                }
 
-            var result = game.Propose(request.SliceNumber);
-            if (result is not null)
-            {
-                _hub.Clients.Users(game.GuesserIds).SendAsync("Proposal", result, cancellationToken);
-            }
                 return Task.FromResult(Unit.Value);
             }
         }

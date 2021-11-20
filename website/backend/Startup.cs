@@ -90,8 +90,8 @@ namespace backend
             {
                 var ImagePreprocessor = new ImagePreprocessor();
                 ImagePreprocessor.Parse();
+                db.ImageCategories.AddRange(ImagePreprocessor.Categories);
                 db.Images.AddRange(ImagePreprocessor.Images);
-
                 db.SaveChanges(); // Save before mapping
             }
 
