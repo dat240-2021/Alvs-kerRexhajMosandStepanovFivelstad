@@ -6,28 +6,28 @@ import {
   deleteGameHandlers,
   updateSlotsHandlers,
   startGameHandlers,
-} from "@/api/BackendGame/subscriptions";
+} from "@/api/Lobby/subscriptions";
 
-export const gameHubConnection = new signalR.HubConnectionBuilder()
+export const lobbyHubConnection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/games")
   .build();
 
-gameHubConnection.on("GameCreated", (data) => {
+lobbyHubConnection.on("GameCreated", (data) => {
   const { game, occupiedSlotsCount } = data;
   createGameHandlers.forEach((handler) =>
     handler({ ...game, occupiedSlotsCount })
   );
 });
 
-gameHubConnection.on("GameRoomUpdated", (data: GameSlotUpdateNotification) => {
+lobbyHubConnection.on("GameRoomUpdated", (data: GameSlotUpdateNotification) => {
   updateSlotsHandlers.forEach((handler) => handler(data));
 });
 
-gameHubConnection.on("GameDeleted", (id: string) => {
+lobbyHubConnection.on("GameDeleted", (id: string) => {
   deleteGameHandlers.forEach((handler) => handler(id));
 });
 
-gameHubConnection.on("GameStarted", () => {
+lobbyHubConnection.on("GameStarted", () => {
   startGameHandlers.forEach((handler) => handler());
 });
 

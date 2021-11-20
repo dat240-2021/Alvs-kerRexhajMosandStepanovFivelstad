@@ -5,14 +5,16 @@ using backend.Core.Domain.Games.Events;
 using backend.Core.Domain.Images;
 using SharedKernel;
 
-namespace backend.Core.Domain.Games{
+namespace backend.Core.Domain.Games
+{
     public enum GameState
     {
         Created,
         Active,
         Ended,
     }
-    public class Game : BaseEntity {
+    public class Game : BaseEntity
+    {
         public Guid Id { get; protected set; }
         private GameState State = GameState.Created;
         public DateTime StartTime = DateTime.Now;
@@ -23,14 +25,16 @@ namespace backend.Core.Domain.Games{
 
         public IProposer Proposer;
         public List<Guesser> Guessers;
-        public List<String> GuesserIds {
+        public List<String> GuesserIds
+        {
             get
             {
                 return Guessers.Where(g => g.Connected).Select(g => g.Id.ToString()).ToList();
             }
         }
 
-        public List<string> PlayerIds {
+        public List<string> PlayerIds
+        {
             get
             {
                 var list = GuesserIds;
@@ -45,26 +49,31 @@ namespace backend.Core.Domain.Games{
         private bool _proposersTurn;
 
         //When _proposersTurn is changed we have to send an event.
-        private bool ProposersTurn { get => _proposersTurn ; set {
-            if (State != GameState.Active) return;
-
-            if (value)
+        private bool ProposersTurn
+        {
+            get => _proposersTurn; set
             {
-                Events.Add(new ProposersTurnEvent() { PlayerIds = PlayerIds });
-                
-                if (Proposer is Oracle)
+                if (State != GameState.Active) return;
+
+                if (value)
                 {
-                    Events.Add(new OracleTurnEvent() { GameId = Id, Proposition = ((Oracle)Proposer).Proposal });
-                }
-            }
-            else
-            {
-                Events.Add(new GuessersTurnEvent() { PlayerIds = PlayerIds });
-            }
-            _proposersTurn = value;
-        }}
+                    Events.Add(new ProposersTurnEvent() { PlayerIds = PlayerIds });
 
-        public Game(Guid id, List<Image> images, List<Guesser> guessers, IProposer proposer) {
+                    if (Proposer is Oracle)
+                    {
+                        Events.Add(new OracleTurnEvent() { GameId = Id, Proposition = ((Oracle)Proposer).Proposal });
+                    }
+                }
+                else
+                {
+                    Events.Add(new GuessersTurnEvent() { PlayerIds = PlayerIds });
+                }
+                _proposersTurn = value;
+            }
+        }
+
+        public Game(Guid id, List<Image> images, List<Guesser> guessers, IProposer proposer)
+        {
             _proposersTurn = true;
             Images = new Queue<Image>(images);
             Id = id;
@@ -81,7 +90,14 @@ namespace backend.Core.Domain.Games{
         {
             if (Proposer is Proposer && Proposer.GetId() == userId.ToString())
             {
-                Proposer = new Oracle(Id);
+                var oracle = new Oracle(Id);
+                oracle.HandleNewImage(
+                    CurrentImage.Slices
+                        .Select(s => s.SequenceNumber)
+                        .Except(SlicesShown)
+                        .ToList()
+                );
+                Proposer = oracle;
             }
             else
             {
@@ -89,23 +105,32 @@ namespace backend.Core.Domain.Games{
             }
         }
 
-        public void Update() {
-            if (State == GameState.Created && (Guessers.All(g => g.Connected) || (StartTime + TimeSpan.FromSeconds(10)) <= DateTime.Now ))
+        public void Update()
+        {
+            if (State == GameState.Created && (Guessers.All(g => g.Connected) || (StartTime + TimeSpan.FromSeconds(10)) <= DateTime.Now))
             {
                 State = GameState.Active;
                 NextImage();
                 return;
             }
 
-            if (!ProposersTurn && State == GameState.Active) {
-                if (( StartTime + RoundTime) <= DateTime.Now) {
+            if (State == GameState.Active && Guessers.All(g => !g.Connected))
+            {
+                GameOver();
+            }
+
+            if (!ProposersTurn && State == GameState.Active)
+            {
+                if ((StartTime + RoundTime) <= DateTime.Now)
+                {
                     //Toggle role turn
                     ProposersTurn = true;
                 }
             }
         }
 
-        public void NextImage() {
+        public void NextImage()
+        {
             Images.TryDequeue(out CurrentImage);
 
             if (CurrentImage is null)
@@ -114,7 +139,8 @@ namespace backend.Core.Domain.Games{
                 return;
             }
 
-            foreach (var g in Guessers){
+            foreach (var g in Guessers)
+            {
                 g.Guessed = false;
             }
 
@@ -127,17 +153,18 @@ namespace backend.Core.Domain.Games{
 
             Events.Add(new NewImageEvent()
             {
-                    ImageId = CurrentImage.Id,
-                    GuesserIds = GuesserIds,
-                    ProposerId = Proposer.GetId()
+                ImageId = CurrentImage.Id,
+                GuesserIds = GuesserIds,
+                ProposerId = Proposer.GetId()
             });
-            
+
             ProposersTurn = true;
         }
 
-        public void GameOver(){
+        public void GameOver()
+        {
             State = GameState.Ended;
-            Events.Add(new GameOverEvent(){GameId = Id});
+            Events.Add(new GameOverEvent() { GameId = Id });
         }
 
 
@@ -150,17 +177,18 @@ namespace backend.Core.Domain.Games{
             {
                 guesser.Guessed = true;
 
-                if (CurrentImage.Label.Label == guess.Guess) {
+                if (CurrentImage.Label.Label == guess.Guess)
+                {
 
-                    guesser.UpdateScore(RoundTime,DateTime.Now - StartTime,nProposes, CurrentImage.Slices.Count);
-                    Proposer.UpdateScore(RoundTime,DateTime.Now - StartTime,nProposes, CurrentImage.Slices.Count,Guessers.Count);
+                    guesser.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
+                    Proposer.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
 
                     NextImage();
                     return true;
                     //other guessers can keep guessing until time runs out.
                 }
 
-                if ( Guessers.All(x => x.Guessed))
+                if (Guessers.All(x => x.Guessed))
                 {
                     if (CurrentImage.Slices.Count == SlicesShown.Count)
                     {
@@ -188,10 +216,11 @@ namespace backend.Core.Domain.Games{
             if (ProposersTurn)
             {
                 // Do proposer stuff
-                if ( ( ! SlicesShown.Contains(proposition) )  && (CurrentImage.Slices.Exists(x => x.SequenceNumber == proposition) ))
+                if ((!SlicesShown.Contains(proposition)) && (CurrentImage.Slices.Exists(x => x.SequenceNumber == proposition)))
                 {
                     StartTime = DateTime.Now;
-                    foreach( var g in Guessers){
+                    foreach (var g in Guessers)
+                    {
                         g.Guessed = false;
                     }
                     ProposersTurn = false;

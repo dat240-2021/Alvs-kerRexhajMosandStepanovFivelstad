@@ -79,10 +79,10 @@
 import { defineComponent } from "vue";
 import Input from "@/components/Form/Input.vue";
 import Submit from "@/components/Form/Submit.vue";
-import { createGame, fetchCategories } from "@/api/BackendGame";
+import { createGame, fetchCategories } from "@/api/Lobby";
 import { Category, Game, GameSlotUpdateNotification } from "@/typings";
 import LoadingGameModal from "@/components/Modal/LoadingGameModal.vue";
-import * as ws from "@/api/BackendGame/subscriptions";
+import * as ws from "@/api/Lobby/subscriptions";
 
 const errors = {
   noCategorySelected: "At least one category must be picked",
@@ -150,7 +150,7 @@ export default defineComponent({
       this.createdGame.occupiedSlotsCount = data.occupiedSlotsCount;
     },
     startGame() {
-      this.$router.push({ name: "InGame" });
+      this.$router.push({ name: "Game" });
     },
     subscribeToGames() {
       ws.subscribeToGameRoomsUpdates(this.updateGameRoom);

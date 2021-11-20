@@ -90,7 +90,7 @@ export interface Guess {
   guess: string;
 }
 
-export interface newScore {
+export interface Score {
   userId: string;
   score: number;
 }
