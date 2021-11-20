@@ -48,12 +48,15 @@
           </thead>
           <tbody>
             <div v-if="guesses.length < 11">
-              <tr v-for="g in guesses" :key="g">
+              <tr v-for="g in guesses.slice().reverse()" :key="g">
                 <td>{{ g.userId }}: {{ g.guess }}</td>
               </tr>
             </div>
             <div v-else>
-              <tr v-for="g in guesses.slice(guesses.length - 10)" :key="g">
+              <tr
+                v-for="g in guesses.slice(guesses.length - 10).reverse()"
+                :key="g"
+              >
                 <td>{{ g.userId }}: {{ g.guess }}</td>
               </tr>
             </div>
