@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using backend.Core.Domain.Images;
 using backend.Core.Domain.Lobby.Models;
 using Domain.Authentication;
-using Domain.Image;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
