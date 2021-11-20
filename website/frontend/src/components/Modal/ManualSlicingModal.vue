@@ -107,8 +107,6 @@ export default defineComponent({
     currentColor: function (newColor: string) {
       if (!this.sliceColors.includes(newColor)) {
         this.sliceColors = [...this.sliceColors, newColor];
-        console.log(this.sliceColors);
-        console.log(newColor);
       }
     },
   },
