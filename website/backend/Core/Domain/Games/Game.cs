@@ -37,7 +37,7 @@ namespace backend.Core.Domain.Games
         {
             get
             {
-                return GuesserIds.Concat(Pro)
+                var list = GuesserIds;
                 list.Add(Proposer.GetId());
                 return list;
             }
