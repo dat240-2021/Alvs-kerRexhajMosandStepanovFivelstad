@@ -45,8 +45,8 @@ export default defineComponent({
   methods: {
     startTimer() {
       setTimeout(() => {
+        this.autoCloseIn--;
         if (this.autoCloseIn) {
-          this.autoCloseIn--;
           this.startTimer();
           return;
         }
