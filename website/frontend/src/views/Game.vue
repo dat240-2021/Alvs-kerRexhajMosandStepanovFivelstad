@@ -52,8 +52,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="g in guesses" :key="g">
-              <td>{{ g.userId }}: {{ g.guess }}</td>
+            <tr v-for="(guess, i) in reversedGuesses" :key="'guess_' + i">
+              <td>{{ guess }}</td>
             </tr>
           </tbody>
         </table>
@@ -214,6 +214,9 @@ export default defineComponent({
       }
 
       return "Proposer's turn";
+    },
+    reversedGuesses(): string[] {
+      return [...this.guesses].reverse();
     }
   },
   created() {
@@ -227,6 +230,7 @@ export default defineComponent({
   methods: {
     sendGuess() {
       sendNewGuess(this.guess);
+      this.guesses = [...this.guesses, this.guess];
       this.guess = "";
       this.myTurn = false;
     },
