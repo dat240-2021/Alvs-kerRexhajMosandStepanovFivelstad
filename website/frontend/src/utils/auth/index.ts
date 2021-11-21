@@ -9,7 +9,7 @@ export const setCurrentUser = (user: User) => {
   }
 };
 
-const getStoredUser = (): User => {
+export const getCurrentUser = (): User => {
   const dataString = localStorage.getItem("user");
 
   if (!dataString) {
@@ -25,6 +25,6 @@ export const logoutUser = async () => {
 };
 
 export const isUserAuth = (): boolean => {
-  const user = getStoredUser();
+  const user = getCurrentUser();
   return user !== null && user.isAuth;
 };

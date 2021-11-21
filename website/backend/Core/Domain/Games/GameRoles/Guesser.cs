@@ -10,6 +10,8 @@ namespace backend.Core.Domain.Games
         public bool Guessed { get; set; }
         public bool Connected { get; set; } = false;
 
+        public int Score { get; set; } = 0;
+
         public Guesser(Guid id)
         {
             Id = id;
@@ -21,7 +23,7 @@ namespace backend.Core.Domain.Games
             int sliceScore = totalSlices - slicesShown;
 
             // do something with the score.
-            int Score = timeScore * timeScore;
+            Score = timeScore * timeScore;
 
             Events.Add( new PlayerScoredEvent{UserId = Id, Score = Score});
         }

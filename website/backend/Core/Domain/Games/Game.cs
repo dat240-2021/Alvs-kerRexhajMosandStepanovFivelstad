@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using backend.Core.Domain.Games.Events;
 using backend.Core.Domain.Images;
 using SharedKernel;
@@ -12,6 +13,7 @@ namespace backend.Core.Domain.Games
         Created,
         Active,
         Ended,
+        Paused
     }
     public class Game : BaseEntity
     {
@@ -25,6 +27,11 @@ namespace backend.Core.Domain.Games
 
         public IProposer Proposer;
         public List<Guesser> Guessers;
+        
+        public bool VersusOracle => Proposer is Oracle;
+
+        public bool HasMoreRounds => Images.Count > 0;
+
         public List<String> GuesserIds
         {
             get
@@ -112,6 +119,11 @@ namespace backend.Core.Domain.Games
 
         public void Update()
         {
+            if (State.Equals(GameState.Paused))
+            {
+                return;
+            }
+            
             if (State == GameState.Created && (Guessers.All(g => g.Connected) || (StartTime + TimeSpan.FromSeconds(10)) <= DateTime.Now))
             {
                 State = GameState.Active;
@@ -169,6 +181,7 @@ namespace backend.Core.Domain.Games
         public void GameOver()
         {
             State = GameState.Ended;
+            
             Events.Add(new GameOverEvent() { GameId = Id });
         }
 
@@ -176,42 +189,45 @@ namespace backend.Core.Domain.Games
         //returns bool, which implies this guess should be broadcast to all players
         public bool Guess(GuessDto guess)
         {
-            Guesser guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
+            var guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
 
-            if (!ProposersTurn && !guesser.Guessed && CurrentImage is not null)
+            if (ProposersTurn || guesser.Guessed || CurrentImage is null) return false;
+            
+            guesser.Guessed = true;
+
+            if (CurrentImage.Label.Label == guess.Guess)
             {
-                guesser.Guessed = true;
-
-                if (CurrentImage.Label.Label == guess.Guess)
+                guesser.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
+                Proposer.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
+                State = GameState.Paused;
+                
+                if (Proposer is Oracle && HasMoreRounds)
                 {
-
-                    guesser.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
-                    Proposer.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
-
-                    NextImage();
-                    return true;
-                    //other guessers can keep guessing until time runs out.
+                    //no waiting
+                    _ = DelayedNextRoundStart(5000);
                 }
-
-                if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
-                {
-                    if (CurrentImage.Slices.Count == SlicesShown.Count)
-                    {
-                        NextImage();
-                    }
-                    else
-                    {
-                        ProposersTurn = true;
-                        foreach (var g in Guessers)
-                        {
-                            g.Guessed = false;
-                        }
-                    }
-                }
-
-                // Implies valid guess -> broadcasted by hub
+                
+                
                 return true;
             }
+
+            if (!Guessers.Where(g => g.Connected).All(x => x.Guessed)) return false;
+            
+            if (CurrentImage.Slices.Count == SlicesShown.Count)
+            {
+                // none won
+            }
+            else
+            {
+                ProposersTurn = true;
+                foreach (var g in Guessers)
+                {
+                    g.Guessed = false;
+                }
+            }
+     
+            
+
             return false;
         }
 
@@ -234,6 +250,18 @@ namespace backend.Core.Domain.Games
                 }
             }
             return null;
+        }
+        
+        public void StartNextRound()
+        {
+            State = GameState.Active;
+            NextImage();
+        }
+        
+        private async Task DelayedNextRoundStart(int ms)
+        {
+            await Task.Delay(ms);
+            StartNextRound();
         }
     }
 }

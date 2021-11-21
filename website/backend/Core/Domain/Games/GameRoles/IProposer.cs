@@ -11,6 +11,12 @@ namespace backend.Core.Domain.Games
         void NotifyTurn();
         void HandleNewImage() {}
         string GetId();
+        
+        int Score
+        {
+            get;
+            set;
+        }
 
     }
 }

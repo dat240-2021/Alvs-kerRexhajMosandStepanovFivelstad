@@ -11,6 +11,8 @@ namespace backend.Core.Domain.Games
 
         public Guid GameId;
         private Queue<int> _proposals;
+        
+        public int Score { get; set; } = 0;
         public int Proposal { get
             {
                 return _proposals.Dequeue();

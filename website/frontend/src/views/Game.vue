@@ -8,6 +8,7 @@
   </div>
   <div class="container-fluid min-vh-100">
     <div class="row mt-3">
+      <div v-if="started" class="text-center turn-label" :class="{ 'bg-success': myTurn, 'bg-danger': !myTurn }">{{ turnLabel }}</div>
       <div class="d-flex" v-if="!isProposer && started">
         <div class="ms-auto">
           <p>
@@ -15,6 +16,7 @@
             <i>Guesser</i>
           </p>
         </div>
+
         <form @submit.prevent="sendGuess" class="form-control border-0">
           <div class="input-group mb-3">
             <input
@@ -27,7 +29,7 @@
               :disabled="!myTurn"
             />
             <div class="input-group-prepend">
-              <button class="btn btn-outline-primary" type="submit">
+              <button class="btn btn-outline-primary" type="submit" :disabled="!myTurn">
                 Guess
               </button>
             </div>
@@ -35,8 +37,15 @@
         </form>
       </div>
       <div v-else class="d-flex ms-auto" />
+      <div class="row">
+        <div class="col d-flex flex-column pb-3">
+          <h2 v-if="isProposer" class="text-center">{{ this.label }}</h2>
+          <h2 v-if="roundAlert" class="alert" :class="roundAlert.type">{{ this.roundAlert.message }}</h2>
+          <h2 v-if="gameAlert" class="alert" :class="gameAlert.type">{{ this.gameAlert.message }}</h2>
 
-      <h2 v-if="isProposer" class="text-center">{{ this.label }}</h2>
+          <button v-if="isProposer && toNextRound" class="btn btn-primary mx-auto" @click="startNewRound">Next image</button>
+        </div>
+      </div>
 
       <div class="col-1">
         <table>
@@ -107,7 +116,7 @@ import {
   sendNewGuess,
   sendNewProposal,
   sendConnect,
-  sendDisconnect,
+  sendDisconnect, sendStartNewRound
 } from "@/api/Game";
 import * as ws from "@/api/Game/subscriptions";
 import {
@@ -115,27 +124,58 @@ import {
   ImageSlice,
   Guess,
   Player,
-  Score,
+  Score, CorrectGuess, User
 } from "@/typings";
+import { getCurrentUser } from "@/utils/auth";
+
+interface Alert {
+  message: string,
+  type: string
+}
 
 declare interface BaseComponentData {
   players: Player[];
-  guesses: Guess[];
+  guesses: string[];
   imageSlices: ImageSlice[];
   guess: string;
   label: string;
   started: boolean;
   isProposer: boolean;
   myTurn: boolean;
+  currentPlayer: User;
+  gameAlert: Alert | null;
+  roundAlert: Alert | null;
+  toNextRound: boolean
 }
+
+const getRoundAlertMessage = {
+  wonRound: (willAutoContinue: boolean) => `Congrats! You won this round. Keep going! ${ willAutoContinue ? "Next round will start soon." : "" }`,
+  lostRound: (userName: string, correctGuess: string, willAutoContinue: boolean) => `Ohh no! ${ userName } won this round by guessing word ${ correctGuess }. ${ willAutoContinue ? "Next round will start soon." : "" }`,
+  winInfo: (userName: string) => `${ userName } won this round. You are doing a great job as a proposer.`,
+};
+
+const getGameAlertMessage = {
+  won: (score: number) => `You won the game! Your score is ${ score }.`,
+  lost: (score: number, highestScore: number, winnerName: string) => `You lost the game! You gathered ${ score } points. Highest score is ${ highestScore } by ${ winnerName }.`,
+  proposer: (score: number, userName: string) => `Game is finished. Your score is ${ score }. Winner is ${ userName }`,
+};
+
+
+const getAlertType = {
+  won: "alert-success",
+  lost: "alert-danger",
+  info: "alert-warning"
+};
+
 
 export default defineComponent({
   name: "Game",
   data(): BaseComponentData {
     return {
+      currentPlayer: getCurrentUser(),
       players: [] as Player[],
 
-      guesses: [] as Guess[],
+      guesses: [] as string[],
 
       isProposer: false,
       started: false,
@@ -146,6 +186,9 @@ export default defineComponent({
       guess: "",
       myTurn: false,
       //player: '',
+      roundAlert: null,
+      gameAlert: null,
+      toNextRound: false
     };
   },
   computed: {
@@ -157,6 +200,16 @@ export default defineComponent({
     isResetGuesser: function (): boolean {
       return this.started && !this.isProposer && this.imageSlices.length == 0;
     },
+    turnLabel: function(): string {
+      if (this.myTurn) {
+        return "Your turn";
+      }
+      if (this.isProposer) {
+        return "Guesser's turn";
+      }
+
+      return "Proposer's turn";
+    }
   },
   created() {
     this.subscribeToGame();
@@ -184,6 +237,7 @@ export default defineComponent({
       this.imageSlices = [];
       this.guesses = [];
       this.started = true;
+      this.roundAlert = null;
     },
 
     newImageProposer(image: GameImage) {
@@ -194,6 +248,8 @@ export default defineComponent({
       this.imageSlices = image.slices;
       this.label = image.label.label;
       this.guesses = [];
+      this.roundAlert = null;
+      this.toNextRound = false;
     },
 
     addSlice(slice: ImageSlice) {
@@ -213,19 +269,19 @@ export default defineComponent({
 
       let x = event.offsetX;
       let y = event.offsetY;
-      var element = event.target;
+      const element = event.target;
       x -= element.offsetLeft;
       y -= element.offsetTop;
 
       for (let slice of this.imageSlices) {
-        var img = document.getElementById(
+        const img = document.getElementById(
           slice.id.toString()
         ) as HTMLImageElement;
 
         let canvas = document.createElement("canvas");
         canvas.width = img.width;
         canvas.height = img.height;
-        var ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, img.width, img.height);
 
         let alpha = ctx?.getImageData(x, y, 1, 1)?.data[3];
@@ -238,13 +294,62 @@ export default defineComponent({
     },
 
     addIncomingGuess(guess: Guess) {
-      this.guesses = [...this.guesses, guess];
+      //this.guesses = [...this.guesses, guess];
     },
     updateScores(score: Score) {
-      var player = this.players.find((x) => x.PlayerId == score.userId);
+      const player = this.players.find((x) => x.PlayerId == score.userId);
       if (player) {
         player.Score += score.score;
       }
+    },
+    handleSubmittedCorrectGuessAsGuesser(guess: CorrectGuess) {
+      if (this.isProposer) return;
+      this.myTurn = false;
+      this.imageSlices = guess.image.slices;
+      const userWin = this.currentPlayer.id === guess.userId;
+
+      // userId should be swapped with user name
+      this.roundAlert = {
+        message: userWin ? getRoundAlertMessage.wonRound(guess.willAutoContinue) : getRoundAlertMessage.lostRound(guess.userId, guess.guess, guess.willAutoContinue),
+        type: userWin ? getAlertType.won : getAlertType.lost
+      };
+    },
+
+    handleSubmittedCorrectGuessAsProposer(guess: CorrectGuess) {
+      if (!this.isProposer) return;
+      this.myTurn = true;
+
+      // userId should be swapped with user name
+      this.roundAlert = {
+        type: getAlertType.info,
+        message: getRoundAlertMessage.winInfo(guess.userId)
+      };
+
+      this.toNextRound = guess.hasMoreRounds;
+    },
+    startNewRound() {
+      sendStartNewRound();
+    },
+    handleGameOver(guessersScore: Map<string, number>, proposerScore: number | null) {
+      this.started = false;
+      const highestScore = [...guessersScore.entries()]
+        .reduce((acc, el) => el[1] < acc.score ? acc : { id: el[0], score: el[1] }, { id: "", score: 0 });
+
+
+      if (this.isProposer && proposerScore) {
+        this.gameAlert = {
+          type: getAlertType.info,
+          message: getGameAlertMessage.proposer(proposerScore, highestScore.id),
+        };
+        return;
+      }
+      const playerScore = guessersScore.get(this.currentPlayer.id) ?? 0;
+      const isWinner = highestScore.id === this.currentPlayer.id;
+
+      this.gameAlert = {
+        type: isWinner ? getAlertType.won : getAlertType.lost,
+        message: isWinner ? getGameAlertMessage.won(playerScore) : getGameAlertMessage.lost(playerScore, highestScore.score, highestScore.id),
+      };
     },
 
     subscribeToGame() {
@@ -253,16 +358,19 @@ export default defineComponent({
       ws.subscribeToGuessersTurn(this.guessersTurn);
       ws.subscribeToNewProposal(this.addSlice);
       ws.subscribeToNewImageGuesser(this.newImageGuesser);
+      ws.subscribeToCorrectGuess(this.handleSubmittedCorrectGuessAsGuesser);
 
       /// Received by proposer
       //
       ws.subscribeToProposersTurn(this.proposersTurn);
       ws.subscribeToNewImageProposer(this.newImageProposer);
+      ws.subscribeToCorrectGuess(this.handleSubmittedCorrectGuessAsProposer);
 
       /// Received by all
       ws.subscribeToPlayerScores(this.updateScores);
       ws.subscribeToNewGuess(this.addIncomingGuess);
       ws.subscribeToInvalidGame(this.leaveGame);
+      ws.subscribeToGameOver(this.handleGameOver);
     },
     unsubscribeToGame() {
       ws.unsubscribeToGuessersTurn(this.guessersTurn);
@@ -277,3 +385,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.turn-label {
+  width: 100px;
+}
+</style>

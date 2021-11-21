@@ -9,15 +9,10 @@ import {
   newImageProposerHandlers,
   scoreHandlers,
   invalidGameHandlers,
+  correctGuessHandlers,
+  gameOverHandlers,
 } from "@/api/Game/subscriptions";
-import {
-  Image,
-  Guess,
-  Proposal,
-  Score,
-} from "@/typings";
-
-
+import { Image, Guess, Proposal, Score, CorrectGuess } from "@/typings";
 
 export const gameHubConnection = new signalR.HubConnectionBuilder()
   .withUrl("/hub/game")
@@ -25,7 +20,7 @@ export const gameHubConnection = new signalR.HubConnectionBuilder()
 
 gameHubConnection.on("InvalidGame", () => {
   invalidGameHandlers.forEach((handler) => handler());
-})
+});
 
 gameHubConnection.on("Guess", (guess: Guess) => {
   guessHandlers.forEach((handler) => handler(guess));
@@ -55,6 +50,18 @@ gameHubConnection.on("APlayerScored", (score: Score) => {
   scoreHandlers.forEach((handler) => handler(score));
 });
 
+gameHubConnection.on("CorrectGuess", (guess: CorrectGuess) => {
+  correctGuessHandlers.forEach((handler) => handler(guess));
+});
+
+gameHubConnection.on("GameOver", (guessersScores, proposerScore) => {
+  const scoresMap = new Map(Object.entries(guessersScores)) as Map<
+    string,
+    number
+  >;
+  gameOverHandlers.forEach((handler) => handler(scoresMap, proposerScore));
+});
+
 export const sendNewGuess = (val: string): void => {
   gameHubConnection.invoke("Guess", val);
 };
@@ -69,4 +76,8 @@ export const sendConnect = (): void => {
 
 export const sendDisconnect = (): void => {
   gameHubConnection.invoke("Disconnect");
+};
+
+export const sendStartNewRound = (): void => {
+  gameHubConnection.invoke("StartNextRound");
 };

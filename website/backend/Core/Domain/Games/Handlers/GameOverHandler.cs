@@ -6,6 +6,9 @@ using Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using backend.Core.Domain.Games.Dtos;
 using Microsoft.AspNetCore.SignalR;
 using backend.Hubs;
 
@@ -25,8 +28,18 @@ namespace backend.Core.Domain.Games.Handlers
 
         public async Task Handle(GameOverEvent notification, CancellationToken cancellationToken)
         {
-            Game game = _service.Remove(notification.GameId);
-            await _hub.Clients.Users(game.PlayerIds).SendAsync("GameOver", cancellationToken);
+            var game = _service.Remove(notification.GameId);
+            var guessersScores = game.Guessers.ToDictionary(guesser => guesser.Id.ToString(), guesser => guesser.Score);
+
+
+            int? proposerScore = null;
+            
+            if (!game.VersusOracle)
+            {
+                proposerScore = game.Proposer.Score;
+            }
+            
+            await _hub.Clients.Users(game.PlayerIds).SendAsync("GameOver", guessersScores, proposerScore, cancellationToken);
         }
     }
 }

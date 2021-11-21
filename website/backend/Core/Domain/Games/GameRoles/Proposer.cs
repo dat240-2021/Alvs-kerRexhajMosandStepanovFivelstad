@@ -7,6 +7,8 @@ namespace backend.Core.Domain.Games
     public class Proposer : BaseEntity, IProposer
     {
         public Guid Id { get; set; }
+        
+        public int Score { get; set; } = 0;
 
         public Proposer(Guid id)
         {
@@ -19,7 +21,7 @@ namespace backend.Core.Domain.Games
             int sliceScore = totalSlices - slicesShown;
 
             // do something with the score.
-            int Score = timeScore * timeScore;
+            Score = timeScore * timeScore;
         }
 
         public void NotifyTurn(){

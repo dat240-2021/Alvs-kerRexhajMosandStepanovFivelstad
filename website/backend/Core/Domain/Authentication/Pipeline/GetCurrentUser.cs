@@ -8,7 +8,7 @@ namespace Domain.Authentication.Pipelines
 {
     public class GetCurrentUser
     {
-        public record Request(string Username, string Password) : IRequest<User>;
+        public record Request() : IRequest<User>;
         
 
         public class Handler : IRequestHandler<Request, User>

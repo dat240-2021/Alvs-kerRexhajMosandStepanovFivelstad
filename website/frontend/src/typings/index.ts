@@ -76,14 +76,9 @@ export interface Image {
   slices: ImageSlice[];
 }
 
-export type subscribeToNewImageCb = (
-  data: Image
-) => void;
+export type subscribeToNewImageCb = (data: Image) => void;
 
-export type subscribeToProposalCb = (
-  data: ImageSlice
-) => void;
-
+export type subscribeToProposalCb = (data: ImageSlice) => void;
 
 export interface Guess {
   userId: string;
@@ -99,7 +94,14 @@ export interface Player {
   Name: string;
   Score: number;
   PlayerId: string;
+}
 
+export interface CorrectGuess {
+  userId: string;
+  image: Image;
+  guess: string;
+  hasMoreRounds: boolean;
+  willAutoContinue: boolean;
 }
 
 export type Proposal = ImageSlice;
@@ -109,7 +111,6 @@ export type subscribeToGuessCb = (data: Guess) => void;
 export type sendProposalCb = () => number;
 
 export type sendGuessCb = () => string;
-
 
 export enum HttpStatus {
   Unathorized = 401,
