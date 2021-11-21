@@ -6,12 +6,13 @@ namespace backend.Core.Domain.Games.Events
 {
     public record CorrectGuessEvent: BaseDomainEvent
     {
-        public CorrectGuessEvent(Game game, Guid userId, string guess, bool hasMoreRounds, bool isVersusOracle)
+        public CorrectGuessEvent(Game game, Guid userId, string guess, bool hasMoreRounds, bool isVersusOracle, Image image)
         {
             Game = game;
             UserId = userId;
             Guess = guess;
             HasMoreRounds = hasMoreRounds;
+            Image = image;
             WillAutoContinue = hasMoreRounds && isVersusOracle;
         }
         
@@ -22,5 +23,7 @@ namespace backend.Core.Domain.Games.Events
         public bool HasMoreRounds { get; set; }
         
         public bool WillAutoContinue { get; set; }
+        
+        public Image Image { get; set; }
     }
 }

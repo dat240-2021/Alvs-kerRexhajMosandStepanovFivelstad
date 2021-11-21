@@ -24,7 +24,7 @@ namespace backend.Core.Domain.Games.Handlers
             var correctGuess = new CorrectGuessDto()
             {
                 Guess = notification.Guess, 
-                Image = notification.Game.CurrentImage, 
+                Image = notification.Image, 
                 UserId = notification.UserId,
                 HasMoreRounds = notification.HasMoreRounds,
                 WillAutoContinue = notification.WillAutoContinue

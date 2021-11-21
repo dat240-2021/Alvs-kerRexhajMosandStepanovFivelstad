@@ -27,7 +27,8 @@ namespace backend.Core.Domain.Games.Pipelines
                 var game = _service.GetByUserId(request.User);
 
                 if (game is null) return Unit.Value;
-                
+
+                var currentGameImage = game.CurrentImage;
                 var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
 
 
@@ -38,7 +39,8 @@ namespace backend.Core.Domain.Games.Pipelines
                     request.User,
                     request.Guess, 
                     game.Images.Count > 0,
-                    game.VersusOracle
+                    game.VersusOracle,
+                    currentGameImage
                 ), cancellationToken);
                     
 
