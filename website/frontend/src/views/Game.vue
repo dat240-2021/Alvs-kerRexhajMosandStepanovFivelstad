@@ -8,7 +8,7 @@
   </div>
   <div class="container min-vh-100">
     <div class="row mt-3">
-      <div v-if="!isOver" class="text-center turn-label" :class="{ 'bg-success': myTurn, 'bg-danger': !myTurn }">{{ turnLabel }}</div>
+      <div v-if="!isOver" class="text-center turn-label rounded" :class="{ 'bg-success': myTurn, 'bg-danger': !myTurn }">{{ turnLabel }}</div>
       <div class="d-flex" v-if="!isProposer && started">
         <div class="ms-auto">
           <p>
@@ -83,7 +83,7 @@
               :src="'data:image/png;base64,' + im.imageData"
               style="object-fit: cover"
               :id="im.id"
-              class="position-absolute top-0 start-0 images"
+              class="position-absolute top-0 start-0 images w-100"
             />
           </div>
           <!-- <canvas id="image-canvas" width="1000" height="1000"></canvas> -->
