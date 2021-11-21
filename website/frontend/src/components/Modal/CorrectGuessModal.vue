@@ -7,15 +7,17 @@
         </div>
         <div class="modal-body">
           <div class="alert" :class="alertType">{{ this.alertMessage }}</div>
-          <div class="position-relative" style="width: 400px; height: 400px">
-            <img
-              v-for="im in imageSlices"
-              :key="im.id"
-              :src="'data:image/png;base64,' + im.imageData"
-              :id="im.id"
-              style="width: 100%; height: 100%; object-fit: contain"
-              class="position-absolute top-0 start-0"
-            />
+          <div class="d-flex w-100">
+            <div class="position-relative mx-auto" style="width: 400px; height: 400px">
+              <img
+                v-for="im in imageSlices"
+                :key="im.id"
+                :src="'data:image/png;base64,' + im.imageData"
+                :id="im.id"
+                style="width: 100%; height: 100%; object-fit: contain"
+                class="position-absolute top-0 start-0"
+              />
+            </div>
           </div>
         </div>
         <div class="modal-footer">

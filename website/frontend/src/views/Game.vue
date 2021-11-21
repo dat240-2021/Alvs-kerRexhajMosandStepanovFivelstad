@@ -58,8 +58,8 @@
           </tbody>
         </table>
       </div>
-      <div class="col position-relative" id="canvas-div">
-        <div class="position-relative">
+      <div class="col position-relative d-flex" id="canvas-div">
+        <div class="position-relative w-75 mx-auto">
           <div v-if="!started" class="d-flex justify-content-center m-5">
             <div
               class="spinner-border"
@@ -81,7 +81,7 @@
             v-for="im in imageSlices"
             :key="im.id"
             :src="'data:image/png;base64,' + im.imageData"
-            style="width: 100%"
+            style="object-fit: contain"
             :id="im.id"
             class="position-absolute top-0 start-0"
           />
@@ -271,7 +271,7 @@ export default defineComponent({
     },
 
     proposerSelectedSlice(event: any) {
-      if ((!this.myTurn && !this.isProposer) || this.isOver) return;
+      if (!this.myTurn || !this.isProposer || this.isOver) return;
 
       let x = event.offsetX;
       let y = event.offsetY;
