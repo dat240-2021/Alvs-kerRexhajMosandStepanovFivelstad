@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -34,8 +35,9 @@ namespace backend.Tests.Core.Domain.Games
                 new Proposer(Guid.NewGuid())
             );
             game.Update();
-
-            Assert.False(game.Guess(new GuessDto() { User = user, Guess = "guess" }));
+            
+            void Act() => game.Guess(new GuessDto() { User = user, Guess = "guess" });
+            Assert.Throws<ConstraintException>(Act);
         }
 
         [Fact]
@@ -52,9 +54,12 @@ namespace backend.Tests.Core.Domain.Games
                 new Proposer(Guid.NewGuid())
             );
             game.Update();
-
+            
             game.Propose(3);
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "guess" }));
+            
+            var exception = Record.Exception(() => game.Guess(new GuessDto() { User = user, Guess = "guess" }));
+            
+            Assert.Null(exception);
         }
 
         [Fact]
@@ -107,14 +112,15 @@ namespace backend.Tests.Core.Domain.Games
             game.Propose(1);
 
             // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test2" }));
-            Assert.False(game.Events.Any(x => x is GameOverEvent));
+            var exception = Record.Exception(() => game.Guess(new GuessDto() { User = user, Guess = "test2" }));
+            Assert.Null(exception);
 
             // Propose tile 1 of image3
             game.Propose(1);
 
             // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
+            var exception2 = Record.Exception(() => game.Guess(new GuessDto() { User = user, Guess = "test" }));
+            Assert.Null(exception2);
 
             // No more tiles to propose. Game ends.
             Assert.True(game.Events.Any(x => x is GameOverEvent));
@@ -141,10 +147,11 @@ namespace backend.Tests.Core.Domain.Games
 
             // Valid and correct guess.
             Assert.True(game.Guess(new GuessDto() { User = user2, Guess = "test" }));
+            Assert.True(game.Events.Any(x => x is GameOverEvent));
 
             // Game has now ended, so further guesses are denied.
-            Assert.False(game.Guess(new GuessDto() { User = user1, Guess = "test1" }));
-            Assert.True(game.Events.Any(x => x is GameOverEvent));
+            void Act() => game.Guess(new GuessDto() { User = user1, Guess = "test1" });
+            Assert.Throws<ConstraintException>(Act);
         }
 
         [Fact]
@@ -175,27 +182,26 @@ namespace backend.Tests.Core.Domain.Games
             Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test" }));
 
             // Previous guess was correct. This guess fails because it's the proposers turn now.
-            Assert.False(game.Guess(new GuessDto() { User = user2, Guess = "test" }));
+            void Act() => game.Guess(new GuessDto() { User = user1, Guess = "test2" });
+            Assert.Throws<ConstraintException>(Act);
             Assert.False(game.Events.Any(x => x is GameOverEvent));
 
             // Propose tile 1 of image2
             game.Propose(1);
 
-            // Valid guess, even though guess is incorrect.
+            // Correct guess.
             Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test2" }));
             Assert.False(game.Events.Any(x => x is GameOverEvent));
 
             // Propose tile 1 of image3
             game.Propose(1);
-            Assert.True(game.Guess(new GuessDto() { User = user2, Guess = "test2" }));
-            Assert.True(game.Guess(new GuessDto() { User = user3, Guess = "test2" }));
-
-            // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test" }));
-
-            // No more tiles to propose. Game ends.
-            Assert.True(game.Propose(1) is null);
+            
+            Assert.True(game.Guess(new GuessDto() { User = user2, Guess = "test3" }));
             Assert.True(game.Events.Any(x => x is GameOverEvent));
+            
+            // Game is ended. Can't propose
+            void Act2() => game.Guess(new GuessDto() { User = user1, Guess = "test3" });
+            Assert.Throws<ConstraintException>(Act2);
         }
     }
 }
