@@ -6,7 +6,7 @@
       </button>
     </div>
   </div>
-  <div class="container-fluid min-vh-100">
+  <div class="container min-vh-100">
     <div class="row mt-3">
       <div v-if="!isOver" class="text-center turn-label" :class="{ 'bg-success': myTurn, 'bg-danger': !myTurn }">{{ turnLabel }}</div>
       <div class="d-flex" v-if="!isProposer && started">
@@ -43,65 +43,66 @@
           <div v-if="gameAlert" class="alert" :class="gameAlert.type">{{ this.gameAlert.message }}</div>
         </div>
       </div>
-
-      <div class="col-1">
-        <table>
-          <thead>
+      <div class="row">
+        <div class="col-1">
+          <table>
+            <thead>
             <tr>
               <th>Guesses:</th>
             </tr>
-          </thead>
-          <tbody>
+            </thead>
+            <tbody>
             <tr v-for="(guess, i) in reversedGuesses" :key="'guess_' + i">
               <td>{{ guess }}</td>
             </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="col position-relative d-flex" id="canvas-div">
-        <div class="position-relative w-75 mx-auto">
-          <div v-if="!started" class="d-flex justify-content-center m-5">
-            <div
-              class="spinner-border"
-              role="status"
-              style="width: 3rem; height: 3rem"
-            />
-            <span class="ms-5">Waiting for game to start...</span>
-          </div>
-          <div v-if="isResetGuesser" class="d-flex justify-content-center m-5">
-            <div
-              class="spinner-border"
-              role="status"
-              style="width: 3rem; height: 3rem"
-            />
-            <span class="ms-5">Waiting for proposer...</span>
-          </div>
-          <img
-            v-on:click="proposerSelectedSlice"
-            v-for="im in imageSlices"
-            :key="im.id"
-            :src="'data:image/png;base64,' + im.imageData"
-            style="object-fit: contain"
-            :id="im.id"
-            class="position-absolute top-0 start-0"
-          />
+            </tbody>
+          </table>
         </div>
-        <!-- <canvas id="image-canvas" width="1000" height="1000"></canvas> -->
-      </div>
-      <div class="col-2">
-        <table>
-          <thead>
+        <div class="col position-relative d-flex" id="canvas-div">
+          <div class="position-relative w-50 mx-auto">
+            <div v-if="!started" class="d-flex justify-content-center m-5">
+              <div
+                class="spinner-border"
+                role="status"
+                style="width: 3rem; height: 3rem"
+              />
+              <span class="ms-5">Waiting for game to start...</span>
+            </div>
+            <div v-if="isResetGuesser" class="d-flex justify-content-center m-5">
+              <div
+                class="spinner-border"
+                role="status"
+                style="width: 3rem; height: 3rem"
+              />
+              <span class="ms-5">Waiting for proposer...</span>
+            </div>
+            <img
+              v-on:click="proposerSelectedSlice"
+              v-for="im in imageSlices"
+              :key="im.id"
+              :src="'data:image/png;base64,' + im.imageData"
+              style="object-fit: cover"
+              :id="im.id"
+              class="position-absolute top-0 start-0 images"
+            />
+          </div>
+          <!-- <canvas id="image-canvas" width="1000" height="1000"></canvas> -->
+        </div>
+        <div class="col-2">
+          <table>
+            <thead>
             <tr>
               <th>Players:</th>
             </tr>
-          </thead>
-          <tbody>
+            </thead>
+            <tbody>
             <tr v-for="p in sortedPlayers" :key="p.PlayerId">
               <td>{{ p.Name }}</td>
               <td>{{ p.Score }}</td>
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
