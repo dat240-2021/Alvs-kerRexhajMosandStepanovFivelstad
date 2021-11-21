@@ -33,7 +33,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
             {
                 var game = await _db.Games.Where(g => g.Id.Equals(request.GameId)).FirstOrDefaultAsync(cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
                 _LobbyService.LeaveGame(game.Id, request.UserId);
-                var gameSlotInfo = _LobbyService.GetSlotInfo(game.Id);
+                var gameSlotInfo = _LobbyService.GetSlotInfo(game);
                 await _mediator.Publish(new UserLeftGame(new GameSlotNotification(game.Id, gameSlotInfo.PlayerSlots.Count), request.UserId), cancellationToken);
                 return Unit.Value;
             }

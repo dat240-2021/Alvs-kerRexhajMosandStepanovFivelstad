@@ -27,7 +27,7 @@ namespace backend.Core.Domain.Lobby.Handlers
         
         public async Task Handle(GameStarted notification, CancellationToken cancellationToken)
         {
-            var playerIds = _LobbyService.GetSlotInfo(notification.Game.Id).PlayerIds;
+            var playerIds = _LobbyService.GetSlotInfo(notification.Game).PlayerIds;
             await _hubContext.Clients.Users(playerIds.Select(id => id.ToString())).SendAsync("GameStarted", notification.Game.Id, cancellationToken);
         }
     }
