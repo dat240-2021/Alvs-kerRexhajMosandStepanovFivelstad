@@ -34,7 +34,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
             {
                 var game = await _db.Games.FirstOrDefaultAsync(g => g.Id.Equals(request.GameId), cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
                 _LobbyService.JoinGame(game.Id, request.User.Id, request.Role);
-                var gameSlotInfo = _LobbyService.GetSlotInfo(game.Id);
+                var gameSlotInfo = _LobbyService.GetSlotInfo(game);
                 await _mediator.Publish(new UserJoinGame(new GameSlotNotification(game.Id, gameSlotInfo.GuessersIds.Count)), cancellationToken);
 
                 return Unit.Value;

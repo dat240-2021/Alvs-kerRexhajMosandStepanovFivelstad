@@ -40,7 +40,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
                 _LobbyService.StoreGame(game);
                 await _mediator.Publish(new GameCreated(game), cancellationToken);
                 await _mediator.Send(new JoinGame.Request(request.User, game.Id, creatorRole), cancellationToken);
-                return new GameWithSlotInfo(game, _LobbyService.GetSlotInfo(game.Id));
+                return new GameWithSlotInfo(game, _LobbyService.GetSlotInfo(game));
             }
         }
     }
