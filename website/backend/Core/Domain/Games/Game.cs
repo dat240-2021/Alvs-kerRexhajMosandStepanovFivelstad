@@ -185,8 +185,20 @@ namespace backend.Core.Domain.Games
                 if (CurrentImage.Label.Label == guess.Guess)
                 {
 
-                    guesser.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
-                    Proposer.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
+                    if (Proposer is Proposer){
+                        Events.Add( new PlayerScoredEvent{
+                            PlayerIds = PlayerIds,
+                            UserId = Guid.Parse(Proposer.GetId()),
+                            UserName = Proposer.GetUsername(),
+                            Score =  Proposer.ScoreCalc(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count)
+                            });
+                    }
+                    Events.Add( new PlayerScoredEvent{
+                        PlayerIds = PlayerIds,
+                        UserId = guesser.Id,
+                        UserName = guesser.UserName,
+                        Score = guesser.ScoreCalc(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count)
+                        });
 
                     NextImage();
                     return true;

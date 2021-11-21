@@ -35,7 +35,7 @@ namespace backend.Core.Domain.Games {
             Games.TryGetValue(gameId, out active_game);
             return active_game;
         }
-        private async void UpdateGames(Object _, ElapsedEventArgs e) 
+        private async void UpdateGames(Object _, ElapsedEventArgs e)
         {
             foreach (var game in Games.Values)
             {
@@ -43,12 +43,12 @@ namespace backend.Core.Domain.Games {
 
                 var events = game.Events.ToArray();
                 game.Events.Clear();
-                
+
                 foreach (var domainEvent in events)
                 {
                     await _mediator.Publish(domainEvent);
                 }
-                
+
             }
         }
 

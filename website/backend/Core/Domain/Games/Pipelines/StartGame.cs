@@ -32,7 +32,10 @@ namespace backend.Core.Domain.Games.Pipelines
 
                 if (proposerId is not null)
                 {
-                    proposer = new Proposer((Guid)proposerId);
+                    proposer = new Proposer(
+                        (Guid)proposerId,
+                        _db.Users.Where( u => u.Id==proposerId).FirstOrDefault().UserName
+                        );
                 }
 
                 var images = await _db.Images
@@ -45,7 +48,10 @@ namespace backend.Core.Domain.Games.Pipelines
                 var game = new Game(
                     request.Game.Game.Id,
                     images,
-                    request.Game.SlotInfo.GuessersIds.Select(g => new Guesser(g)).ToList(),
+                    request.Game.SlotInfo.GuessersIds.Select(g => new Guesser(
+                        g,
+                        _db.Users.Where( u => u.Id==g).FirstOrDefault().UserName
+                    )).ToList(),
                     proposer
                     ) {
                     RoundTime = TimeSpan.FromSeconds(request.Game.Game.Settings.Duration)

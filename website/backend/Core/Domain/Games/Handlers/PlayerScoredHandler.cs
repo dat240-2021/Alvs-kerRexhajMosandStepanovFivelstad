@@ -9,38 +9,44 @@ using System;
 using Microsoft.AspNetCore.SignalR;
 using backend.Hubs;
 using backend.Core.Domain.Games.Pipelines;
+using Microsoft.Extensions.DependencyInjection;
+using backend.Core.Domain.Lobby.Models;
 
 namespace backend.Core.Domain.Games.Handlers
 {
     public class PlayerScoredHandler: INotificationHandler<PlayerScoredEvent>
     {
-        private readonly GameContext _db;
-        private readonly IGameService _service;
+        private readonly IServiceScopeFactory _service;
 
         private readonly IHubContext<GameHub> _hub;
 
-        public PlayerScoredHandler(GameContext db, IGameService service, IHubContext<GameHub> hub)
+        public PlayerScoredHandler(IServiceScopeFactory service, IHubContext<GameHub> hub, IMediator mediator)
         {
-            _db = db ?? throw new System.ArgumentException(nameof(db));
             _service = service ?? throw new System.ArgumentException(nameof(service));
             _hub = hub ?? throw new System.ArgumentException(nameof(hub));
         }
 
         public async Task Handle(PlayerScoredEvent notification, CancellationToken cancellationToken)
         {
+            using (var scope = _service.CreateScope())
+            {
+                await _hub.Clients.Users(notification.PlayerIds).SendAsync("APlayerScored", notification.UserName, notification.Score, cancellationToken);
 
-            var game = _service.GetByUserId(notification.UserId);
 
-            await _hub.Clients.Clients(game.Guessers.Select(g => g.Id.ToString())).SendAsync("APlayerScored", notification.UserId, notification.Score, cancellationToken);
-            var proposer = game.Proposer.GetId();
-            if (proposer is not null) {
-                await _hub.Clients.Client(proposer).SendAsync("APlayerScored", notification.UserId, notification.Score, cancellationToken);
+                var db = scope.ServiceProvider.GetRequiredService<GameContext>();
+
+                var dbScore = await db.Scores.Where(x => x.User == notification.UserId).FirstOrDefaultAsync();
+                if (dbScore==null){
+                    dbScore = new Score(
+                        notification.UserId,
+                        notification.Score);
+                    db.Add(dbScore);
+                }
+
+                dbScore.UserScore+= notification.Score;
+                await db.SaveChangesAsync();
+
             }
-
-
-            var dbscore = await _db.Scores.Include(x => x.User).Where(x => x.User.Id==notification.UserId).FirstOrDefaultAsync();
-            dbscore.UserScore+= notification.Score;
-            await _db.SaveChangesAsync();
 
         }
     }

@@ -22,12 +22,15 @@ namespace backend.Core.Domain.Games
             GameId = id;
         }
 
-        public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){}
+        public int ScoreCalc(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
+            return -1;
+        }
 
         public void NotifyTurn(){
         }
 
         public string GetId() => null;
+        public string GetUsername() => "";
 
         public void HandleNewImage(List<int> slices)
         {
