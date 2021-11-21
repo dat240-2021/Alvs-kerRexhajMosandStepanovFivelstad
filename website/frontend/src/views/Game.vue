@@ -8,7 +8,7 @@
   </div>
   <div class="container min-vh-100">
     <div class="row mt-3">
-      <div v-if="!isOver" class="text-center turn-label rounded" :class="{ 'bg-success': myTurn, 'bg-danger': !myTurn }">{{ turnLabel }}</div>
+      <div v-if="!isOver" class="text-center turn-label rounded mb-4" :class="{ 'bg-success': myTurn, 'bg-danger': !myTurn }">{{ turnLabel }}</div>
       <div class="d-flex" v-if="!isProposer && started">
         <div class="ms-auto">
           <p>
@@ -61,19 +61,23 @@
         <div class="col position-relative d-flex" id="canvas-div">
           <div class="position-relative w-50 mx-auto">
             <div v-if="!started" class="d-flex justify-content-center m-5">
-              <div
-                class="spinner-border"
-                role="status"
-                style="width: 3rem; height: 3rem"
-              />
+              <div>
+                <div
+                  class="spinner-border"
+                  role="status"
+                  style="width: 3rem; height: 3rem"
+                />
+              </div>
               <span class="ms-5">Waiting for game to start...</span>
             </div>
             <div v-if="isResetGuesser" class="d-flex justify-content-center m-5">
-              <div
-                class="spinner-border"
-                role="status"
-                style="width: 3rem; height: 3rem"
-              />
+              <div>
+                <div
+                  class="spinner-border"
+                  role="status"
+                  style="width: 3rem; height: 3rem"
+                />
+              </div>
               <span class="ms-5">Waiting for proposer...</span>
             </div>
             <img
@@ -398,9 +402,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.turn-label {
-  width: 100px;
-}
-</style>
