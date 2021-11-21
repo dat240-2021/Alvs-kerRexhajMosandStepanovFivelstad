@@ -185,10 +185,8 @@ namespace backend.Core.Domain.Games
         {
             var guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
 
-            if (ProposersTurn) throw new ConstraintException("Can't do a guess during proposer's turn.");
-            if (guesser.Guessed) throw new ConstraintException($"Guesser with id {guess.User} has already guessed during this round.");
-            if (CurrentImage is null) throw new ConstraintException($"Game with id {Id} has no more rounds");
-            
+            if (ProposersTurn || guesser.Guessed || CurrentImage is null) return false;
+
             guesser.Guessed = true;
 
             if (CurrentImage.Label.Label == guess.Guess)
