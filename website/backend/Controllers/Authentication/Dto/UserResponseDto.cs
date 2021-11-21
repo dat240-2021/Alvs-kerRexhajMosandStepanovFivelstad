@@ -14,6 +14,11 @@ namespace backend.Controllers.Authentication.Dto
             Username = username;
             Id = id;
         }
+        
+        public UserResponseDto(string username)
+        {
+            Username = username;
+        }
 
     }
 

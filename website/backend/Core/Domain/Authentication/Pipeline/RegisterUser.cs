@@ -23,10 +23,6 @@ namespace Domain.Authentication.Pipelines
                         public async Task<RegisterUser.Response> Handle(Request request, CancellationToken cancellationToken)
                         {
                                 var (success, errors) = await _authServ.RegisterUser(request.Username,request.Password);
-                                if (success)
-                                {
-                                        await _authServ.LoginUser(request.Username, request.Password);
-                                }
                                 return new Response(success,errors);
 
                         }

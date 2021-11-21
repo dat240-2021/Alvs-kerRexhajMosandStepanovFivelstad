@@ -29,8 +29,7 @@ namespace backend.Controllers.Authentication
 
             if (!result.Success) return UnprocessableEntity(result.errors);
             
-            var currentUser = await _mediator.Send(new GetCurrentUser.Request());
-            return Ok(new UserResponseDto(currentUser.Id, currentUser.UserName));
+            return Ok(new UserResponseDto(user.Username));
 
         }
     }
