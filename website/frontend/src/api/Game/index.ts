@@ -1,4 +1,3 @@
-import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 import {
   guessHandlers,
@@ -76,8 +75,4 @@ export const sendConnect = (): void => {
 
 export const sendDisconnect = (): void => {
   gameHubConnection.invoke("Disconnect");
-};
-
-export const sendStartNewRound = (): void => {
-  gameHubConnection.invoke("StartNextRound");
 };

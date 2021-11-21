@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using backend.Core.Domain.Games.Events;
 using backend.Core.Domain.Images;
 using SharedKernel;
@@ -13,7 +12,6 @@ namespace backend.Core.Domain.Games
         Created,
         Active,
         Ended,
-        Paused
     }
     public class Game : BaseEntity
     {
@@ -119,11 +117,6 @@ namespace backend.Core.Domain.Games
 
         public void Update()
         {
-            if (State.Equals(GameState.Paused))
-            {
-                return;
-            }
-            
             if (State == GameState.Created && (Guessers.All(g => g.Connected) || (StartTime + TimeSpan.FromSeconds(10)) <= DateTime.Now))
             {
                 State = GameState.Active;
@@ -199,15 +192,8 @@ namespace backend.Core.Domain.Games
             {
                 guesser.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
                 Proposer.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
-                State = GameState.Paused;
                 
-                if (Proposer is Oracle && HasMoreRounds)
-                {
-                    //no waiting
-                    _ = DelayedNextRoundStart(5000);
-                }
-                
-                
+                NextImage();
                 return true;
             }
 
@@ -215,7 +201,7 @@ namespace backend.Core.Domain.Games
             
             if (CurrentImage.Slices.Count == SlicesShown.Count)
             {
-                // none won
+                NextImage();
             }
             else
             {
@@ -225,7 +211,6 @@ namespace backend.Core.Domain.Games
                     g.Guessed = false;
                 }
             }
-     
             
 
             return false;
@@ -250,18 +235,6 @@ namespace backend.Core.Domain.Games
                 }
             }
             return null;
-        }
-        
-        public void StartNextRound()
-        {
-            State = GameState.Active;
-            NextImage();
-        }
-        
-        private async Task DelayedNextRoundStart(int ms)
-        {
-            await Task.Delay(ms);
-            StartNextRound();
         }
     }
 }

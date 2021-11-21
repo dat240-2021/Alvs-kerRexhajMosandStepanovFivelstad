@@ -42,8 +42,6 @@
           <h2 v-if="isProposer" class="text-center">{{ this.label }}</h2>
           <h2 v-if="roundAlert" class="alert" :class="roundAlert.type">{{ this.roundAlert.message }}</h2>
           <h2 v-if="gameAlert" class="alert" :class="gameAlert.type">{{ this.gameAlert.message }}</h2>
-
-          <button v-if="isProposer && toNextRound" class="btn btn-primary mx-auto" @click="startNewRound">Next image</button>
         </div>
       </div>
 
@@ -116,7 +114,7 @@ import {
   sendNewGuess,
   sendNewProposal,
   sendConnect,
-  sendDisconnect, sendStartNewRound
+  sendDisconnect
 } from "@/api/Game";
 import * as ws from "@/api/Game/subscriptions";
 import {
@@ -145,7 +143,6 @@ declare interface BaseComponentData {
   currentPlayer: User;
   gameAlert: Alert | null;
   roundAlert: Alert | null;
-  toNextRound: boolean
 }
 
 const getRoundAlertMessage = {
@@ -188,7 +185,6 @@ export default defineComponent({
       //player: '',
       roundAlert: null,
       gameAlert: null,
-      toNextRound: false
     };
   },
   computed: {
@@ -249,7 +245,6 @@ export default defineComponent({
       this.label = image.label.label;
       this.guesses = [];
       this.roundAlert = null;
-      this.toNextRound = false;
     },
 
     addSlice(slice: ImageSlice) {
@@ -324,11 +319,6 @@ export default defineComponent({
         type: getAlertType.info,
         message: getRoundAlertMessage.winInfo(guess.userId)
       };
-
-      this.toNextRound = guess.hasMoreRounds;
-    },
-    startNewRound() {
-      sendStartNewRound();
     },
     handleGameOver(guessersScore: Map<string, number>, proposerScore: number | null) {
       this.started = false;

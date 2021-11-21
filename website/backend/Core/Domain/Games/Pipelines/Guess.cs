@@ -41,10 +41,7 @@ namespace backend.Core.Domain.Games.Pipelines
                     game.VersusOracle
                 ), cancellationToken);
                     
-                if (!game.HasMoreRounds)
-                {
-                    game.GameOver();
-                }
+
 
                 return Unit.Value;
             }

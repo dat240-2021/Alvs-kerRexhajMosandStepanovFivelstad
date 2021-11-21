@@ -41,11 +41,5 @@ namespace backend.Hubs
             string user = Context.UserIdentifier;
             await _mediator.Send(new UserPropose.Request(Guid.Parse(user), proposition));
         }
-        
-        public async Task StartNextRound()
-        {
-            var user = Context.UserIdentifier;
-            await _mediator.Send(new StartNextRound.Request(Guid.Parse(user)));
-        }
     }
 }
