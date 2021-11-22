@@ -165,7 +165,7 @@ const getRoundAlertMessage = {
   wonRound: (willAutoContinue: boolean) => `Congrats! You won this round. Keep going! ${ willAutoContinue ? "Next round will start soon." : "" }`,
   lostRound: (userName: string, correctGuess: string, willAutoContinue: boolean) => `Ohh no! ${ userName } won this round by guessing word ${ correctGuess }. ${ willAutoContinue ? "Next round will start soon." : "" }`,
   winInfo: (userName: string) => `${ userName } won this round. You are doing a great job as a proposer.`,
-  noGuesses: (correctGuess: string) => `None won this round! The correct guessing word was ${ correctGuess }`
+  noGuesses: (correctGuess: string) => `No one won this round! The correct guessing word was ${ correctGuess }`
 };
 
 const getGameAlertMessage = {
