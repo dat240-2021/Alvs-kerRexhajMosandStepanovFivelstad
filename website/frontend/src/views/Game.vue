@@ -53,7 +53,7 @@
             </thead>
             <tbody>
             <tr v-for="(guess, i) in reversedGuesses" :key="'guess_' + i">
-              <td>{{ guess }}</td>
+              <td>{{ guess.user }} : {{ guess.guess }}</td>
             </tr>
             </tbody>
           </table>
@@ -148,7 +148,7 @@ interface Alert {
 
 declare interface BaseComponentData {
   players: Player[];
-  guesses: string[];
+  guesses: Guess[];
   imageSlices: ImageSlice[];
   guess: string;
   label: string;
@@ -192,7 +192,7 @@ export default defineComponent({
       currentPlayer: getCurrentUser(),
       players: [] as Player[],
 
-      guesses: [] as string[],
+      guesses: [] as Guess[],
 
       isProposer: false,
       started: false,
@@ -227,7 +227,7 @@ export default defineComponent({
 
       return "Proposer's turn";
     },
-    reversedGuesses(): string[] {
+    reversedGuesses(): Guess[] {
       return [...this.guesses].reverse();
     }
   },
@@ -242,7 +242,6 @@ export default defineComponent({
   methods: {
     sendGuess() {
       sendNewGuess(this.guess);
-      this.guesses = [...this.guesses, this.guess];
       this.guess = "";
       this.myTurn = false;
     },
@@ -312,7 +311,7 @@ export default defineComponent({
     },
 
     addIncomingGuess(guess: Guess) {
-      //this.guesses = [...this.guesses, guess];
+      this.guesses = [...this.guesses, guess];
     },
     updateScores(score: Score) {
       const player = this.players.find((x) => x.PlayerId == score.userId);

@@ -194,11 +194,19 @@ namespace backend.Core.Domain.Games
                 guesser.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
                 Proposer.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
                 
+                Events.Add(new CorrectGuessEvent(
+                    this,
+                    guess.User,
+                    guess.Guess, 
+                    HasMoreRounds,
+                    VersusOracle,
+                    CurrentImage
+                ));
                 NextImage();
                 return true;
             }
 
-            if (!Guessers.Where(g => g.Connected).All(x => x.Guessed)) return false;
+            if (!Guessers.Where(g => g.Connected).All(x => x.Guessed)) return true;
             
             if (CurrentImage.Slices.Count == SlicesShown.Count)
             {
@@ -215,7 +223,7 @@ namespace backend.Core.Domain.Games
             }
             
 
-            return false;
+            return true;
         }
 
 

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using MediatR;
 using System.Linq;
 using backend.Core.Domain.Games.Events;
+using backend.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Core.Domain.Games.Pipelines
 {
@@ -15,11 +17,12 @@ namespace backend.Core.Domain.Games.Pipelines
         {
             
             private readonly IGameService _service;
-            private IMediator _mediator;
-            public Handler(IGameService service, IMediator mediator)
+            private readonly IHubContext<GameHub> _hub;
+            
+            public Handler(IGameService service, IHubContext<GameHub> hub)
             {
                 _service = service ?? throw new ArgumentNullException(nameof(service));
-                _mediator = mediator;
+                _hub = hub;
             }
 
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
@@ -27,23 +30,13 @@ namespace backend.Core.Domain.Games.Pipelines
                 var game = _service.GetByUserId(request.User);
 
                 if (game is null) return Unit.Value;
-
-                var currentGameImage = game.CurrentImage;
+                
                 var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
 
 
                 if (!result) return Unit.Value;
                 
-                await _mediator.Publish(new CorrectGuessEvent(
-                    game,
-                    request.User,
-                    request.Guess, 
-                    game.Images.Count > 0,
-                    game.VersusOracle,
-                    currentGameImage
-                ), cancellationToken);
-                    
-
+                await _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", request, cancellationToken);
 
                 return Unit.Value;
             }
