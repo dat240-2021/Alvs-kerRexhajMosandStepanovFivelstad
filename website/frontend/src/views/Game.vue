@@ -52,7 +52,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(guess, i) in reversedGuesses" :key="'guess_' + i">
+            <tr v-for="(guess, i) in latestValidGuesses" :key="'guess_' + i">
               <td>{{ guess.user }} : {{ guess.guess }}</td>
             </tr>
             </tbody>
@@ -227,8 +227,13 @@ export default defineComponent({
 
       return "Proposer's turn";
     },
-    reversedGuesses(): Guess[] {
-      return [...this.guesses].reverse();
+    latestValidGuesses(): Guess[] {
+      const takeElements = 10;
+
+      return [...this.guesses]
+        .reverse()
+        .filter(guess => guess.guess.trim().length)
+        .filter((_, i) => i < takeElements);
     }
   },
   created() {
@@ -344,7 +349,6 @@ export default defineComponent({
       };
     },
     handleNoGuesses(guess: string) {
-      console.log("handleNoGuesses", guess);
       this.modalAlert = {
         type: getAlertType.info,
         message: getRoundAlertMessage.noGuesses(guess),
