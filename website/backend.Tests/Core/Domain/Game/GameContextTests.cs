@@ -1,16 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using backend.Core.Domain.Games;
 using backend.Core.Domain.Games.Events;
-using backend.Core.Domain.Games.Pipelines;
 using backend.Core.Domain.Images;
 using backend.Tests.Helpers;
-using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -29,7 +22,7 @@ namespace backend.Tests.Core.Domain.Games
             var user = Guid.NewGuid();
             var game = new Game(
                 Guid.NewGuid(),
-                new List<backend.Core.Domain.Images.Image>() { new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test"))) },
+                new List<backend.Core.Domain.Images.Image>() { new (Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test"))) },
                 new List<Guesser>() { new Guesser(user, "") { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
@@ -74,7 +67,7 @@ namespace backend.Tests.Core.Domain.Games
 
             game.Propose(3);
             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
-            Assert.True(game.Events.Any(x => x is GameOverEvent));
+            Assert.Contains(game.Events, x => x is GameOverEvent);
         }
 
         [Fact]
@@ -101,14 +94,14 @@ namespace backend.Tests.Core.Domain.Games
 
             // Valid guess. Guess is also correct.
             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
-            Assert.False(game.Events.Any(x => x is GameOverEvent));
+            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
             // Propose tile 1 of image2
             game.Propose(1);
 
             // Valid guess, even though guess is incorrect.
             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test2" }));
-            Assert.False(game.Events.Any(x => x is GameOverEvent));
+            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
             // Propose tile 1 of image3
             game.Propose(1);
@@ -117,7 +110,7 @@ namespace backend.Tests.Core.Domain.Games
             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
 
             // No more tiles to propose. Game ends.
-            Assert.True(game.Events.Any(x => x is GameOverEvent));
+            Assert.Contains(game.Events, x => x is GameOverEvent);
         }
 
         [Fact]
@@ -144,7 +137,7 @@ namespace backend.Tests.Core.Domain.Games
 
             // Game has now ended, so further guesses are denied.
             Assert.False(game.Guess(new GuessDto() { User = user1, Guess = "test1" }));
-            Assert.True(game.Events.Any(x => x is GameOverEvent));
+            Assert.Contains(game.Events, x => x is GameOverEvent);
         }
 
         [Fact]
@@ -163,7 +156,7 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image1, image2, image3 },
-                new List<Guesser>() { new Guesser(user1,"") { Connected = true }, new Guesser(user2,"") { Connected = true }, new Guesser(user3,"") { Connected = true } },
+                new List<Guesser>() { new Guesser(user1,"") { Connected = true }, new (user2,"") { Connected = true }, new (user3,"") { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
             game.Update();
@@ -176,14 +169,14 @@ namespace backend.Tests.Core.Domain.Games
 
             // Previous guess was correct. This guess fails because it's the proposers turn now.
             Assert.False(game.Guess(new GuessDto() { User = user2, Guess = "test" }));
-            Assert.False(game.Events.Any(x => x is GameOverEvent));
+            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
             // Propose tile 1 of image2
             game.Propose(1);
 
             // Valid guess, even though guess is incorrect.
             Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test2" }));
-            Assert.False(game.Events.Any(x => x is GameOverEvent));
+            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
             // Propose tile 1 of image3
             game.Propose(1);
@@ -195,7 +188,7 @@ namespace backend.Tests.Core.Domain.Games
 
             // No more tiles to propose. Game ends.
             Assert.True(game.Propose(1) is null);
-            Assert.True(game.Events.Any(x => x is GameOverEvent));
+            Assert.Contains(game.Events, x => x is GameOverEvent);
         }
     }
 }
