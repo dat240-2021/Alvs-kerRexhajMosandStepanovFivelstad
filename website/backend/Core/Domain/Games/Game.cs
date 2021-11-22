@@ -174,7 +174,7 @@ namespace backend.Core.Domain.Games
 
 
         //returns bool, which implies this guess should be broadcast to all players
-        public bool Guess(GuessDto guess)
+        public (bool broadCast,string user) Guess(GuessDto guess)
         {
             Guesser guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
 
@@ -204,7 +204,7 @@ namespace backend.Core.Domain.Games
                     });
 
                     NextImage();
-                    return true;
+                    return (true,guesser.Username);
                 }
 
                 if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
@@ -228,9 +228,9 @@ namespace backend.Core.Domain.Games
                 }
 
                 // Implies valid guess -> broadcasted by hub
-                return true;
+                return (true,guesser.Username);
             }
-            return false;
+            return (false,"");
         }
 
 

@@ -15,7 +15,6 @@ namespace backend.Core.Domain.Games.Pipelines
 
         public class Handler: IRequestHandler<Request,Unit>
         {
-
             private GameContext _db;
             private IGameService _service;
             private IHubContext<GameHub> _hub;
@@ -34,9 +33,15 @@ namespace backend.Core.Domain.Games.Pipelines
                 {
                     var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
 
-                    if (result)
+
+                    if (result.broadCast)
                     {
-                        _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", request, cancellationToken);
+                        var response = new GuessResponseDto(){
+                            Guess = request.Guess,
+                            User = result.user
+                        };
+
+                        _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", response, cancellationToken);
                     }
                 }
 
