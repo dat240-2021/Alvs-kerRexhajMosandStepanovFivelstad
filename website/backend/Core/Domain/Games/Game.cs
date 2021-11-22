@@ -202,6 +202,7 @@ namespace backend.Core.Domain.Games
             
             if (CurrentImage.Slices.Count == SlicesShown.Count)
             {
+                Events.Add(new FullyVisibleImageWithoutCorrectGuessesEvent() {GameId = Id, Guess = CurrentImage.Label.Label});
                 NextImage();
             }
             else

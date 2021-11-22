@@ -7,7 +7,7 @@
         </div>
         <div class="modal-body">
           <div class="alert" :class="alertType">{{ this.alertMessage }}</div>
-          <div class="d-flex w-100">
+          <div v-if="imageSlices?.length" class="d-flex w-100">
             <div class="position-relative mx-auto" style="width: 400px; height: 400px">
               <img
                 v-for="im in imageSlices"
@@ -31,11 +31,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import { ImageSlice } from "@/typings";
-import { leaveGameRoom } from "@/api/Lobby";
-
 
 export default defineComponent({
-  name: "CorrectGuessModal",
+  name: "AlertInGameModal",
   created() {
     this.startTimer();
   },
@@ -71,7 +69,8 @@ export default defineComponent({
     },
     imageSlices: {
       type: Object as PropType<ImageSlice[]>,
-      required: true,
+      required: false,
+      default: [] as ImageSlice[]
     },
   },
 });

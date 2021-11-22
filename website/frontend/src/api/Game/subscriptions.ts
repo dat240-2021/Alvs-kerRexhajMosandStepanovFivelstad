@@ -23,6 +23,9 @@ export let newImageProposerHandlers: subscribeToNewImageCb[] = [];
 export let scoreHandlers: ((score: Score) => void)[] = [];
 
 export let correctGuessHandlers: ((guess: CorrectGuess) => void)[] = [];
+
+export let noCorrectGuessesHandlers: ((guess: string) => void)[] = [];
+
 export let gameOverHandlers: ((
   guessersScore: Map<string, number>,
   proposerScore: number | null
@@ -79,6 +82,12 @@ export const subscribeToGameOver = (
   gameOverHandlers = [...gameOverHandlers, cb];
 };
 
+export const subscribeToNoneGuessedCorrectly = (
+  cb: (guess: string) => void
+) => {
+  noCorrectGuessesHandlers = [...noCorrectGuessesHandlers, cb];
+};
+
 /*
 
 UNSUBSCRIBING METHODS
@@ -129,6 +138,23 @@ export const unsubscribeToCorrectGuess = (
   cb: (guess: CorrectGuess) => void
 ) => {
   correctGuessHandlers = correctGuessHandlers.filter(
+    (handler) => handler !== cb
+  );
+};
+
+export const unsubscribeToGameOver = (
+  cb: (
+    guessersScores: Map<string, number>,
+    proposerScore: number | null
+  ) => void
+) => {
+  gameOverHandlers = gameOverHandlers.filter((handler) => handler !== cb);
+};
+
+export const unsubscribeToNoneGuessedCorrectly = (
+  cb: (guess: string) => void
+) => {
+  noCorrectGuessesHandlers = noCorrectGuessesHandlers.filter(
     (handler) => handler !== cb
   );
 };

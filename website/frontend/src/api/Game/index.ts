@@ -10,6 +10,7 @@ import {
   invalidGameHandlers,
   correctGuessHandlers,
   gameOverHandlers,
+  noCorrectGuessesHandlers,
 } from "@/api/Game/subscriptions";
 import { Image, Guess, Proposal, Score, CorrectGuess } from "@/typings";
 
@@ -52,6 +53,13 @@ gameHubConnection.on("APlayerScored", (score: Score) => {
 gameHubConnection.on("CorrectGuess", (guess: CorrectGuess) => {
   correctGuessHandlers.forEach((handler) => handler(guess));
 });
+
+gameHubConnection.on(
+  "ImageFullyVisibleWithNoCorrectGuesses",
+  (guess: string) => {
+    noCorrectGuessesHandlers.forEach((handler) => handler(guess));
+  }
+);
 
 gameHubConnection.on("GameOver", (guessersScores, proposerScore) => {
   const scoresMap = new Map(Object.entries(guessersScores)) as Map<
