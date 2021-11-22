@@ -106,7 +106,7 @@ namespace backend.Tests.Core.Domain.Games
             // Propose tile 1 of image2
             game.Propose(1);
 
-            // Valid guess, even though guess is incorrect.
+            // Valid guess, guess is correct.
             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test2" }));
             Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
