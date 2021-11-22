@@ -1,0 +1,1317 @@
+diff --git a/website/backend.Tests/Core/Domain/BackendGame/BackendGameServiceTest.cs b/website/backend.Tests/Core/Domain/BackendGame/BackendGameServiceTest.cs
+index c2c2083..fca6da6 100644
+--- a/website/backend.Tests/Core/Domain/BackendGame/BackendGameServiceTest.cs
++++ b/website/backend.Tests/Core/Domain/BackendGame/BackendGameServiceTest.cs
+@@ -49,7 +49,7 @@ namespace backend.Tests.Core.Domain.Lobby
+             service.JoinGame(game.Id, user.Id, SlotRole.Guesser);
+             Assert.False(service.HasAvailableSlots(game.Id));
+ 
+-            var slotInfo = service.GetSlotInfo(game);
++            var slotInfo = service.GetSlotInfo(game.Id);
+             Assert.Contains(userId, slotInfo.GuessersIds);
+         }
+         
+diff --git a/website/backend.Tests/Core/Domain/Game/GameContextTests.cs b/website/backend.Tests/Core/Domain/Game/GameContextTests.cs
+index 963cba8..7242756 100644
+--- a/website/backend.Tests/Core/Domain/Game/GameContextTests.cs
++++ b/website/backend.Tests/Core/Domain/Game/GameContextTests.cs
+@@ -30,7 +30,7 @@ namespace backend.Tests.Core.Domain.Games
+             var game = new Game(
+                 Guid.NewGuid(),
+                 new List<backend.Core.Domain.Images.Image>() { new backend.Core.Domain.Images.Image(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test"))) },
+-                new List<Guesser>() { new Guesser(user) { Connected = true } },
++                new List<Guesser>() { new Guesser(user, "") { Connected = true } },
+                 new Proposer(Guid.NewGuid())
+             );
+             game.Update();
+@@ -48,7 +48,7 @@ namespace backend.Tests.Core.Domain.Games
+             var game = new Game(
+                 Guid.NewGuid(),
+                 new() { image },
+-                new List<Guesser>() { new Guesser(user) { Connected = true } },
++                new List<Guesser>() { new Guesser(user,"") { Connected = true } },
+                 new Proposer(Guid.NewGuid())
+             );
+             game.Update();
+@@ -67,14 +67,14 @@ namespace backend.Tests.Core.Domain.Games
+             var game = new Game(
+                 Guid.NewGuid(),
+                 new() { image },
+-                new List<Guesser>() { new Guesser(user) { Connected = true } },
++                new List<Guesser>() { new Guesser(user,"") { Connected = true } },
+                 new Proposer(Guid.NewGuid())
+             );
+             game.Update();
+ 
+             game.Propose(3);
+             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
+-            Assert.Contains(game.Events, x => x is GameOverEvent);
++            Assert.True(game.Events.Any(x => x is GameOverEvent));
+         }
+ 
+         [Fact]
+@@ -91,7 +91,7 @@ namespace backend.Tests.Core.Domain.Games
+             var game = new Game(
+                 Guid.NewGuid(),
+                 new() { image1, image2, image3 },
+-                new List<Guesser>() { new Guesser(user) { Connected = true } },
++                new List<Guesser>() { new Guesser(user,"") { Connected = true } },
+                 new Proposer(Guid.NewGuid())
+             );
+             game.Update();
+@@ -101,14 +101,14 @@ namespace backend.Tests.Core.Domain.Games
+ 
+             // Valid guess. Guess is also correct.
+             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
+-            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
++            Assert.False(game.Events.Any(x => x is GameOverEvent));
+ 
+             // Propose tile 1 of image2
+             game.Propose(1);
+ 
+-            // Valid guess, guess is correct.
++            // Valid guess, even though guess is incorrect.
+             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test2" }));
+-            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
++            Assert.False(game.Events.Any(x => x is GameOverEvent));
+ 
+             // Propose tile 1 of image3
+             game.Propose(1);
+@@ -117,7 +117,7 @@ namespace backend.Tests.Core.Domain.Games
+             Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
+ 
+             // No more tiles to propose. Game ends.
+-            Assert.Contains(game.Events, x => x is GameOverEvent);
++            Assert.True(game.Events.Any(x => x is GameOverEvent));
+         }
+ 
+         [Fact]
+@@ -131,7 +131,7 @@ namespace backend.Tests.Core.Domain.Games
+             var game = new Game(
+                 Guid.NewGuid(),
+                 new() { image },
+-                new List<Guesser>() { new Guesser(user1) { Connected = true }, new Guesser(user2) { Connected = true } },
++                new List<Guesser>() { new Guesser(user1,"") { Connected = true }, new Guesser(user2,"") { Connected = true } },
+                 new Proposer(Guid.NewGuid())
+             );
+             game.Update();
+@@ -141,11 +141,10 @@ namespace backend.Tests.Core.Domain.Games
+ 
+             // Valid and correct guess.
+             Assert.True(game.Guess(new GuessDto() { User = user2, Guess = "test" }));
+-            Assert.Contains(game.Events, x => x is CorrectGuessEvent);
+ 
+             // Game has now ended, so further guesses are denied.
+             Assert.False(game.Guess(new GuessDto() { User = user1, Guess = "test1" }));
+-            Assert.Contains(game.Events, x => x is GameOverEvent);
++            Assert.True(game.Events.Any(x => x is GameOverEvent));
+         }
+ 
+         [Fact]
+@@ -164,7 +163,7 @@ namespace backend.Tests.Core.Domain.Games
+             var game = new Game(
+                 Guid.NewGuid(),
+                 new() { image1, image2, image3 },
+-                new List<Guesser>() { new Guesser(user1) { Connected = true }, new Guesser(user2) { Connected = true }, new Guesser(user3) { Connected = true } },
++                new List<Guesser>() { new Guesser(user1,"") { Connected = true }, new Guesser(user2,"") { Connected = true }, new Guesser(user3,"") { Connected = true } },
+                 new Proposer(Guid.NewGuid())
+             );
+             game.Update();
+@@ -177,14 +176,14 @@ namespace backend.Tests.Core.Domain.Games
+ 
+             // Previous guess was correct. This guess fails because it's the proposers turn now.
+             Assert.False(game.Guess(new GuessDto() { User = user2, Guess = "test" }));
+-            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
++            Assert.False(game.Events.Any(x => x is GameOverEvent));
+ 
+             // Propose tile 1 of image2
+             game.Propose(1);
+ 
+-            // Valid guess, guess is correct.
++            // Valid guess, even though guess is incorrect.
+             Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test2" }));
+-            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
++            Assert.False(game.Events.Any(x => x is GameOverEvent));
+ 
+             // Propose tile 1 of image3
+             game.Propose(1);
+@@ -196,7 +195,7 @@ namespace backend.Tests.Core.Domain.Games
+ 
+             // No more tiles to propose. Game ends.
+             Assert.True(game.Propose(1) is null);
+-            Assert.Contains(game.Events, x => x is GameOverEvent);
++            Assert.True(game.Events.Any(x => x is GameOverEvent));
+         }
+     }
+ }
+diff --git a/website/backend/Controllers/Authentication/Dto/UserResponseDto.cs b/website/backend/Controllers/Authentication/Dto/UserResponseDto.cs
+index 964857a..c45f64a 100644
+--- a/website/backend/Controllers/Authentication/Dto/UserResponseDto.cs
++++ b/website/backend/Controllers/Authentication/Dto/UserResponseDto.cs
+@@ -1,4 +1,3 @@
+-using System;
+ using System.ComponentModel.DataAnnotations;
+ 
+ namespace backend.Controllers.Authentication.Dto
+@@ -6,15 +5,7 @@ namespace backend.Controllers.Authentication.Dto
+     public record UserResponseDto
+     {
+         [Required] public string Username { get; set; }
+-        
+-        public Guid? Id { get; set; }
+ 
+-        public UserResponseDto(Guid? id, string username)
+-        {
+-            Username = username;
+-            Id = id;
+-        }
+-        
+         public UserResponseDto(string username)
+         {
+             Username = username;
+diff --git a/website/backend/Controllers/Authentication/LoginController.cs b/website/backend/Controllers/Authentication/LoginController.cs
+index e36d0e1..40a2551 100644
+--- a/website/backend/Controllers/Authentication/LoginController.cs
++++ b/website/backend/Controllers/Authentication/LoginController.cs
+@@ -1,13 +1,18 @@
++using System;
+ using System.Threading.Tasks;
+ using backend.Controllers.Authentication.Dto;
++using backend.Hubs;
+ using Controllers.Authentication.Dto;
+ using Controllers.Generics;
+ using Domain.Authentication.Pipelines;
++using Domain.Authentication.Services;
+ using MediatR;
+ using Microsoft.AspNetCore.Mvc;
+-using Microsoft.Extensions.Logging; // using Microsoft.AspNetCore.Http.StatusCode;
++using Microsoft.AspNetCore.SignalR;
++// using Microsoft.AspNetCore.Http.StatusCode;
++using Microsoft.Extensions.Logging;
+ 
+-namespace backend.Controllers.Authentication
++namespace Controllers.Authentication
+ {
+     
+     // [Route("[controller]")]
+@@ -26,10 +31,8 @@ namespace backend.Controllers.Authentication
+         [HttpPost]
+         public async Task<IActionResult> Post(UserRequestDto user)
+         {
+-            if ( (await _mediator.Send(new LoginUser.Request(user.Username,user.Password))).Success )
+-            {
+-                var currentUser = await _mediator.Send(new GetCurrentUser.Request());
+-                return Ok(new UserResponseDto(currentUser?.Id, currentUser?.UserName));
++            if ( (await _mediator.Send(new LoginUser.Request(user.Username,user.Password))).Success ){
++                return Ok(new UserResponseDto(user.Username));
+             }
+ 
+             return Unauthorized();
+diff --git a/website/backend/Controllers/Authentication/LoginStateController.cs b/website/backend/Controllers/Authentication/LoginStateController.cs
+index dba53a7..491d23d 100644
+--- a/website/backend/Controllers/Authentication/LoginStateController.cs
++++ b/website/backend/Controllers/Authentication/LoginStateController.cs
+@@ -1,7 +1,7 @@
+ using System.Threading.Tasks;
+ using backend.Controllers.Authentication.Dto;
+ using Controllers.Generics;
+-using Domain.Authentication.Pipelines;
++using Domain.Authentication.Services;
+ using MediatR;
+ using Microsoft.AspNetCore.Mvc;
+ using Microsoft.Extensions.Logging; // using Microsoft.AspNetCore.Http.StatusCode;
+@@ -14,18 +14,20 @@ namespace Controllers.Authentication
+     {
+         private readonly ILogger<LoginStateController> _logger;
+ 		private readonly IMediator _mediator;
++        private readonly IAuthenticationService _authenticationService;
+ 
+-        public LoginStateController(ILogger<LoginStateController> logger, IMediator mediator)
++        public LoginStateController(ILogger<LoginStateController> logger, IMediator mediator, IAuthenticationService authenticationService)
+         {
+             _logger = logger;
+             _mediator = mediator;
++            _authenticationService = authenticationService;
+         }
+ 
+         [HttpGet]
+         public async Task<IActionResult> Get()
+         {
+-            var currentUser = await _mediator.Send(new GetCurrentUser.Request());
+-            return Ok(new UserResponseDto(currentUser?.Id, currentUser?.UserName));
++            var user = await _authenticationService.GetCurrentUser();
++            return Ok(new UserResponseDto(user?.UserName));
+         }
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Controllers/Authentication/RegistrationController.cs b/website/backend/Controllers/Authentication/RegistrationController.cs
+index 4e275b5..cc8d38c 100644
+--- a/website/backend/Controllers/Authentication/RegistrationController.cs
++++ b/website/backend/Controllers/Authentication/RegistrationController.cs
+@@ -27,10 +27,11 @@ namespace backend.Controllers.Authentication
+         public async Task<IActionResult> Post(UserRequestDto user){
+             var result = await _mediator.Send(new RegisterUser.Request(user.Username,user.Password));
+ 
+-            if (!result.Success) return UnprocessableEntity(result.errors);
+-            
+-            return Ok(new UserResponseDto(user.Username));
++            if (result.Success){
++                return Ok(new UserResponseDto(user.Username));
++            }
+ 
++            return UnprocessableEntity(result.errors);
+         }
+     }
+ 
+diff --git a/website/backend/Core/Domain/Authentication/Pipeline/GetCurrentUser.cs b/website/backend/Core/Domain/Authentication/Pipeline/GetCurrentUser.cs
+index bf263da..400e286 100644
+--- a/website/backend/Core/Domain/Authentication/Pipeline/GetCurrentUser.cs
++++ b/website/backend/Core/Domain/Authentication/Pipeline/GetCurrentUser.cs
+@@ -8,7 +8,7 @@ namespace Domain.Authentication.Pipelines
+ {
+     public class GetCurrentUser
+     {
+-        public record Request() : IRequest<User>;
++        public record Request(string Username, string Password) : IRequest<User>;
+         
+ 
+         public class Handler : IRequestHandler<Request, User>
+diff --git a/website/backend/Core/Domain/Authentication/Pipeline/RegisterUser.cs b/website/backend/Core/Domain/Authentication/Pipeline/RegisterUser.cs
+index 972011b..04b3eec 100644
+--- a/website/backend/Core/Domain/Authentication/Pipeline/RegisterUser.cs
++++ b/website/backend/Core/Domain/Authentication/Pipeline/RegisterUser.cs
+@@ -23,6 +23,10 @@ namespace Domain.Authentication.Pipelines
+                         public async Task<RegisterUser.Response> Handle(Request request, CancellationToken cancellationToken)
+                         {
+                                 var (success, errors) = await _authServ.RegisterUser(request.Username,request.Password);
++                                if (success)
++                                {
++                                        await _authServ.LoginUser(request.Username, request.Password);
++                                }
+                                 return new Response(success,errors);
+ 
+                         }
+diff --git a/website/backend/Core/Domain/Games/Dtos/CorrectGuessDto.cs b/website/backend/Core/Domain/Games/Dtos/CorrectGuessDto.cs
+index 14d9d34..9132cba 100644
+--- a/website/backend/Core/Domain/Games/Dtos/CorrectGuessDto.cs
++++ b/website/backend/Core/Domain/Games/Dtos/CorrectGuessDto.cs
+@@ -5,11 +5,12 @@ namespace backend.Core.Domain.Games.Dtos
+ {
+     public class CorrectGuessDto
+     {
+-        public Guid UserId { get; set; }
++        public int NewGuesserScore { get; set; }
++        public int NewProposerScore { get; set; }
++        public string Guesser { get; set; }
+         public Image Image { get; set; }
+         public string Guess { get; set; }
+         public bool HasMoreRounds { get; set; }
+-        
+         public bool WillAutoContinue { get; set; }
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Events/CorrectGuessEvent.cs b/website/backend/Core/Domain/Games/Events/CorrectGuessEvent.cs
+index a722b83..e0f1c22 100644
+--- a/website/backend/Core/Domain/Games/Events/CorrectGuessEvent.cs
++++ b/website/backend/Core/Domain/Games/Events/CorrectGuessEvent.cs
+@@ -6,24 +6,15 @@ namespace backend.Core.Domain.Games.Events
+ {
+     public record CorrectGuessEvent: BaseDomainEvent
+     {
+-        public CorrectGuessEvent(Game game, Guid userId, string guess, bool hasMoreRounds, bool isVersusOracle, Image image)
+-        {
+-            Game = game;
+-            UserId = userId;
+-            Guess = guess;
+-            HasMoreRounds = hasMoreRounds;
+-            Image = image;
+-            WillAutoContinue = hasMoreRounds && isVersusOracle;
+-        }
+-        
+-        public Game Game { get; set; }
+-        public Guid UserId { get; set; }
++        public string[] PlayerIds { get; set; }
++        public Guesser Guesser { get; set; }
++        public int GuesserScored { get; set; }
++        public IProposer Proposer { get; set; }
++        public int ProposerScored { get; set; }
+         public string Guess { get; set; }
+-        
+         public bool HasMoreRounds { get; set; }
+-        
+         public bool WillAutoContinue { get; set; }
+-        
++
+         public Image Image { get; set; }
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Events/FullyVisibleImageWithoutCorrectGuessesEvent.cs b/website/backend/Core/Domain/Games/Events/FullyVisibleImageWithoutCorrectGuessesEvent.cs
+index 123804e..db72b34 100644
+--- a/website/backend/Core/Domain/Games/Events/FullyVisibleImageWithoutCorrectGuessesEvent.cs
++++ b/website/backend/Core/Domain/Games/Events/FullyVisibleImageWithoutCorrectGuessesEvent.cs
+@@ -5,7 +5,7 @@ namespace backend.Core.Domain.Games.Events
+ {
+     public record FullyVisibleImageWithoutCorrectGuessesEvent: BaseDomainEvent
+     {
+-        public Guid GameId;
++        public string[] PlayerIds;
+         public string Guess;
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Events/PlayerScoredEvent.cs b/website/backend/Core/Domain/Games/Events/PlayerScoredEvent.cs
+deleted file mode 100644
+index 2debaa0..0000000
+--- a/website/backend/Core/Domain/Games/Events/PlayerScoredEvent.cs
++++ /dev/null
+@@ -1,12 +0,0 @@
+-using System;
+-using SharedKernel;
+-using System.Collections.Generic;
+-
+-namespace backend.Core.Domain.Games.Events
+-{
+-    public record PlayerScoredEvent: BaseDomainEvent
+-    {
+-        public Guid UserId;
+-        public int Score;
+-    }
+-}
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Game.cs b/website/backend/Core/Domain/Games/Game.cs
+index 32e301e..34bd8b5 100644
+--- a/website/backend/Core/Domain/Games/Game.cs
++++ b/website/backend/Core/Domain/Games/Game.cs
+@@ -1,6 +1,5 @@
+ using System;
+ using System.Collections.Generic;
+-using System.Data;
+ using System.Linq;
+ using backend.Core.Domain.Games.Events;
+ using backend.Core.Domain.Images;
+@@ -26,11 +25,6 @@ namespace backend.Core.Domain.Games
+ 
+         public IProposer Proposer;
+         public List<Guesser> Guessers;
+-        
+-        public bool VersusOracle => Proposer is Oracle;
+-
+-        public bool HasMoreRounds => Images.Count > 0;
+-
+         public List<String> GuesserIds
+         {
+             get
+@@ -175,7 +169,6 @@ namespace backend.Core.Domain.Games
+         public void GameOver()
+         {
+             State = GameState.Ended;
+-            
+             Events.Add(new GameOverEvent() { GameId = Id });
+         }
+ 
+@@ -183,47 +176,61 @@ namespace backend.Core.Domain.Games
+         //returns bool, which implies this guess should be broadcast to all players
+         public bool Guess(GuessDto guess)
+         {
+-            var guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
++            Guesser guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
+ 
+-            if (ProposersTurn || guesser.Guessed || CurrentImage is null) return false;
++            if (!ProposersTurn && !guesser.Guessed && CurrentImage is not null)
++            {
++                guesser.Guessed = true;
+ 
+-            guesser.Guessed = true;
++                if (CurrentImage.Label.Label == guess.Guess)
++                {
++                    var pScored = 0;
++                    if (Proposer is Proposer){
++                       pScored = Proposer.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
++                    }
+ 
+-            if (CurrentImage.Label.Label == guess.Guess)
+-            {
+-                guesser.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
+-                Proposer.UpdateScore(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
+-                
+-                Events.Add(new CorrectGuessEvent(
+-                    this,
+-                    guess.User,
+-                    guess.Guess, 
+-                    HasMoreRounds,
+-                    VersusOracle,
+-                    CurrentImage
+-                ));
+-                NextImage();
+-                return true;
+-            }
++                   var gScored = guesser.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
++
++                    Events.Add(new CorrectGuessEvent(){
++                        PlayerIds = PlayerIds.ToArray(),
++                        Guesser = guesser,
++                        GuesserScored = gScored,
++                        Proposer = Proposer,
++                        ProposerScored = pScored,
++                        Guess = guess.Guess,
++                        HasMoreRounds = Images.Count>0,
++                        WillAutoContinue = Images.Count>0 && Proposer is Oracle,
++                        Image = CurrentImage,
++                    });
++
++                    NextImage();
++                    return true;
++                }
+ 
+-            if (!Guessers.Where(g => g.Connected).All(x => x.Guessed)) return true;
+-            
+-            if (CurrentImage.Slices.Count == SlicesShown.Count)
+-            {
+-                Events.Add(new FullyVisibleImageWithoutCorrectGuessesEvent() {GameId = Id, Guess = CurrentImage.Label.Label});
+-                NextImage();
+-            }
+-            else
+-            {
+-                ProposersTurn = true;
+-                foreach (var g in Guessers)
++                if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
+                 {
+-                    g.Guessed = false;
++                    if (CurrentImage.Slices.Count == SlicesShown.Count)
++                    {
++                        Events.Add(new FullyVisibleImageWithoutCorrectGuessesEvent(){
++                            PlayerIds = PlayerIds.ToArray(),
++                            Guess = CurrentImage.Label.Label
++                        });
++                        NextImage();
++                    }
++                    else
++                    {
++                        ProposersTurn = true;
++                        foreach (var g in Guessers)
++                        {
++                            g.Guessed = false;
++                        }
++                    }
+                 }
+-            }
+-            
+ 
+-            return true;
++                // Implies valid guess -> broadcasted by hub
++                return true;
++            }
++            return false;
+         }
+ 
+ 
+diff --git a/website/backend/Core/Domain/Games/GameRoles/Guesser.cs b/website/backend/Core/Domain/Games/GameRoles/Guesser.cs
+index 3846e64..2023309 100644
+--- a/website/backend/Core/Domain/Games/GameRoles/Guesser.cs
++++ b/website/backend/Core/Domain/Games/GameRoles/Guesser.cs
+@@ -7,25 +7,29 @@ namespace backend.Core.Domain.Games
+     public class Guesser : BaseEntity
+     {
+         public Guid Id { get; set; }
++
++        public int Score { get; set; }
++        public string Username { get; set; }
+         public bool Guessed { get; set; }
+         public bool Connected { get; set; } = false;
+ 
+-        public int Score { get; set; } = 0;
+-
+-        public Guesser(Guid id)
++        public Guesser(Guid id, string uname)
+         {
+             Id = id;
++            Username = uname;
+         }
+-        public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices){
++        public int ScorePlayer(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices){
+ 
+ 
+             int timeScore = (int)Math.Round(RoundTime.TotalSeconds - timeDelta.TotalSeconds);
+             int sliceScore = totalSlices - slicesShown;
+ 
+-            // do something with the score.
+-            Score = timeScore * timeScore;
+ 
+-            Events.Add( new PlayerScoredEvent{UserId = Id, Score = Score});
++            var newScore = timeScore * sliceScore;
++            Score += newScore;
++
++            return newScore;
++
+         }
+ 
+         public string GetId() => Id.ToString();
+diff --git a/website/backend/Core/Domain/Games/GameRoles/IProposer.cs b/website/backend/Core/Domain/Games/GameRoles/IProposer.cs
+index 8fd3de7..a1f8291 100644
+--- a/website/backend/Core/Domain/Games/GameRoles/IProposer.cs
++++ b/website/backend/Core/Domain/Games/GameRoles/IProposer.cs
+@@ -7,16 +7,12 @@ namespace backend.Core.Domain.Games
+ {
+     public interface IProposer
+     {
+-        void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers);
++        int Score {get;}
++        string Username {get;}
++        int ScorePlayer(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers);
+         void NotifyTurn();
+         void HandleNewImage() {}
+         string GetId();
+-        
+-        int Score
+-        {
+-            get;
+-            set;
+-        }
+ 
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/GameRoles/Oracle.cs b/website/backend/Core/Domain/Games/GameRoles/Oracle.cs
+index 1b12363..53fc93a 100644
+--- a/website/backend/Core/Domain/Games/GameRoles/Oracle.cs
++++ b/website/backend/Core/Domain/Games/GameRoles/Oracle.cs
+@@ -10,9 +10,10 @@ namespace backend.Core.Domain.Games
+     {
+ 
+         public Guid GameId;
++
++        public int Score => 0;
++        public string Username => "";
+         private Queue<int> _proposals;
+-        
+-        public int Score { get; set; } = 0;
+         public int Proposal { get
+             {
+                 return _proposals.Dequeue();
+@@ -24,12 +25,15 @@ namespace backend.Core.Domain.Games
+             GameId = id;
+         }
+ 
+-        public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){}
++        public int ScorePlayer(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
++            return -1;
++        }
+ 
+         public void NotifyTurn(){
+         }
+ 
+         public string GetId() => null;
++        public string GetUsername() => "";
+ 
+         public void HandleNewImage(List<int> slices)
+         {
+diff --git a/website/backend/Core/Domain/Games/GameRoles/Proposer.cs b/website/backend/Core/Domain/Games/GameRoles/Proposer.cs
+index a6ab072..c05eb9c 100644
+--- a/website/backend/Core/Domain/Games/GameRoles/Proposer.cs
++++ b/website/backend/Core/Domain/Games/GameRoles/Proposer.cs
+@@ -7,26 +7,33 @@ namespace backend.Core.Domain.Games
+     public class Proposer : BaseEntity, IProposer
+     {
+         public Guid Id { get; set; }
+-        
+-        public int Score { get; set; } = 0;
++        public int Score { get; set; }
++
++        public string Username { get; set; }
+ 
+         public Proposer(Guid id)
+         {
+             Id = id;
+         }
+-
+-            public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
++        public Proposer(Guid id,string uname)
++        {
++            Id = id;
++            Username = uname;
++        }
++            public int ScorePlayer(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
+ 
+             int timeScore = (int)Math.Round(RoundTime.TotalSeconds - timeDelta.TotalSeconds);
+             int sliceScore = totalSlices - slicesShown;
++            var newScore = timeScore * sliceScore;
++            Score += newScore;
+ 
+-            // do something with the score.
+-            Score = timeScore * timeScore;
++            return newScore;
+         }
+ 
+         public void NotifyTurn(){
+         }
+ 
+         public string GetId() => Id.ToString();
++
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Handlers/CorrectGuessHandler.cs b/website/backend/Core/Domain/Games/Handlers/CorrectGuessHandler.cs
+index f1e5bd3..1a937e7 100644
+--- a/website/backend/Core/Domain/Games/Handlers/CorrectGuessHandler.cs
++++ b/website/backend/Core/Domain/Games/Handlers/CorrectGuessHandler.cs
+@@ -1,35 +1,73 @@
++using System;
++using System.Collections.Generic;
++using System.Linq;
+ using System.Threading;
+ using System.Threading.Tasks;
+ using backend.Core.Domain.Games.Dtos;
+ using backend.Core.Domain.Games.Events;
+ using backend.Core.Domain.Lobby.Events;
++using backend.Core.Domain.Lobby.Models;
+ using backend.Hubs;
++using Infrastructure.Data;
+ using MediatR;
+ using Microsoft.AspNetCore.SignalR;
++using Microsoft.EntityFrameworkCore;
++using Microsoft.Extensions.DependencyInjection;
+ 
+ namespace backend.Core.Domain.Games.Handlers
+ {
+     public class CorrectGuessHandler: INotificationHandler<CorrectGuessEvent>
+     {
++        private readonly IServiceScopeFactory _scope;
+         private readonly IHubContext<GameHub> _hubContext;
+ 
+-        public CorrectGuessHandler(IHubContext<GameHub> hubContext)
++        public CorrectGuessHandler(IHubContext<GameHub> hubContext, IServiceScopeFactory scope )
+         {
++            _scope = scope ?? throw new System.ArgumentException(nameof(scope));
+             _hubContext = hubContext;
+         }
+ 
+ 
+         public async Task Handle(CorrectGuessEvent notification, CancellationToken cancellationToken)
+         {
++
++
++            var playersToScore = new List<(Guid id, int score)>();
++            playersToScore.Add((notification.Guesser.Id, notification.GuesserScored));
++
++            if (notification.Proposer is Proposer){
++                playersToScore.Add((Guid.Parse(notification.Proposer.GetId()), notification.ProposerScored));
++            }
++
++            using (var scope = _scope.CreateScope())
++            {
++                var db = scope.ServiceProvider.GetRequiredService<GameContext>();
++
++                foreach( var usr in playersToScore){
++                    var dbScore = await db.Scores.Where(x => x.User == usr.id).FirstOrDefaultAsync();
++                    if (dbScore==null){
++                        dbScore = new Score(
++                            usr.id,
++                            0
++                            );
++                        db.Add(dbScore);
++                    }
++                    dbScore.UserScore+= usr.score;
++                }
++                await db.SaveChangesAsync();
++            }
++
+             var correctGuess = new CorrectGuessDto()
+             {
+-                Guess = notification.Guess, 
+-                Image = notification.Image, 
+-                UserId = notification.UserId,
++                Guess = notification.Guess,
++                Image = notification.Image,
++                Guesser = notification.Guesser.Username,
++                NewGuesserScore = notification.Guesser.Score,
++                NewProposerScore = notification.Proposer.Score,
+                 HasMoreRounds = notification.HasMoreRounds,
+                 WillAutoContinue = notification.WillAutoContinue
+             };
+-            await _hubContext.Clients.Users(notification.Game.PlayerIds).SendAsync("CorrectGuess", correctGuess, cancellationToken);
++            await _hubContext.Clients.Users(notification.PlayerIds).SendAsync("CorrectGuess", correctGuess, cancellationToken);
+         }
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Handlers/FullyVisibleImageWithoutCorrectGuessesHandler.cs b/website/backend/Core/Domain/Games/Handlers/FullyVisibleImageWithoutCorrectGuessesHandler.cs
+index 9b1ac95..0e5f547 100644
+--- a/website/backend/Core/Domain/Games/Handlers/FullyVisibleImageWithoutCorrectGuessesHandler.cs
++++ b/website/backend/Core/Domain/Games/Handlers/FullyVisibleImageWithoutCorrectGuessesHandler.cs
+@@ -20,8 +20,7 @@ namespace backend.Core.Domain.Games.Handlers
+ 
+         public async Task Handle(FullyVisibleImageWithoutCorrectGuessesEvent notification, CancellationToken cancellationToken)
+         {
+-            var game = _service.Get(notification.GameId);
+-            await _hub.Clients.Users(game.PlayerIds).SendAsync("ImageFullyVisibleWithNoCorrectGuesses", notification.Guess, cancellationToken);
++            await _hub.Clients.Users(notification.PlayerIds).SendAsync("ImageFullyVisibleWithNoCorrectGuesses", notification.Guess, cancellationToken);
+         }
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Handlers/GameOverHandler.cs b/website/backend/Core/Domain/Games/Handlers/GameOverHandler.cs
+index a3b9eaf..64203cc 100644
+--- a/website/backend/Core/Domain/Games/Handlers/GameOverHandler.cs
++++ b/website/backend/Core/Domain/Games/Handlers/GameOverHandler.cs
+@@ -6,9 +6,6 @@ using Infrastructure.Data;
+ using MediatR;
+ using Microsoft.EntityFrameworkCore;
+ using System;
+-using System.Collections;
+-using System.Collections.Generic;
+-using backend.Core.Domain.Games.Dtos;
+ using Microsoft.AspNetCore.SignalR;
+ using backend.Hubs;
+ 
+@@ -28,18 +25,8 @@ namespace backend.Core.Domain.Games.Handlers
+ 
+         public async Task Handle(GameOverEvent notification, CancellationToken cancellationToken)
+         {
+-            var game = _service.Remove(notification.GameId);
+-            var guessersScores = game.Guessers.ToDictionary(guesser => guesser.Id.ToString(), guesser => guesser.Score);
+-
+-
+-            int? proposerScore = null;
+-            
+-            if (!game.VersusOracle)
+-            {
+-                proposerScore = game.Proposer.Score;
+-            }
+-            
+-            await _hub.Clients.Users(game.PlayerIds).SendAsync("GameOver", guessersScores, proposerScore, cancellationToken);
++            Game game = _service.Remove(notification.GameId);
++            await _hub.Clients.Users(game.PlayerIds).SendAsync("GameOver", cancellationToken);
+         }
+     }
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Handlers/PlayerScoredHandler.cs b/website/backend/Core/Domain/Games/Handlers/PlayerScoredHandler.cs
+deleted file mode 100644
+index 85ed21f..0000000
+--- a/website/backend/Core/Domain/Games/Handlers/PlayerScoredHandler.cs
++++ /dev/null
+@@ -1,47 +0,0 @@
+-using System.Threading;
+-using System.Threading.Tasks;
+-using System.Linq;
+-using backend.Core.Domain.Games.Events;
+-using Infrastructure.Data;
+-using MediatR;
+-using Microsoft.EntityFrameworkCore;
+-using System;
+-using Microsoft.AspNetCore.SignalR;
+-using backend.Hubs;
+-using backend.Core.Domain.Games.Pipelines;
+-
+-namespace backend.Core.Domain.Games.Handlers
+-{
+-    public class PlayerScoredHandler: INotificationHandler<PlayerScoredEvent>
+-    {
+-        private readonly GameContext _db;
+-        private readonly IGameService _service;
+-
+-        private readonly IHubContext<GameHub> _hub;
+-
+-        public PlayerScoredHandler(GameContext db, IGameService service, IHubContext<GameHub> hub)
+-        {
+-            _db = db ?? throw new System.ArgumentException(nameof(db));
+-            _service = service ?? throw new System.ArgumentException(nameof(service));
+-            _hub = hub ?? throw new System.ArgumentException(nameof(hub));
+-        }
+-
+-        public async Task Handle(PlayerScoredEvent notification, CancellationToken cancellationToken)
+-        {
+-
+-            var game = _service.GetByUserId(notification.UserId);
+-
+-            await _hub.Clients.Clients(game.Guessers.Select(g => g.Id.ToString())).SendAsync("APlayerScored", notification.UserId, notification.Score, cancellationToken);
+-            var proposer = game.Proposer.GetId();
+-            if (proposer is not null) {
+-                await _hub.Clients.Client(proposer).SendAsync("APlayerScored", notification.UserId, notification.Score, cancellationToken);
+-            }
+-
+-
+-            var dbscore = await _db.Scores.Include(x => x.User).Where(x => x.User.Id==notification.UserId).FirstOrDefaultAsync();
+-            dbscore.UserScore+= notification.Score;
+-            await _db.SaveChangesAsync();
+-
+-        }
+-    }
+-}
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Pipelines/Guess.cs b/website/backend/Core/Domain/Games/Pipelines/Guess.cs
+index 3cf95aa..7630b88 100644
+--- a/website/backend/Core/Domain/Games/Pipelines/Guess.cs
++++ b/website/backend/Core/Domain/Games/Pipelines/Guess.cs
+@@ -1,11 +1,11 @@
+ using System;
+ using System.Threading;
+ using System.Threading.Tasks;
++using Infrastructure.Data;
+ using MediatR;
++using Microsoft.AspNetCore.SignalR;
+ using System.Linq;
+-using backend.Core.Domain.Games.Events;
+ using backend.Hubs;
+-using Microsoft.AspNetCore.SignalR;
+ 
+ namespace backend.Core.Domain.Games.Pipelines
+ {
+@@ -15,30 +15,32 @@ namespace backend.Core.Domain.Games.Pipelines
+ 
+         public class Handler: IRequestHandler<Request,Unit>
+         {
+-            
+-            private readonly IGameService _service;
+-            private readonly IHubContext<GameHub> _hub;
+-            
+-            public Handler(IGameService service, IHubContext<GameHub> hub)
++
++            private GameContext _db;
++            private IGameService _service;
++            private IHubContext<GameHub> _hub;
++            public Handler(GameContext db, IGameService service, IHubContext<GameHub> hub)
+             {
+-                _service = service ?? throw new ArgumentNullException(nameof(service));
+-                _hub = hub;
++                _db = db ?? throw new System.ArgumentNullException(nameof(db));
++                _service = service ?? throw new System.ArgumentNullException(nameof(service));
++                _hub = hub ?? throw new System.ArgumentNullException(nameof(hub));
+             }
+ 
+-            public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
++            public Task<Unit> Handle(Request request, CancellationToken cancellationToken)
+             {
+-                var game = _service.GetByUserId(request.User);
+-
+-                if (game is null) return Unit.Value;
+-                
+-                var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
++                Game game = _service.GetByUserId(request.User);
+ 
++                if (game is not null)
++                {
++                    var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
+ 
+-                if (!result) return Unit.Value;
+-                
+-                await _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", request, cancellationToken);
++                    if (result)
++                    {
++                        _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", request, cancellationToken);
++                    }
++                }
+ 
+-                return Unit.Value;
++                return Task.FromResult(Unit.Value);
+             }
+         }
+     }
+diff --git a/website/backend/Core/Domain/Games/Pipelines/Propose.cs b/website/backend/Core/Domain/Games/Pipelines/Propose.cs
+index 1029f39..2246ae5 100644
+--- a/website/backend/Core/Domain/Games/Pipelines/Propose.cs
++++ b/website/backend/Core/Domain/Games/Pipelines/Propose.cs
+@@ -34,7 +34,7 @@ namespace backend.Core.Domain.Games.Pipelines
+             {
+                 _hub.Clients.Users(game.GuesserIds).SendAsync("Proposal", result, cancellationToken);
+             }
+-            return Task.FromResult(Unit.Value);
++                return Task.FromResult(Unit.Value);
+             }
+         }
+     }
+diff --git a/website/backend/Core/Domain/Games/Pipelines/StartGame.cs b/website/backend/Core/Domain/Games/Pipelines/StartGame.cs
+index 5a74e71..4a25a20 100644
+--- a/website/backend/Core/Domain/Games/Pipelines/StartGame.cs
++++ b/website/backend/Core/Domain/Games/Pipelines/StartGame.cs
+@@ -32,7 +32,10 @@ namespace backend.Core.Domain.Games.Pipelines
+ 
+                 if (proposerId is not null)
+                 {
+-                    proposer = new Proposer((Guid)proposerId);
++                    proposer = new Proposer(
++                        (Guid)proposerId,
++                        _db.Users.Where( u => u.Id==proposerId).FirstOrDefault().UserName
++                        );
+                 }
+ 
+                 var images = await _db.Images
+@@ -45,7 +48,10 @@ namespace backend.Core.Domain.Games.Pipelines
+                 var game = new Game(
+                     request.Game.Game.Id,
+                     images,
+-                    request.Game.SlotInfo.GuessersIds.Select(g => new Guesser(g)).ToList(),
++                    request.Game.SlotInfo.GuessersIds.Select(g => new Guesser(
++                        g,
++                        _db.Users.Where( u => u.Id==g).FirstOrDefault().UserName
++                    )).ToList(),
+                     proposer
+                     ) {
+                     RoundTime = TimeSpan.FromSeconds(request.Game.Game.Settings.Duration)
+diff --git a/website/backend/Core/Domain/Games/Pipelines/UpdatePlayerScore.cs b/website/backend/Core/Domain/Games/Pipelines/UpdatePlayerScore.cs
+new file mode 100644
+index 0000000..8e0e19b
+--- /dev/null
++++ b/website/backend/Core/Domain/Games/Pipelines/UpdatePlayerScore.cs
+@@ -0,0 +1,49 @@
++using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Threading;
++using System.Threading.Tasks;
++using backend.Core.Domain.Games.Events;
++using backend.Core.Domain.Lobby.Models;
++using Infrastructure.Data;
++using Microsoft.EntityFrameworkCore;
++using MediatR;
++
++namespace backend.Core.Domain.Games.Pipelines
++{
++    public class UpdatePlayerScore
++    {
++        public record Request(Guid UserId, int Score): IRequest<Unit> {}
++        public class Handler : IRequestHandler<Request, Unit>
++        {
++            private readonly GameContext _db;
++            private readonly IGameService _service;
++
++            public Handler(GameContext db, IGameService service)
++            {
++                _db = db;
++                _service = service;
++            }
++
++            public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
++            {
++
++                var dbScore = await _db.Scores.Where(x => x.User == request.UserId).FirstOrDefaultAsync();
++                if (dbScore==null){
++                    dbScore = new Score(
++                        request.UserId,
++                        request.Score);
++                    _db.Add(dbScore);
++                }
++
++                dbScore.UserScore+= request.Score;
++                await _db.SaveChangesAsync();
++
++                return Unit.Value;
++
++
++
++            }
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Games/Services/GameService.cs b/website/backend/Core/Domain/Games/Services/GameService.cs
+index 3459f66..6377fde 100644
+--- a/website/backend/Core/Domain/Games/Services/GameService.cs
++++ b/website/backend/Core/Domain/Games/Services/GameService.cs
+@@ -35,7 +35,7 @@ namespace backend.Core.Domain.Games {
+             Games.TryGetValue(gameId, out active_game);
+             return active_game;
+         }
+-        private async void UpdateGames(Object _, ElapsedEventArgs e) 
++        private async void UpdateGames(Object _, ElapsedEventArgs e)
+         {
+             foreach (var game in Games.Values)
+             {
+@@ -43,12 +43,12 @@ namespace backend.Core.Domain.Games {
+ 
+                 var events = game.Events.ToArray();
+                 game.Events.Clear();
+-                
++
+                 foreach (var domainEvent in events)
+                 {
+                     await _mediator.Publish(domainEvent);
+                 }
+-                
++
+             }
+         }
+ 
+diff --git a/website/backend/Core/Domain/Lobby/Handlers/GameStartedHandler.cs b/website/backend/Core/Domain/Lobby/Handlers/GameStartedHandler.cs
+index c042ddc..c0161b0 100644
+--- a/website/backend/Core/Domain/Lobby/Handlers/GameStartedHandler.cs
++++ b/website/backend/Core/Domain/Lobby/Handlers/GameStartedHandler.cs
+@@ -24,10 +24,11 @@ namespace backend.Core.Domain.Lobby.Handlers
+             _LobbyService = LobbyService ?? throw new System.ArgumentException(nameof(LobbyService));
+             _hubContext = hubContext ?? throw new System.ArgumentException(nameof(hubContext));
+         }
+-        
++
++
+         public async Task Handle(GameStarted notification, CancellationToken cancellationToken)
+         {
+-            var playerIds = _LobbyService.GetSlotInfo(notification.Game).PlayerIds;
++            var playerIds = _LobbyService.GetSlotInfo(notification.Game.Id).PlayerIds;
+             await _hubContext.Clients.Users(playerIds.Select(id => id.ToString())).SendAsync("GameStarted", notification.Game.Id, cancellationToken);
+         }
+     }
+diff --git a/website/backend/Core/Domain/Lobby/Models/Score.cs b/website/backend/Core/Domain/Lobby/Models/Score.cs
+index 8bd5a24..e79ada0 100644
+--- a/website/backend/Core/Domain/Lobby/Models/Score.cs
++++ b/website/backend/Core/Domain/Lobby/Models/Score.cs
+@@ -6,8 +6,19 @@ namespace backend.Core.Domain.Lobby.Models
+     public class Score
+     {
+         public int Id { get; set; }
+-        public User User { get; set; }
+-        public double UserScore { get; set; }
++        public Guid GameId { get; set; }
++        public Guid User { get; set; }
++        public int UserScore { get; set; }
+         public DateTime Date { get; set; }
++
++        public  Score(){}
++
++
++        public Score(Guid usr,int score){
++            User = usr;
++            UserScore = score;
++            Date = DateTime.Now;
++        }
+     }
++
+ }
+\ No newline at end of file
+diff --git a/website/backend/Core/Domain/Lobby/Pipelines/CreateGame.cs b/website/backend/Core/Domain/Lobby/Pipelines/CreateGame.cs
+index 1101f12..563c089 100644
+--- a/website/backend/Core/Domain/Lobby/Pipelines/CreateGame.cs
++++ b/website/backend/Core/Domain/Lobby/Pipelines/CreateGame.cs
+@@ -40,7 +40,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
+                 _LobbyService.StoreGame(game);
+                 await _mediator.Publish(new GameCreated(game), cancellationToken);
+                 await _mediator.Send(new JoinGame.Request(request.User, game.Id, creatorRole), cancellationToken);
+-                return new GameWithSlotInfo(game, _LobbyService.GetSlotInfo(game));
++                return new GameWithSlotInfo(game, _LobbyService.GetSlotInfo(game.Id));
+             }
+         }
+     }
+diff --git a/website/backend/Core/Domain/Lobby/Pipelines/GetAvailableGames.cs b/website/backend/Core/Domain/Lobby/Pipelines/GetAvailableGames.cs
+index 03304f4..5533503 100644
+--- a/website/backend/Core/Domain/Lobby/Pipelines/GetAvailableGames.cs
++++ b/website/backend/Core/Domain/Lobby/Pipelines/GetAvailableGames.cs
+@@ -34,7 +34,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
+                     .Where(g => g.State.Equals(GameState.Created))
+                     .ToListAsync(cancellationToken);
+ 
+-                return games.Select(game => new GameWithSlotInfo(game, _LobbyService.GetSlotInfo(game))
++                return games.Select(game => new GameWithSlotInfo(game, _LobbyService.GetSlotInfo(game.Id))
+                 ).ToList();
+             }
+         }
+diff --git a/website/backend/Core/Domain/Lobby/Pipelines/JoinGame.cs b/website/backend/Core/Domain/Lobby/Pipelines/JoinGame.cs
+index 2261834..2fc5932 100644
+--- a/website/backend/Core/Domain/Lobby/Pipelines/JoinGame.cs
++++ b/website/backend/Core/Domain/Lobby/Pipelines/JoinGame.cs
+@@ -34,7 +34,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
+             {
+                 var game = await _db.Games.FirstOrDefaultAsync(g => g.Id.Equals(request.GameId), cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
+                 _LobbyService.JoinGame(game.Id, request.User.Id, request.Role);
+-                var gameSlotInfo = _LobbyService.GetSlotInfo(game);
++                var gameSlotInfo = _LobbyService.GetSlotInfo(game.Id);
+                 await _mediator.Publish(new UserJoinGame(new GameSlotNotification(game.Id, gameSlotInfo.GuessersIds.Count)), cancellationToken);
+ 
+                 return Unit.Value;
+diff --git a/website/backend/Core/Domain/Lobby/Pipelines/LeaveGame.cs b/website/backend/Core/Domain/Lobby/Pipelines/LeaveGame.cs
+index 1d0226a..f64828d 100644
+--- a/website/backend/Core/Domain/Lobby/Pipelines/LeaveGame.cs
++++ b/website/backend/Core/Domain/Lobby/Pipelines/LeaveGame.cs
+@@ -33,7 +33,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
+             {
+                 var game = await _db.Games.Where(g => g.Id.Equals(request.GameId)).FirstOrDefaultAsync(cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");
+                 _LobbyService.LeaveGame(game.Id, request.UserId);
+-                var gameSlotInfo = _LobbyService.GetSlotInfo(game);
++                var gameSlotInfo = _LobbyService.GetSlotInfo(game.Id);
+                 await _mediator.Publish(new UserLeftGame(new GameSlotNotification(game.Id, gameSlotInfo.PlayerSlots.Count), request.UserId), cancellationToken);
+                 return Unit.Value;
+             }
+diff --git a/website/backend/Core/Domain/Lobby/Pipelines/StartGame.cs b/website/backend/Core/Domain/Lobby/Pipelines/StartGame.cs
+index 36bb96b..b665c98 100644
+--- a/website/backend/Core/Domain/Lobby/Pipelines/StartGame.cs
++++ b/website/backend/Core/Domain/Lobby/Pipelines/StartGame.cs
+@@ -43,7 +43,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
+ 
+                 var imageIds = await _mediator.Send(new GetImageIdsListByCategoriesIds.Request(game.Settings.CategoryIds, game.Settings.ImagesCount, (Guid)request.UserId));
+ 
+-                var slotInfo = _LobbyService.GetSlotInfo(game);
++                var slotInfo = _LobbyService.GetSlotInfo(game.Id);
+ 
+                 await _mediator.Send(new Games.Pipelines.StartGame.Request(new GameWithSlotInfo(game, slotInfo), imageIds), cancellationToken);
+                 await _mediator.Publish(new GameStarted(game), cancellationToken);
+diff --git a/website/backend/Core/Domain/Lobby/Services/ILobbyService.cs b/website/backend/Core/Domain/Lobby/Services/ILobbyService.cs
+index e68540a..d29b37a 100644
+--- a/website/backend/Core/Domain/Lobby/Services/ILobbyService.cs
++++ b/website/backend/Core/Domain/Lobby/Services/ILobbyService.cs
+@@ -9,7 +9,7 @@ namespace backend.Core.Domain.Lobby.Services
+         void StoreGame(Game game);
+         void JoinGame(Guid gameId, Guid userId, SlotRole role);
+         void LeaveGame(Guid gameId, Guid userId);
+-        GameSlotInfo GetSlotInfo(Game game);
++        GameSlotInfo GetSlotInfo(Guid gameId);
+         bool HasAvailableSlots(Guid gameId);
+         
+         bool DeleteGame(Guid gameId);
+diff --git a/website/backend/Core/Domain/Lobby/Services/LobbyService.cs b/website/backend/Core/Domain/Lobby/Services/LobbyService.cs
+index c885f97..f0384fc 100644
+--- a/website/backend/Core/Domain/Lobby/Services/LobbyService.cs
++++ b/website/backend/Core/Domain/Lobby/Services/LobbyService.cs
+@@ -24,14 +24,14 @@ namespace backend.Core.Domain.Lobby.Services
+             });
+         }
+         
+-        public GameSlotInfo GetSlotInfo(Game game)
++        public GameSlotInfo GetSlotInfo(Guid gameId)
+         {
+-            if (!_games.ContainsKey(game.Id))
++            if (_games.TryGetValue(gameId, out var gameSlotInfo))
+             {
+-                StoreGame(game);
++                return gameSlotInfo;
+             }
+-            
+-            return _games.TryGetValue(game.Id, out var gameSlotInfo) ? gameSlotInfo : null;
++
++            throw new Exception($"Game room with id { gameId } is not stored");
+         }
+         
+         public bool HasAvailableSlots(Guid gameId)
+diff --git a/website/backend/Infrastructure/GameContext.cs b/website/backend/Infrastructure/GameContext.cs
+index 9f8cc71..406f3bd 100644
+--- a/website/backend/Infrastructure/GameContext.cs
++++ b/website/backend/Infrastructure/GameContext.cs
+@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+ using Microsoft.EntityFrameworkCore;
+ using SharedKernel;
+ 
+-
+ namespace Infrastructure.Data
+ {
+     public class GameContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+diff --git a/website/frontend/src/components/Modal/AlertInGameModal.vue b/website/frontend/src/components/Modal/AlertInGameModal.vue
+index c8cc90c..9dbf636 100644
+--- a/website/frontend/src/components/Modal/AlertInGameModal.vue
++++ b/website/frontend/src/components/Modal/AlertInGameModal.vue
+@@ -21,7 +21,7 @@
+           </div>
+         </div>
+         <div class="modal-footer">
+-          <button  type="button" class="btn btn-secondary" @click="closeModal">Close ({{ autoCloseIn }})</button>
++          <button  type="button" class="btn btn-secondary" @click="closeModal">Leave ({{ autoCloseIn }})</button>
+         </div>
+       </div>
+     </div>
+diff --git a/website/frontend/src/typings/index.ts b/website/frontend/src/typings/index.ts
+index f8fca0a..c31ed5e 100644
+--- a/website/frontend/src/typings/index.ts
++++ b/website/frontend/src/typings/index.ts
+@@ -81,7 +81,7 @@ export type subscribeToNewImageCb = (data: Image) => void;
+ export type subscribeToProposalCb = (data: ImageSlice) => void;
+ 
+ export interface Guess {
+-  user: string;
++  userId: string;
+   guess: string;
+ }
+ 
+diff --git a/website/frontend/src/views/Game.vue b/website/frontend/src/views/Game.vue
+index 1b18aee..0cd3beb 100644
+--- a/website/frontend/src/views/Game.vue
++++ b/website/frontend/src/views/Game.vue
+@@ -52,8 +52,8 @@
+             </tr>
+             </thead>
+             <tbody>
+-            <tr v-for="(guess, i) in latestValidGuesses" :key="'guess_' + i">
+-              <td>{{ guess.user }} : {{ guess.guess }}</td>
++            <tr v-for="(guess, i) in reversedGuesses" :key="'guess_' + i">
++              <td>{{ guess }}</td>
+             </tr>
+             </tbody>
+           </table>
+@@ -148,7 +148,7 @@ interface Alert {
+ 
+ declare interface BaseComponentData {
+   players: Player[];
+-  guesses: Guess[];
++  guesses: string[];
+   imageSlices: ImageSlice[];
+   guess: string;
+   label: string;
+@@ -165,7 +165,7 @@ const getRoundAlertMessage = {
+   wonRound: (willAutoContinue: boolean) => `Congrats! You won this round. Keep going! ${ willAutoContinue ? "Next round will start soon." : "" }`,
+   lostRound: (userName: string, correctGuess: string, willAutoContinue: boolean) => `Ohh no! ${ userName } won this round by guessing word ${ correctGuess }. ${ willAutoContinue ? "Next round will start soon." : "" }`,
+   winInfo: (userName: string) => `${ userName } won this round. You are doing a great job as a proposer.`,
+-  noGuesses: (correctGuess: string) => `No one won this round! The correct guessing word was ${ correctGuess }`
++  noGuesses: (correctGuess: string) => `None won this round! The correct guessing word was ${ correctGuess }`
+ };
+ 
+ const getGameAlertMessage = {
+@@ -192,7 +192,7 @@ export default defineComponent({
+       currentPlayer: getCurrentUser(),
+       players: [] as Player[],
+ 
+-      guesses: [] as Guess[],
++      guesses: [] as string[],
+ 
+       isProposer: false,
+       started: false,
+@@ -227,13 +227,8 @@ export default defineComponent({
+ 
+       return "Proposer's turn";
+     },
+-    latestValidGuesses(): Guess[] {
+-      const takeElements = 10;
+-
+-      return [...this.guesses]
+-        .reverse()
+-        .filter(guess => guess.guess.trim().length)
+-        .filter((_, i) => i < takeElements);
++    reversedGuesses(): string[] {
++      return [...this.guesses].reverse();
+     }
+   },
+   created() {
+@@ -247,6 +242,7 @@ export default defineComponent({
+   methods: {
+     sendGuess() {
+       sendNewGuess(this.guess);
++      this.guesses = [...this.guesses, this.guess];
+       this.guess = "";
+       this.myTurn = false;
+     },
+@@ -316,7 +312,7 @@ export default defineComponent({
+     },
+ 
+     addIncomingGuess(guess: Guess) {
+-      this.guesses = [...this.guesses, guess];
++      //this.guesses = [...this.guesses, guess];
+     },
+     updateScores(score: Score) {
+       const player = this.players.find((x) => x.PlayerId == score.userId);
+@@ -349,6 +345,7 @@ export default defineComponent({
+       };
+     },
+     handleNoGuesses(guess: string) {
++      console.log("handleNoGuesses", guess);
+       this.modalAlert = {
+         type: getAlertType.info,
+         message: getRoundAlertMessage.noGuesses(guess),
+diff --git a/website/frontend/src/views/auth/Registration.vue b/website/frontend/src/views/auth/Registration.vue
+index b21ba48..ec7f9ff 100644
+--- a/website/frontend/src/views/auth/Registration.vue
++++ b/website/frontend/src/views/auth/Registration.vue
+@@ -90,7 +90,6 @@ export default defineComponent({
+ 
+       auth
+         .registrateUser(userName, password)
+-        .then(() => auth.authUser(userName, password))
+         .then(setCurrentUser)
+         .then(() => this.$router.push({ name: "Home" }))
+         .catch((e) => {

@@ -7,26 +7,33 @@ namespace backend.Core.Domain.Games
     public class Proposer : BaseEntity, IProposer
     {
         public Guid Id { get; set; }
-        
-        public int Score { get; set; } = 0;
+        public int Score { get; set; }
+
+        public string Username { get; set; }
 
         public Proposer(Guid id)
         {
             Id = id;
         }
-
-            public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
+        public Proposer(Guid id,string uname)
+        {
+            Id = id;
+            Username = uname;
+        }
+            public int ScorePlayer(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
 
             int timeScore = (int)Math.Round(RoundTime.TotalSeconds - timeDelta.TotalSeconds);
             int sliceScore = totalSlices - slicesShown;
+            var newScore = timeScore * sliceScore;
+            Score += newScore;
 
-            // do something with the score.
-            Score = timeScore * timeScore;
+            return newScore;
         }
 
         public void NotifyTurn(){
         }
 
         public string GetId() => Id.ToString();
+
     }
 }

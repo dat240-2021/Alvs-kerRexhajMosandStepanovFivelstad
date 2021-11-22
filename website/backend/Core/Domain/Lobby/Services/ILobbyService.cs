@@ -9,7 +9,7 @@ namespace backend.Core.Domain.Lobby.Services
         void StoreGame(Game game);
         void JoinGame(Guid gameId, Guid userId, SlotRole role);
         void LeaveGame(Guid gameId, Guid userId);
-        GameSlotInfo GetSlotInfo(Game game);
+        GameSlotInfo GetSlotInfo(Guid gameId);
         bool HasAvailableSlots(Guid gameId);
         
         bool DeleteGame(Guid gameId);

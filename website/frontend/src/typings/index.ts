@@ -81,7 +81,7 @@ export type subscribeToNewImageCb = (data: Image) => void;
 export type subscribeToProposalCb = (data: ImageSlice) => void;
 
 export interface Guess {
-  user: string;
+  userId: string;
   guess: string;
 }
 

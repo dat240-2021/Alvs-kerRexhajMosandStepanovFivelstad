@@ -52,8 +52,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(guess, i) in latestValidGuesses" :key="'guess_' + i">
-              <td>{{ guess.user }} : {{ guess.guess }}</td>
+            <tr v-for="(guess, i) in reversedGuesses" :key="'guess_' + i">
+              <td>{{ guess }}</td>
             </tr>
             </tbody>
           </table>
@@ -148,7 +148,7 @@ interface Alert {
 
 declare interface BaseComponentData {
   players: Player[];
-  guesses: Guess[];
+  guesses: string[];
   imageSlices: ImageSlice[];
   guess: string;
   label: string;
@@ -165,7 +165,7 @@ const getRoundAlertMessage = {
   wonRound: (willAutoContinue: boolean) => `Congrats! You won this round. Keep going! ${ willAutoContinue ? "Next round will start soon." : "" }`,
   lostRound: (userName: string, correctGuess: string, willAutoContinue: boolean) => `Ohh no! ${ userName } won this round by guessing word ${ correctGuess }. ${ willAutoContinue ? "Next round will start soon." : "" }`,
   winInfo: (userName: string) => `${ userName } won this round. You are doing a great job as a proposer.`,
-  noGuesses: (correctGuess: string) => `No one won this round! The correct guessing word was ${ correctGuess }`
+  noGuesses: (correctGuess: string) => `None won this round! The correct guessing word was ${ correctGuess }`
 };
 
 const getGameAlertMessage = {
@@ -192,7 +192,7 @@ export default defineComponent({
       currentPlayer: getCurrentUser(),
       players: [] as Player[],
 
-      guesses: [] as Guess[],
+      guesses: [] as string[],
 
       isProposer: false,
       started: false,
@@ -227,13 +227,8 @@ export default defineComponent({
 
       return "Proposer's turn";
     },
-    latestValidGuesses(): Guess[] {
-      const takeElements = 10;
-
-      return [...this.guesses]
-        .reverse()
-        .filter(guess => guess.guess.trim().length)
-        .filter((_, i) => i < takeElements);
+    reversedGuesses(): string[] {
+      return [...this.guesses].reverse();
     }
   },
   created() {
@@ -247,6 +242,7 @@ export default defineComponent({
   methods: {
     sendGuess() {
       sendNewGuess(this.guess);
+      this.guesses = [...this.guesses, this.guess];
       this.guess = "";
       this.myTurn = false;
     },
@@ -316,7 +312,7 @@ export default defineComponent({
     },
 
     addIncomingGuess(guess: Guess) {
-      this.guesses = [...this.guesses, guess];
+      //this.guesses = [...this.guesses, guess];
     },
     updateScores(score: Score) {
       const player = this.players.find((x) => x.PlayerId == score.userId);
@@ -349,6 +345,7 @@ export default defineComponent({
       };
     },
     handleNoGuesses(guess: string) {
+      console.log("handleNoGuesses", guess);
       this.modalAlert = {
         type: getAlertType.info,
         message: getRoundAlertMessage.noGuesses(guess),

@@ -24,14 +24,14 @@ namespace backend.Core.Domain.Lobby.Services
             });
         }
         
-        public GameSlotInfo GetSlotInfo(Game game)
+        public GameSlotInfo GetSlotInfo(Guid gameId)
         {
-            if (!_games.ContainsKey(game.Id))
+            if (_games.TryGetValue(gameId, out var gameSlotInfo))
             {
-                StoreGame(game);
+                return gameSlotInfo;
             }
-            
-            return _games.TryGetValue(game.Id, out var gameSlotInfo) ? gameSlotInfo : null;
+
+            throw new Exception($"Game room with id { gameId } is not stored");
         }
         
         public bool HasAvailableSlots(Guid gameId)

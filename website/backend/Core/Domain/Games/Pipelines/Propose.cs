@@ -34,7 +34,7 @@ namespace backend.Core.Domain.Games.Pipelines
             {
                 _hub.Clients.Users(game.GuesserIds).SendAsync("Proposal", result, cancellationToken);
             }
-            return Task.FromResult(Unit.Value);
+                return Task.FromResult(Unit.Value);
             }
         }
     }

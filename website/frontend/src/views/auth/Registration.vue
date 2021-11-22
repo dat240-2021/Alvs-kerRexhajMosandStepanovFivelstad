@@ -90,7 +90,6 @@ export default defineComponent({
 
       auth
         .registrateUser(userName, password)
-        .then(() => auth.authUser(userName, password))
         .then(setCurrentUser)
         .then(() => this.$router.push({ name: "Home" }))
         .catch((e) => {

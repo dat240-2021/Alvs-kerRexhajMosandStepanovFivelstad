@@ -21,7 +21,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button  type="button" class="btn btn-secondary" @click="closeModal">Close ({{ autoCloseIn }})</button>
+          <button  type="button" class="btn btn-secondary" @click="closeModal">Leave ({{ autoCloseIn }})</button>
         </div>
       </div>
     </div>
