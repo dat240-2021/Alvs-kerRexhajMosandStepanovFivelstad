@@ -7,8 +7,6 @@ namespace backend.Core.Domain.Games {
 
         public Guid User {get; set;}
         public string Guess {get; set;}
-        public string Username {get; set;}
-
 
     }
 }
