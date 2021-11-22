@@ -6,6 +6,7 @@ namespace backend.Core.Domain.Lobby.Models
     public class Score
     {
         public int Id { get; set; }
+        public Guid GameId { get; set; }
         public Guid User { get; set; }
         public int UserScore { get; set; }
         public DateTime Date { get; set; }

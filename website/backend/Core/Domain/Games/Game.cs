@@ -184,31 +184,37 @@ namespace backend.Core.Domain.Games
 
                 if (CurrentImage.Label.Label == guess.Guess)
                 {
-
+                    var pScored = 0;
                     if (Proposer is Proposer){
-                        Events.Add( new PlayerScoredEvent{
-                            PlayerIds = PlayerIds,
-                            UserId = Guid.Parse(Proposer.GetId()),
-                            UserName = Proposer.GetUsername(),
-                            Score =  Proposer.ScoreCalc(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count)
-                            });
+                       pScored = Proposer.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
                     }
-                    Events.Add( new PlayerScoredEvent{
-                        PlayerIds = PlayerIds,
-                        UserId = guesser.Id,
-                        UserName = guesser.UserName,
-                        Score = guesser.ScoreCalc(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count)
-                        });
+
+                   var gScored = guesser.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
+
+                    Events.Add(new CorrectGuessEvent(){
+                        PlayerIds = PlayerIds.ToArray(),
+                        Guesser = guesser,
+                        GuesserScored = gScored,
+                        Proposer = Proposer,
+                        ProposerScored = pScored,
+                        Guess = guess.Guess,
+                        HasMoreRounds = Images.Count>0,
+                        WillAutoContinue = Images.Count>0 && Proposer is Oracle,
+                        Image = CurrentImage,
+                    });
 
                     NextImage();
                     return true;
-                    //other guessers can keep guessing until time runs out.
                 }
 
                 if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
                 {
                     if (CurrentImage.Slices.Count == SlicesShown.Count)
                     {
+                        Events.Add(new FullyVisibleImageWithoutCorrectGuessesEvent(){
+                            PlayerIds = PlayerIds.ToArray(),
+                            Guess = CurrentImage.Label.Label
+                        });
                         NextImage();
                     }
                     else

@@ -24,7 +24,8 @@ namespace backend.Core.Domain.Lobby.Handlers
             _LobbyService = LobbyService ?? throw new System.ArgumentException(nameof(LobbyService));
             _hubContext = hubContext ?? throw new System.ArgumentException(nameof(hubContext));
         }
-        
+
+
         public async Task Handle(GameStarted notification, CancellationToken cancellationToken)
         {
             var playerIds = _LobbyService.GetSlotInfo(notification.Game.Id).PlayerIds;
