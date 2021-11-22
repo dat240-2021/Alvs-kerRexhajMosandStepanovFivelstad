@@ -27,10 +27,11 @@ namespace backend.Controllers.Authentication
         public async Task<IActionResult> Post(UserRequestDto user){
             var result = await _mediator.Send(new RegisterUser.Request(user.Username,user.Password));
 
-            if (!result.Success) return UnprocessableEntity(result.errors);
-            
-            return Ok(new UserResponseDto(user.Username));
+            if (result.Success){
+                return Ok(new UserResponseDto(user.Username));
+            }
 
+            return UnprocessableEntity(result.errors);
         }
     }
 

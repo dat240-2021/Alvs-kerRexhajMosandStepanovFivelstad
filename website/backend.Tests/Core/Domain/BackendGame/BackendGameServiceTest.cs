@@ -49,7 +49,7 @@ namespace backend.Tests.Core.Domain.Lobby
             service.JoinGame(game.Id, user.Id, SlotRole.Guesser);
             Assert.False(service.HasAvailableSlots(game.Id));
 
-            var slotInfo = service.GetSlotInfo(game);
+            var slotInfo = service.GetSlotInfo(game.Id);
             Assert.Contains(userId, slotInfo.GuessersIds);
         }
         

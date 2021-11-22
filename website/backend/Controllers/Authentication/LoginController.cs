@@ -1,13 +1,18 @@
+using System;
 using System.Threading.Tasks;
 using backend.Controllers.Authentication.Dto;
+using backend.Hubs;
 using Controllers.Authentication.Dto;
 using Controllers.Generics;
 using Domain.Authentication.Pipelines;
+using Domain.Authentication.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging; // using Microsoft.AspNetCore.Http.StatusCode;
+using Microsoft.AspNetCore.SignalR;
+// using Microsoft.AspNetCore.Http.StatusCode;
+using Microsoft.Extensions.Logging;
 
-namespace backend.Controllers.Authentication
+namespace Controllers.Authentication
 {
     
     // [Route("[controller]")]
@@ -26,10 +31,8 @@ namespace backend.Controllers.Authentication
         [HttpPost]
         public async Task<IActionResult> Post(UserRequestDto user)
         {
-            if ( (await _mediator.Send(new LoginUser.Request(user.Username,user.Password))).Success )
-            {
-                var currentUser = await _mediator.Send(new GetCurrentUser.Request());
-                return Ok(new UserResponseDto(currentUser?.Id, currentUser?.UserName));
+            if ( (await _mediator.Send(new LoginUser.Request(user.Username,user.Password))).Success ){
+                return Ok(new UserResponseDto(user.Username));
             }
 
             return Unauthorized();

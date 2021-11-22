@@ -5,7 +5,7 @@ namespace backend.Core.Domain.Games.Events
 {
     public record FullyVisibleImageWithoutCorrectGuessesEvent: BaseDomainEvent
     {
-        public Guid GameId;
+        public string[] PlayerIds;
         public string Guess;
     }
 }

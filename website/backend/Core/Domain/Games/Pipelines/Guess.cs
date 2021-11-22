@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Infrastructure.Data;
 using MediatR;
-using System.Linq;
-using backend.Core.Domain.Games.Events;
-using backend.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using System.Linq;
+using backend.Hubs;
 
 namespace backend.Core.Domain.Games.Pipelines
 {
@@ -15,30 +15,32 @@ namespace backend.Core.Domain.Games.Pipelines
 
         public class Handler: IRequestHandler<Request,Unit>
         {
-            
-            private readonly IGameService _service;
-            private readonly IHubContext<GameHub> _hub;
-            
-            public Handler(IGameService service, IHubContext<GameHub> hub)
+
+            private GameContext _db;
+            private IGameService _service;
+            private IHubContext<GameHub> _hub;
+            public Handler(GameContext db, IGameService service, IHubContext<GameHub> hub)
             {
-                _service = service ?? throw new ArgumentNullException(nameof(service));
-                _hub = hub;
+                _db = db ?? throw new System.ArgumentNullException(nameof(db));
+                _service = service ?? throw new System.ArgumentNullException(nameof(service));
+                _hub = hub ?? throw new System.ArgumentNullException(nameof(hub));
             }
 
-            public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
+            public Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
-                var game = _service.GetByUserId(request.User);
+                Game game = _service.GetByUserId(request.User);
 
-                if (game is null) return Unit.Value;
-                
-                var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
+                if (game is not null)
+                {
+                    var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
 
+                    if (result)
+                    {
+                        _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", request, cancellationToken);
+                    }
+                }
 
-                if (!result) return Unit.Value;
-                
-                await _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", request, cancellationToken);
-
-                return Unit.Value;
+                return Task.FromResult(Unit.Value);
             }
         }
     }

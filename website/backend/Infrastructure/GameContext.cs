@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
-
 namespace Infrastructure.Data
 {
     public class GameContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>

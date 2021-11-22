@@ -20,8 +20,7 @@ namespace backend.Core.Domain.Games.Handlers
 
         public async Task Handle(FullyVisibleImageWithoutCorrectGuessesEvent notification, CancellationToken cancellationToken)
         {
-            var game = _service.Get(notification.GameId);
-            await _hub.Clients.Users(game.PlayerIds).SendAsync("ImageFullyVisibleWithNoCorrectGuesses", notification.Guess, cancellationToken);
+            await _hub.Clients.Users(notification.PlayerIds).SendAsync("ImageFullyVisibleWithNoCorrectGuesses", notification.Guess, cancellationToken);
         }
     }
 }
