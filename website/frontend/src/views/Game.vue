@@ -8,7 +8,13 @@
   </div>
   <div class="container min-vh-100">
     <div class="row mt-3">
-      <div v-if="!isOver" class="text-center turn-label rounded mb-4" :class="{ 'bg-success': myTurn, 'bg-danger': !myTurn }">{{ turnLabel }}</div>
+      <div
+        v-if="!isOver"
+        class="text-center turn-label rounded mb-4"
+        :class="{ 'bg-success': myTurn, 'bg-danger': !myTurn }"
+      >
+        {{ turnLabel }}
+      </div>
       <div class="d-flex" v-if="!isProposer && started">
         <div class="ms-auto">
           <p>
@@ -29,7 +35,11 @@
               :disabled="!myTurn"
             />
             <div class="input-group-prepend">
-              <button class="btn btn-outline-primary" type="submit" :disabled="!myTurn">
+              <button
+                class="btn btn-outline-primary"
+                type="submit"
+                :disabled="!myTurn"
+              >
                 Guess
               </button>
             </div>
@@ -40,21 +50,23 @@
       <div class="row">
         <div class="col d-flex flex-column pb-3">
           <h2 v-if="isProposer" class="text-center">{{ this.label }}</h2>
-          <div v-if="inlineAlert" class="alert" :class="inlineAlert.type">{{ this.inlineAlert.message }}</div>
+          <div v-if="inlineAlert" class="alert" :class="inlineAlert.type">
+            {{ this.inlineAlert.message }}
+          </div>
         </div>
       </div>
       <div class="row">
         <div class="col-1">
           <table>
             <thead>
-            <tr>
-              <th>Guesses:</th>
-            </tr>
+              <tr>
+                <th>Guesses:</th>
+              </tr>
             </thead>
             <tbody>
-            <tr v-for="(guess, i) in latestValidGuesses" :key="'guess_' + i">
-              <td>{{ guess.user }} : {{ guess.guess }}</td>
-            </tr>
+              <tr v-for="(guess, i) in latestValidGuesses" :key="'guess_' + i">
+                <td>{{ guess.user }} : {{ guess.guess }}</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -70,7 +82,10 @@
               </div>
               <span class="ms-5">Waiting for game to start...</span>
             </div>
-            <div v-if="isResetGuesser" class="d-flex justify-content-center m-5">
+            <div
+              v-if="isResetGuesser"
+              class="d-flex justify-content-center m-5"
+            >
               <div>
                 <div
                   class="spinner-border"
@@ -95,15 +110,15 @@
         <div class="col-2">
           <table>
             <thead>
-            <tr>
-              <th>Players:</th>
-            </tr>
+              <tr>
+                <th>Players:</th>
+              </tr>
             </thead>
             <tbody>
-            <tr v-for="p in sortedPlayers" :key="p.PlayerId">
-              <td>{{ p.Name }}</td>
-              <td>{{ p.Score }}</td>
-            </tr>
+              <tr v-for="p in sortedPlayers" :key="p.Name">
+                <td>{{ p.Name }}</td>
+                <td>{{ p.Score }}</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -127,7 +142,7 @@ import {
   sendNewGuess,
   sendNewProposal,
   sendConnect,
-  sendDisconnect
+  sendDisconnect,
 } from "@/api/Game";
 import * as ws from "@/api/Game/subscriptions";
 import {
@@ -135,15 +150,17 @@ import {
   ImageSlice,
   Guess,
   Player,
-  Score, CorrectGuess, User
+  Score,
+  CorrectGuess,
+  User,
 } from "@/typings";
 import { getCurrentUser } from "@/utils/auth";
 import AlertInGameModal from "@/components/Modal/AlertInGameModal.vue";
 
 interface Alert {
-  message: string,
-  type: string,
-  imageSlices: ImageSlice[] | null
+  message: string;
+  type: string;
+  imageSlices: ImageSlice[] | null;
 }
 
 declare interface BaseComponentData {
@@ -162,30 +179,42 @@ declare interface BaseComponentData {
 }
 
 const getRoundAlertMessage = {
-  wonRound: (willAutoContinue: boolean) => `Congrats! You won this round. Keep going! ${ willAutoContinue ? "Next round will start soon." : "" }`,
-  lostRound: (userName: string, correctGuess: string, willAutoContinue: boolean) => `Ohh no! ${ userName } won this round by guessing word ${ correctGuess }. ${ willAutoContinue ? "Next round will start soon." : "" }`,
-  winInfo: (userName: string) => `${ userName } won this round. You are doing a great job as a proposer.`,
-  noGuesses: (correctGuess: string) => `No one won this round! The correct guessing word was ${ correctGuess }`
+  wonRound: (willAutoContinue: boolean) =>
+    `Congrats! You won this round. Keep going! ${
+      willAutoContinue ? "Next round will start soon." : ""
+    }`,
+  lostRound: (
+    username: string,
+    correctGuess: string,
+    willAutoContinue: boolean
+  ) =>
+    `Ohh no! ${username} won this round by guessing word ${correctGuess}. ${
+      willAutoContinue ? "Next round will start soon." : ""
+    }`,
+  winInfo: (username: string) =>
+    `${username} won this round. You are doing a great job as a proposer.`,
+  noGuesses: (correctGuess: string) =>
+    `No one won this round! The correct guessing word was ${correctGuess}`,
 };
 
 const getGameAlertMessage = {
-  won: (score: number) => `You won the game! Your score is ${ score }.`,
-  lost: (score: number, highestScore: number, winnerName: string) => `You lost the game! You gathered ${ score } points. Highest score is ${ highestScore } by ${ winnerName }.`,
-  proposer: (score: number, userName: string) => `Game is finished. Your score is ${ score }. Winner is ${ userName }`,
+  won: (score: number) => `You won the game! Your score is ${score}.`,
+  lost: (score: number, highestScore: number, winnerName: string) =>
+    `You lost the game! You gathered ${score} points. Highest score is ${highestScore} by ${winnerName}.`,
+  proposer: (score: number, username: string) =>
+    `Game is finished. Your score is ${score}. Winner is ${username}`,
 };
-
 
 const getAlertType = {
   won: "alert-success",
   lost: "alert-danger",
-  info: "alert-warning"
+  info: "alert-warning",
 };
-
 
 export default defineComponent({
   name: "Game",
   components: {
-    AlertInGameModal
+    AlertInGameModal,
   },
   data(): BaseComponentData {
     return {
@@ -205,7 +234,7 @@ export default defineComponent({
       //player: '',
       modalAlert: null,
       inlineAlert: null,
-      isOver: false
+      isOver: false,
     };
   },
   computed: {
@@ -217,7 +246,7 @@ export default defineComponent({
     isResetGuesser: function (): boolean {
       return this.started && !this.isProposer && this.imageSlices.length == 0;
     },
-    turnLabel: function(): string {
+    turnLabel: function (): string {
       if (this.myTurn) {
         return "Your turn";
       }
@@ -232,9 +261,9 @@ export default defineComponent({
 
       return [...this.guesses]
         .reverse()
-        .filter(guess => guess.guess.trim().length)
+        .filter((guess) => guess.guess.trim().length)
         .filter((_, i) => i < takeElements);
-    }
+    },
   },
   created() {
     this.subscribeToGame();
@@ -319,53 +348,79 @@ export default defineComponent({
       this.guesses = [...this.guesses, guess];
     },
     updateScores(score: Score) {
-      const player = this.players.find((x) => x.PlayerId == score.userId);
+      const player = this.players.find((x) => x.Name == score.PlayerName);
       if (player) {
-        player.Score += score.score;
+        player.Score = score.score;
       }
     },
     handleSubmittedCorrectGuessAsGuesser(guess: CorrectGuess) {
+      if (guess.guesser != this.currentPlayer.username) {
+        return;
+      }
       if (this.isProposer) return;
       this.myTurn = false;
-      const userWin = this.currentPlayer.id === guess.userId;
+      const userWin = this.currentPlayer.username === guess.guesser;
 
       // userId should be swapped with user name
       this.modalAlert = {
-        message: userWin ? getRoundAlertMessage.wonRound(guess.willAutoContinue) : getRoundAlertMessage.lostRound(guess.userId, guess.guess, guess.willAutoContinue),
+        message: userWin
+          ? getRoundAlertMessage.wonRound(guess.willAutoContinue)
+          : getRoundAlertMessage.lostRound(
+              guess.guesser,
+              guess.guess,
+              guess.willAutoContinue
+            ),
         type: userWin ? getAlertType.won : getAlertType.lost,
-        imageSlices: guess.image.slices
+        imageSlices: guess.image.slices,
       };
     },
-
     handleSubmittedCorrectGuessAsProposer(guess: CorrectGuess) {
+      if (guess.proposer != this.currentPlayer.username) {
+        return;
+      }
       if (!this.isProposer) return;
       this.myTurn = true;
 
       // userId should be swapped with user name
       this.modalAlert = {
         type: getAlertType.info,
-        message: getRoundAlertMessage.winInfo(guess.userId),
-        imageSlices: guess.image.slices
+        message: getRoundAlertMessage.winInfo(guess.guesser),
+        imageSlices: guess.image.slices,
       };
+    },
+    handleCorrectGuess(guess: CorrectGuess) {
+      let player = this.players.find((x) => x.Name == guess.guesser);
+      if (player != null) {
+        player.Score = guess.newGuesserScore;
+      } else {
+        this.players = [
+          ...this.players,
+          { Name: guess.guesser, Score: guess.newGuesserScore } as Player,
+        ];
+      }
     },
     handleNoGuesses(guess: string) {
       this.modalAlert = {
         type: getAlertType.info,
         message: getRoundAlertMessage.noGuesses(guess),
-        imageSlices: null
+        imageSlices: null,
       };
     },
-    handleGameOver(guessersScore: Map<string, number>, proposerScore: number | null) {
+    handleGameOver(
+      guessersScore: Map<string, number>,
+      proposerScore: number | null
+    ) {
       this.isOver = true;
-      const highestScore = [...guessersScore.entries()]
-        .reduce((acc, el) => el[1] < acc.score ? acc : { id: el[0], score: el[1] }, { id: "", score: 0 });
-
+      const highestScore = [...guessersScore.entries()].reduce(
+        (acc, el) => (el[1] < acc.score ? acc : { id: el[0], score: el[1] }),
+        { id: "", score: 0 }
+      );
 
       if (this.isProposer && proposerScore) {
         this.inlineAlert = {
           type: getAlertType.info,
           message: getGameAlertMessage.proposer(proposerScore, highestScore.id),
-          imageSlices: null
+          imageSlices: null,
         };
         return;
       }
@@ -373,16 +428,20 @@ export default defineComponent({
       const playerScore = guessersScore.get(this.currentPlayer.id) ?? 0;
       const isWinner = highestScore.id === this.currentPlayer.id;
 
-
-
       if (this.modalAlert?.imageSlices) {
         this.imageSlices = this.modalAlert.imageSlices;
       }
 
       this.inlineAlert = {
         type: isWinner ? getAlertType.won : getAlertType.lost,
-        message: isWinner ? getGameAlertMessage.won(playerScore) : getGameAlertMessage.lost(playerScore, highestScore.score, highestScore.id),
-        imageSlices: null
+        message: isWinner
+          ? getGameAlertMessage.won(playerScore)
+          : getGameAlertMessage.lost(
+              playerScore,
+              highestScore.score,
+              highestScore.id
+            ),
+        imageSlices: null,
       };
     },
 
@@ -399,6 +458,7 @@ export default defineComponent({
       ws.subscribeToProposersTurn(this.proposersTurn);
       ws.subscribeToNewImageProposer(this.newImageProposer);
       ws.subscribeToCorrectGuess(this.handleSubmittedCorrectGuessAsProposer);
+      ws.subscribeToCorrectGuess(this.handleCorrectGuess);
 
       /// Received by all
       ws.subscribeToPlayerScores(this.updateScores);
@@ -408,6 +468,7 @@ export default defineComponent({
       ws.subscribeToNoneGuessedCorrectly(this.handleNoGuesses);
     },
     unsubscribeToGame() {
+      ws.unsubscribeToCorrectGuess(this.handleCorrectGuess);
       ws.unsubscribeToGuessersTurn(this.guessersTurn);
       ws.unsubscribeToNewProposal(this.addSlice);
       ws.unsubscribeToNewImageGuesser(this.newImageGuesser);

@@ -1,6 +1,6 @@
 export interface User {
   id: string;
-  userName: string;
+  username: string;
   isAuth: boolean;
 }
 
@@ -86,18 +86,21 @@ export interface Guess {
 }
 
 export interface Score {
-  userId: string;
+  PlayerName: string;
   score: number;
 }
 
 export interface Player {
   Name: string;
   Score: number;
-  PlayerId: string;
+  // PlayerId: string;
 }
 
 export interface CorrectGuess {
-  userId: string;
+  newGuesserScore: number;
+  newProposerScore: number;
+  guesser: string;
+  proposer: string;
   image: Image;
   guess: string;
   hasMoreRounds: boolean;
