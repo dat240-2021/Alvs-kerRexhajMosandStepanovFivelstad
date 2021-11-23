@@ -323,19 +323,19 @@ export default defineComponent({
 
       let x = event.offsetX;
       let y = event.offsetY;
-      const element = event.target;
+      let element = event.target;
       x -= element.offsetLeft;
       y -= element.offsetTop;
 
       for (let slice of this.imageSlices) {
-        const img = document.getElementById(
+        let img = document.getElementById(
           slice.id.toString()
         ) as HTMLImageElement;
 
         let canvas = document.createElement("canvas");
         canvas.width = img.width;
         canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
+        let ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, img.width, img.height);
 
         let alpha = ctx?.getImageData(x, y, 1, 1)?.data[3];
@@ -351,7 +351,7 @@ export default defineComponent({
       this.guesses = [...this.guesses, guess];
     },
     updateScores(score: Score) {
-      const player = this.players.find((x) => x.Name == score.PlayerName);
+      let player = this.players.find((x) => x.Name == score.PlayerName);
       if (player) {
         player.Score = score.score;
       }
@@ -362,7 +362,7 @@ export default defineComponent({
       }
       if (this.isProposer) return;
       this.myTurn = false;
-      const userWin = this.currentPlayer.username === guess.guesser;
+      let userWin = this.currentPlayer.username === guess.guesser;
 
       // userId should be swapped with user name
       this.modalAlert = {
@@ -413,9 +413,10 @@ export default defineComponent({
         imageSlices: null,
       };
     },
-    handleGameOver() {
+    async handleGameOver() {
+      await new Promise(resolve => setTimeout(resolve, 1000));
       this.isOver = true;
-      const highestScore = this.sortedPlayers[0];
+      let highestScore = this.sortedPlayers[0];
 
       if (this.isProposer && this.proposerScore) {
         this.inlineAlert = {
@@ -432,7 +433,7 @@ export default defineComponent({
           playerScore = player.Score;
       }
 
-      const isWinner = highestScore.Name === this.currentPlayer.username;
+      let isWinner = highestScore.Name === this.currentPlayer.username;
       if (this.modalAlert?.imageSlices) {
         this.imageSlices = this.modalAlert.imageSlices;
       }
