@@ -414,7 +414,6 @@ export default defineComponent({
       };
     },
     handleGameOver() {
-      console.log("THE FUCKING GAME IS OVER!!!")
       this.isOver = true;
       const highestScore = this.sortedPlayers[0];
 
