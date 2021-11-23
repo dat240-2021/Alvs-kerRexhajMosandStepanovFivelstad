@@ -414,7 +414,6 @@ export default defineComponent({
       };
     },
     async handleGameOver() {
-      await new Promise(resolve => setTimeout(resolve, 1000));
       this.isOver = true;
       let highestScore = this.sortedPlayers[0];
 
