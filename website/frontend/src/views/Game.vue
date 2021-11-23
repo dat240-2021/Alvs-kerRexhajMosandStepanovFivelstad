@@ -176,7 +176,7 @@ declare interface BaseComponentData {
   inlineAlert: Alert | null;
   modalAlert: Alert | null;
   isOver: boolean;
-  proposerScore: number;
+  myScore: number;
 }
 
 const getRoundAlertMessage = {
@@ -237,7 +237,7 @@ export default defineComponent({
       inlineAlert: null,
       isOver: false,
 
-      proposerScore: 0,
+      myScore: 0,
     };
   },
   computed: {
@@ -378,9 +378,6 @@ export default defineComponent({
       };
     },
     handleSubmittedCorrectGuessAsProposer(guess: CorrectGuess) {
-      if (guess.proposer != this.currentPlayer.username) {
-        return;
-      }
       if (!this.isProposer) return;
       this.myTurn = true;
 
@@ -403,7 +400,11 @@ export default defineComponent({
       }
 
       if (this.isProposer){
-        this.proposerScore = guess.newProposerScore;
+        this.myScore = guess.newProposerScore;
+      }
+
+      if (this.currentPlayer.username == guess.guesser){
+        this.myScore = guess.newGuesserScore;
       }
     },
     handleNoGuesses(guess: string) {
@@ -417,19 +418,13 @@ export default defineComponent({
       this.isOver = true;
       let highestScore = this.sortedPlayers[0];
 
-      if (this.isProposer && this.proposerScore) {
+      if (this.isProposer) {
         this.inlineAlert = {
           type: getAlertType.info,
-          message: getGameAlertMessage.proposer(this.proposerScore, highestScore.Name),
+          message: getGameAlertMessage.proposer(highestScore.Score, highestScore.Name),
           imageSlices: null,
         };
         return;
-      }
-
-      let player = this.players.find( p => p.Name == this.currentPlayer.username );
-      let playerScore = 0
-      if (player){
-          playerScore = player.Score;
       }
 
       let isWinner = highestScore.Name === this.currentPlayer.username;
@@ -440,9 +435,9 @@ export default defineComponent({
       this.inlineAlert = {
         type: isWinner ? getAlertType.won : getAlertType.lost,
         message: isWinner
-          ? getGameAlertMessage.won(playerScore)
+          ? getGameAlertMessage.won(highestScore.Score)
           : getGameAlertMessage.lost(
-              playerScore,
+              this.myScore,
               highestScore.Score,
               highestScore.Name
             ),
