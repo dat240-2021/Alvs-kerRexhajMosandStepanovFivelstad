@@ -174,20 +174,33 @@ namespace backend.Core.Domain.Games
 
 
         //returns bool, which implies this guess should be broadcast to all players
-        public (bool broadCast,string user) Guess(GuessDto guess)
+        public void Guess(GuessDto guess)
         {
             Guesser guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
 
-            if (!ProposersTurn && !guesser.Guessed && CurrentImage is not null)
+            if (ProposersTurn || guesser.Guessed || CurrentImage is null)
             {
-                guesser.Guessed = true;
+                return;
+            }
 
-                if (CurrentImage.Label.Label == guess.Guess)
-                {
-                    var pScored = 0;
-                    if (Proposer is Proposer){
-                       pScored = Proposer.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
-                    }
+            //implies the guessers guess was valid, therefore we can add the event right after it.
+            guesser.Guessed = true;
+
+            //Add the guess event no even if its correct or not.
+            Events.Add(new BroadcastGuessEvent(){
+                PlayerIds = PlayerIds,
+                Guess = guess.Guess,
+                Username = guesser.Username,
+                });
+
+
+            //if correct guess
+            if (CurrentImage.Label.Label == guess.Guess)
+            {
+                var pScored = 0;
+                if (Proposer is Proposer){
+                    pScored = Proposer.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
+                }
 
                    var gScored = guesser.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
 
@@ -203,8 +216,9 @@ namespace backend.Core.Domain.Games
                         Image = CurrentImage,
                     });
 
+
                     NextImage();
-                    return (true,guesser.Username);
+                    return;
                 }
 
                 if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
@@ -226,11 +240,7 @@ namespace backend.Core.Domain.Games
                         }
                     }
                 }
-
-                // Implies valid guess -> broadcasted by hub
-                return (true,guesser.Username);
-            }
-            return (false,"");
+                return;
         }
 
 

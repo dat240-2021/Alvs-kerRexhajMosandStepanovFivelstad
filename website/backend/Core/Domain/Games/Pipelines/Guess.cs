@@ -31,18 +31,7 @@ namespace backend.Core.Domain.Games.Pipelines
 
                 if (game is not null)
                 {
-                    var result = game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
-
-
-                    if (result.broadCast)
-                    {
-                        var response = new GuessResponseDto(){
-                            Guess = request.Guess,
-                            User = result.user
-                        };
-
-                        _hub.Clients.Users(game.PlayerIds).SendAsync("Guess", response, cancellationToken);
-                    }
+                    game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
                 }
 
                 return Task.FromResult(Unit.Value);
