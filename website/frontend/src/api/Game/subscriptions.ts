@@ -26,10 +26,7 @@ export let correctGuessHandlers: ((guess: CorrectGuess) => void)[] = [];
 
 export let noCorrectGuessesHandlers: ((guess: string) => void)[] = [];
 
-export let gameOverHandlers: ((
-  guessersScore: Map<string, number>,
-  proposerScore: number | null
-) => void)[] = [];
+export let gameOverHandlers: (() => void)[] = [];
 
 /*
 
@@ -73,12 +70,7 @@ export const subscribeToCorrectGuess = (cb: (guess: CorrectGuess) => void) => {
   correctGuessHandlers = [...correctGuessHandlers, cb];
 };
 
-export const subscribeToGameOver = (
-  cb: (
-    guessersScores: Map<string, number>,
-    proposerScore: number | null
-  ) => void
-) => {
+export const subscribeToGameOver = (cb: () => void) => {
   gameOverHandlers = [...gameOverHandlers, cb];
 };
 

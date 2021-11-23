@@ -61,12 +61,8 @@ gameHubConnection.on(
   }
 );
 
-gameHubConnection.on("GameOver", (guessersScores, proposerScore) => {
-  const scoresMap = new Map(Object.entries(guessersScores)) as Map<
-    string,
-    number
-  >;
-  gameOverHandlers.forEach((handler) => handler(scoresMap, proposerScore));
+gameHubConnection.on("GameOver", () => {
+  gameOverHandlers.forEach((handler) => handler());
 });
 
 export const sendNewGuess = (val: string): void => {

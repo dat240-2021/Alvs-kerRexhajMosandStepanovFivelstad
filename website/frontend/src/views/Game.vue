@@ -176,6 +176,7 @@ declare interface BaseComponentData {
   inlineAlert: Alert | null;
   modalAlert: Alert | null;
   isOver: boolean;
+  proposerScore: number;
 }
 
 const getRoundAlertMessage = {
@@ -235,6 +236,8 @@ export default defineComponent({
       modalAlert: null,
       inlineAlert: null,
       isOver: false,
+
+      proposerScore: 0,
     };
   },
   computed: {
@@ -398,6 +401,10 @@ export default defineComponent({
           { Name: guess.guesser, Score: guess.newGuesserScore } as Player,
         ];
       }
+
+      if (this.isProposer){
+        this.proposerScore = guess.newProposerScore;
+      }
     },
     handleNoGuesses(guess: string) {
       this.modalAlert = {
@@ -406,28 +413,27 @@ export default defineComponent({
         imageSlices: null,
       };
     },
-    handleGameOver(
-      guessersScore: Map<string, number>,
-      proposerScore: number | null
-    ) {
+    handleGameOver() {
+      console.log("THE FUCKING GAME IS OVER!!!")
       this.isOver = true;
-      const highestScore = [...guessersScore.entries()].reduce(
-        (acc, el) => (el[1] < acc.score ? acc : { id: el[0], score: el[1] }),
-        { id: "", score: 0 }
-      );
+      const highestScore = this.sortedPlayers[0];
 
-      if (this.isProposer && proposerScore) {
+      if (this.isProposer && this.proposerScore) {
         this.inlineAlert = {
           type: getAlertType.info,
-          message: getGameAlertMessage.proposer(proposerScore, highestScore.id),
+          message: getGameAlertMessage.proposer(this.proposerScore, highestScore.Name),
           imageSlices: null,
         };
         return;
       }
 
-      const playerScore = guessersScore.get(this.currentPlayer.id) ?? 0;
-      const isWinner = highestScore.id === this.currentPlayer.id;
+      let player = this.players.find( p => p.Name == this.currentPlayer.username );
+      let playerScore = 0
+      if (player){
+          playerScore = player.Score;
+      }
 
+      const isWinner = highestScore.Name === this.currentPlayer.username;
       if (this.modalAlert?.imageSlices) {
         this.imageSlices = this.modalAlert.imageSlices;
       }
@@ -438,8 +444,8 @@ export default defineComponent({
           ? getGameAlertMessage.won(playerScore)
           : getGameAlertMessage.lost(
               playerScore,
-              highestScore.score,
-              highestScore.id
+              highestScore.Score,
+              highestScore.Name
             ),
         imageSlices: null,
       };
