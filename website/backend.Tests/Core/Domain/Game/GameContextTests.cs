@@ -28,7 +28,9 @@ namespace backend.Tests.Core.Domain.Games
             );
             game.Update();
 
-            Assert.False(game.Guess(new GuessDto() { User = user, Guess = "guess" }));
+            game.Guess(new GuessDto() { User = user, Guess = "guess" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 0);
+
         }
 
         [Fact]
@@ -47,7 +49,8 @@ namespace backend.Tests.Core.Domain.Games
             game.Update();
 
             game.Propose(3);
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "guess" }));
+            game.Guess(new GuessDto() { User = user, Guess = "guess" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
         }
 
         [Fact]
@@ -66,7 +69,9 @@ namespace backend.Tests.Core.Domain.Games
             game.Update();
 
             game.Propose(3);
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
+            game.Guess(new GuessDto() { User = user, Guess = "test" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
+
             Assert.Contains(game.Events, x => x is GameOverEvent);
         }
 
@@ -93,21 +98,25 @@ namespace backend.Tests.Core.Domain.Games
             game.Propose(1);
 
             // Valid guess. Guess is also correct.
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
+            game.Guess(new GuessDto() { User = user, Guess = "test" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
+
             Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
             // Propose tile 1 of image2
             game.Propose(1);
 
             // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test2" }));
+            game.Guess(new GuessDto() { User = user, Guess = "test2" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 2);
             Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
             // Propose tile 1 of image3
             game.Propose(1);
 
             // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user, Guess = "test" }));
+            game.Guess(new GuessDto() { User = user, Guess = "test" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 3);
 
             // No more tiles to propose. Game ends.
             Assert.Contains(game.Events, x => x is GameOverEvent);
@@ -133,10 +142,14 @@ namespace backend.Tests.Core.Domain.Games
             game.Propose(1);
 
             // Valid and correct guess.
-            Assert.True(game.Guess(new GuessDto() { User = user2, Guess = "test" }));
+            game.Guess(new GuessDto() { User = user2, Guess = "test" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
+
 
             // Game has now ended, so further guesses are denied.
-            Assert.False(game.Guess(new GuessDto() { User = user1, Guess = "test1" }));
+            game.Guess(new GuessDto() { User = user1, Guess = "test1" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
+
             Assert.Contains(game.Events, x => x is GameOverEvent);
         }
 
@@ -165,26 +178,37 @@ namespace backend.Tests.Core.Domain.Games
             game.Propose(1);
 
             // Valid guess. Guess is also correct.
-            Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test" }));
+            game.Guess(new GuessDto() { User = user1, Guess = "test" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
+
 
             // Previous guess was correct. This guess fails because it's the proposers turn now.
-            Assert.False(game.Guess(new GuessDto() { User = user2, Guess = "test" }));
+            game.Guess(new GuessDto() { User = user2, Guess = "test" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
             Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
             // Propose tile 1 of image2
             game.Propose(1);
 
             // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test2" }));
+            game.Guess(new GuessDto() { User = user1, Guess = "test2" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 2);
+
             Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
 
             // Propose tile 1 of image3
             game.Propose(1);
-            Assert.True(game.Guess(new GuessDto() { User = user2, Guess = "test2" }));
-            Assert.True(game.Guess(new GuessDto() { User = user3, Guess = "test2" }));
+            game.Guess(new GuessDto() { User = user2, Guess = "test2" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 3);
+
+            game.Guess(new GuessDto() { User = user3, Guess = "test2" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 4);
+
 
             // Valid guess, even though guess is incorrect.
-            Assert.True(game.Guess(new GuessDto() { User = user1, Guess = "test" }));
+            game.Guess(new GuessDto() { User = user1, Guess = "test" });
+            Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 5);
+
 
             // No more tiles to propose. Game ends.
             Assert.True(game.Propose(1) is null);
