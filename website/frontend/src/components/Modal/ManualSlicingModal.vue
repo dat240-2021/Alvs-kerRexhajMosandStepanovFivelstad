@@ -187,14 +187,7 @@ export default defineComponent({
   },
   methods: {
     imageLoaded(event: any) {
-      // // document.getElementById("canvas_modal").style();
-      // if (event.target.width > event.target.height) {
-      //   // if the image is wider than its tall,
-      //   // 80 vh should ensure it won't exceed window height
-      //   event.target.style = "width:80vh;";
-      // } else {
-      //   event.target.style = "height:50vh;";
-      // }
+
       if (this.modalImage.sliceFile != "") {
         this.reloadData(this.modalImage.sliceFile);
       }

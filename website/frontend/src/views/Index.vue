@@ -4,7 +4,10 @@
       <h1>Image Quizzer</h1>
     </div>
     <div class="d-flex justify-content-center">
-      <img :src="require('@/assets/horse.png')" class="img-fluid img-thumbnail rounded"/>
+      <img
+        :src="require('@/assets/horse.png')"
+        class="img-fluid img-thumbnail rounded"
+      />
     </div>
     <div class="d-grid gap-3 d-md-flex justify-content-center h-10 mt-3">
       <router-link class="btn btn-primary" to="/login">Login</router-link>
