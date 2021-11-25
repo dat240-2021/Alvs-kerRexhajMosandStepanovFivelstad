@@ -45,9 +45,13 @@ namespace backend.Core.Domain.Games.Handlers
                 {
                     var score = await db.Scores
                         .Where(x => x.User == player.id)
-                        .FirstOrDefaultAsync()
-                        ?? new Score(player.id, 0);
-                    
+                        .FirstOrDefaultAsync();
+
+                    if (score is null){
+                    score = new Score(player.id, 0);
+                    db.Add(score);
+                    }
+
                     score.UserScore += player.score;
                 }
 
