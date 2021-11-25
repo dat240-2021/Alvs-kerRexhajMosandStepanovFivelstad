@@ -190,11 +190,12 @@ export default defineComponent({
       reader.readAsDataURL(file);
     },
     async onUploadImage() {
+      this.successText="";
       if (this.images.length < 1) {
         this.error = "Upload at least one file!";
       }
       let imagesContainEmptyfields = this.images.find(
-        (x) => x.label == "" && x.category == ""
+        (x) => x.label == "" || x.category == ""
       );
       if (imagesContainEmptyfields != undefined) {
         this.error = "Please fill in all fields!";
