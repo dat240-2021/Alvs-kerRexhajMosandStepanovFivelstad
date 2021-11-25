@@ -28,22 +28,22 @@
               UploadFiles
             </button>
           </div>
-          <div v-if="!loading">
-            <p v-if="images.length > 1">{{ images.length }} Files selected</p>
-          </div>
-          <div v-else class="d-flex">
-            <div
-              class="spinner-border text-primary align-self-center"
-              role="status"
-            ></div>
-            <div class="align-self-center">
-              <p class="m-2">Processing {{ images.length }} files</p>
-            </div>
-          </div>
         </div>
       </form>
     </div>
     <div>
+      <div v-if="!loading">
+        <p v-if="images.length > 0">{{ images.length }} Files selected</p>
+      </div>
+      <div v-else class="d-flex">
+        <div
+          class="spinner-border text-primary align-self-center"
+          role="status"
+        ></div>
+        <div class="align-self-center">
+          <p class="m-2">Processing {{ images.length }} files</p>
+        </div>
+      </div>
       <p v-if="successText.length > 2" class="text-success">
         {{ successText }}
       </p>
