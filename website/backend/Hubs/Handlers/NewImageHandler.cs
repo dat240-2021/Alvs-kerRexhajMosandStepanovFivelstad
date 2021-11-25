@@ -25,7 +25,7 @@ namespace backend.Hubs.Handlers
 
         public async Task Handle(NewImageEvent notification, CancellationToken cancellationToken)
         {
-            using (var scope = _scopeFactory.CreateScope()) 
+            using (var scope = _scopeFactory.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<GameContext>();
                 var image = await db.Images
@@ -33,8 +33,8 @@ namespace backend.Hubs.Handlers
                     .Include(image => image.Slices)
                     .Include(image => image.Label)
                     .ThenInclude(label => label.Category)
-                    .FirstOrDefaultAsync(); 
-            
+                    .FirstOrDefaultAsync();
+
                 if (notification.ProposerId is not null)
                 {
                     await _hub.Clients.User(notification.ProposerId).SendAsync("NewImageProposer", image, cancellationToken);
