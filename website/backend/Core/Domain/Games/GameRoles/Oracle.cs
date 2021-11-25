@@ -25,9 +25,7 @@ namespace backend.Core.Domain.Games
             GameId = id;
         }
 
-        public int ScorePlayer(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
-            return -1;
-        }
+        public int CalculateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices) => -1;
 
         public void NotifyTurn(){
         }

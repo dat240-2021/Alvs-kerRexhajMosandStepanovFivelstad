@@ -16,8 +16,8 @@ namespace backend.Core.Domain.Games
     public class Game : BaseEntity
     {
         public Guid Id { get; protected set; }
-        private GameState State = GameState.Created;
-        public DateTime StartTime = DateTime.Now;
+        public GameState State = GameState.Created;
+        private DateTime _startTime = DateTime.Now;
         public TimeSpan RoundTime;
 
         public Image CurrentImage;
@@ -42,9 +42,8 @@ namespace backend.Core.Domain.Games
                 return list;
             }
         }
-        public Queue<Image> Images;
-        public List<int> SlicesShown = new();
-        public int nProposes { get => SlicesShown.Count(); }
+        private Queue<Image> _images;
+        private List<int> _proposals = new();
 
         private bool _proposersTurn;
 
@@ -66,6 +65,7 @@ namespace backend.Core.Domain.Games
                 }
                 else
                 {
+                    Guessers.ForEach(guesser => guesser.Guessed = false);
                     Events.Add(new GuessersTurnEvent() { PlayerIds = PlayerIds });
                 }
                 _proposersTurn = value;
@@ -75,7 +75,7 @@ namespace backend.Core.Domain.Games
         public Game(Guid id, List<Image> images, List<Guesser> guessers, IProposer proposer)
         {
             _proposersTurn = true;
-            Images = new Queue<Image>(images);
+            _images = new Queue<Image>(images);
             Id = id;
             Proposer = proposer;
             Guessers = guessers;
@@ -83,7 +83,12 @@ namespace backend.Core.Domain.Games
 
         public void ConnectUser(Guid userId)
         {
-            Guessers.Find(g => g.Id == userId).Connected = true;
+            var guesser = Guessers.Find(g => g.Id == userId);
+
+            if (guesser is not null)
+            {
+                guesser.Connected = true;
+            }
         }
 
         public void DisconnectUser(Guid userId)
@@ -94,7 +99,7 @@ namespace backend.Core.Domain.Games
                 oracle.HandleNewImage(
                     CurrentImage.Slices
                         .Select(s => s.SequenceNumber)
-                        .Except(SlicesShown)
+                        .Except(_proposals)
                         .ToList()
                 );
                 Proposer = oracle;
@@ -112,7 +117,7 @@ namespace backend.Core.Domain.Games
 
         public void Update()
         {
-            if (State == GameState.Created && (Guessers.All(g => g.Connected) || (StartTime + TimeSpan.FromSeconds(10)) <= DateTime.Now))
+            if (State == GameState.Created && (Guessers.All(g => g.Connected) || (_startTime + TimeSpan.FromSeconds(10)) <= DateTime.Now))
             {
                 State = GameState.Active;
                 NextImage();
@@ -126,7 +131,7 @@ namespace backend.Core.Domain.Games
 
             if (!ProposersTurn && State == GameState.Active)
             {
-                if ((StartTime + RoundTime) <= DateTime.Now)
+                if ((_startTime + RoundTime) <= DateTime.Now)
                 {
                     //Toggle role turn
                     ProposersTurn = true;
@@ -136,7 +141,7 @@ namespace backend.Core.Domain.Games
 
         public void NextImage()
         {
-            Images.TryDequeue(out CurrentImage);
+            _images.TryDequeue(out CurrentImage);
 
             if (CurrentImage is null)
             {
@@ -144,12 +149,7 @@ namespace backend.Core.Domain.Games
                 return;
             }
 
-            foreach (var g in Guessers)
-            {
-                g.Guessed = false;
-            }
-
-            SlicesShown.Clear();
+            _proposals.Clear();
 
             if (Proposer is Oracle)
             {
@@ -186,33 +186,34 @@ namespace backend.Core.Domain.Games
             //implies the guessers guess was valid, therefore we can add the event right after it.
             guesser.Guessed = true;
 
-            //Add the guess event no even if its correct or not.
+            //Add the guess event even if its correct or not.
             Events.Add(new BroadcastGuessEvent(){
                 PlayerIds = PlayerIds,
                 Guess = guess.Guess,
                 Username = guesser.Username,
-                });
+            });
 
 
-            //if correct guess
+            // If guess was correct
             if (CurrentImage.Label.Label == guess.Guess)
             {
-                var pScored = 0;
+                var proposerScore = 0;
+
                 if (Proposer is Proposer){
-                    pScored = Proposer.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count, Guessers.Count);
+                    proposerScore = Proposer.CalculateScore(RoundTime, DateTime.Now - _startTime, _proposals.Count, CurrentImage.Slices.Count);
                 }
 
-                   var gScored = guesser.ScorePlayer(RoundTime, DateTime.Now - StartTime, nProposes, CurrentImage.Slices.Count);
+                var guesserScore = guesser.CalculateScore(RoundTime, DateTime.Now - _startTime, _proposals.Count, CurrentImage.Slices.Count);
 
                     Events.Add(new CorrectGuessEvent(){
                         PlayerIds = PlayerIds.ToArray(),
                         Guesser = guesser,
-                        GuesserScored = gScored,
+                        GuesserScored = guesserScore,
                         Proposer = Proposer,
-                        ProposerScored = pScored,
+                        ProposerScored = proposerScore,
                         Guess = guess.Guess,
-                        HasMoreRounds = Images.Count>0,
-                        WillAutoContinue = Images.Count>0 && Proposer is Oracle,
+                        HasMoreRounds = _images.Count > 0,
+                        WillAutoContinue = _images.Count > 0 && Proposer is Oracle,
                         Image = CurrentImage,
                     });
 
@@ -223,7 +224,7 @@ namespace backend.Core.Domain.Games
 
                 if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
                 {
-                    if (CurrentImage.Slices.Count == SlicesShown.Count)
+                    if (CurrentImage.Slices.Count == _proposals.Count)
                     {
                         Events.Add(new FullyVisibleImageWithoutCorrectGuessesEvent(){
                             PlayerIds = PlayerIds.ToArray(),
@@ -234,33 +235,23 @@ namespace backend.Core.Domain.Games
                     else
                     {
                         ProposersTurn = true;
-                        foreach (var g in Guessers)
-                        {
-                            g.Guessed = false;
-                        }
                     }
                 }
-                return;
         }
 
 
-        public ImageSlice Propose(int proposition)
+        public ImageSlice Propose(int proposal)
         {
-            if (ProposersTurn)
+            if (ProposersTurn && !_proposals.Contains(proposal) && (CurrentImage.Slices.Exists(x => x.SequenceNumber == proposal)))
             {
-                // Do proposer stuff
-                if ((!SlicesShown.Contains(proposition)) && (CurrentImage.Slices.Exists(x => x.SequenceNumber == proposition)))
-                {
-                    StartTime = DateTime.Now;
-                    foreach (var g in Guessers)
-                    {
-                        g.Guessed = false;
-                    }
-                    ProposersTurn = false;
-                    SlicesShown.Add(proposition);
-                    return CurrentImage.Slices.Find(i => i.SequenceNumber == proposition);
-                }
+                _startTime = DateTime.Now;
+
+                ProposersTurn = false;
+                _proposals.Add(proposal);
+
+                return CurrentImage.Slices.Find(i => i.SequenceNumber == proposal);
             }
+
             return null;
         }
     }

@@ -13,7 +13,7 @@ namespace backend.Core.Domain.Games.Pipelines
     {
         public record Request(Guid User, string Guess): IRequest<Unit> {}
 
-        public class Handler: IRequestHandler<Request,Unit>
+        public class Handler: IRequestHandler<Request, Unit>
         {
             private GameContext _db;
             private IGameService _service;
@@ -31,7 +31,7 @@ namespace backend.Core.Domain.Games.Pipelines
 
                 if (game is not null)
                 {
-                    game.Guess(new GuessDto(){ User = request.User, Guess = request.Guess });
+                    game.Guess(new GuessDto() { User = request.User, Guess = request.Guess });
                 }
 
                 return Task.FromResult(Unit.Value);

@@ -15,13 +15,13 @@ namespace backend.Core.Domain.Games
         {
             Id = id;
         }
-        public Proposer(Guid id,string uname)
+        public Proposer(Guid id, string username)
         {
             Id = id;
-            Username = uname;
+            Username = username;
         }
-            public int ScorePlayer(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){
-
+        public int CalculateScore(TimeSpan RoundTime, TimeSpan timeDelta, int slicesShown, int totalSlices)
+        {
             int timeScore = (int)Math.Round(RoundTime.TotalSeconds - timeDelta.TotalSeconds);
             int sliceScore = totalSlices - slicesShown;
             var newScore = timeScore * sliceScore;

@@ -15,10 +15,10 @@ namespace backend.Core.Domain.Games.Pipelines
 
         public class Handler: IRequestHandler<Request,Unit>
         {
-
             private IMediator _mediator;
             private IGameService _service;
-            public Handler(IMediator mediator, IGameService service, IHubContext<GameHub> hub)
+
+            public Handler(IMediator mediator, IGameService service)
             {
                 _mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
                 _service = service ?? throw new System.ArgumentNullException(nameof(service));

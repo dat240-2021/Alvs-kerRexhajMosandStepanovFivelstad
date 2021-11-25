@@ -27,10 +27,8 @@ namespace backend.Core.Domain.Games.Handlers
             _hubContext = hubContext;
         }
 
-
         public async Task Handle(CorrectGuessEvent notification, CancellationToken cancellationToken)
         {
-
 
             var playersToScore = new List<(Guid id, int score)>();
             playersToScore.Add((notification.Guesser.Id, notification.GuesserScored));
@@ -43,17 +41,16 @@ namespace backend.Core.Domain.Games.Handlers
             {
                 var db = scope.ServiceProvider.GetRequiredService<GameContext>();
 
-                foreach( var usr in playersToScore){
-                    var dbScore = await db.Scores.Where(x => x.User == usr.id).FirstOrDefaultAsync();
-                    if (dbScore==null){
-                        dbScore = new Score(
-                            usr.id,
-                            0
-                            );
-                        db.Add(dbScore);
-                    }
-                    dbScore.UserScore+= usr.score;
+                foreach (var player in playersToScore)
+                {
+                    var score = await db.Scores
+                        .Where(x => x.User == player.id)
+                        .FirstOrDefaultAsync()
+                        ?? new Score(player.id, 0);
+                    
+                    score.UserScore += player.score;
                 }
+
                 await db.SaveChangesAsync();
             }
 
@@ -67,6 +64,7 @@ namespace backend.Core.Domain.Games.Handlers
                 HasMoreRounds = notification.HasMoreRounds,
                 WillAutoContinue = notification.WillAutoContinue
             };
+
             await _hubContext.Clients.Users(notification.PlayerIds).SendAsync("CorrectGuess", correctGuess, cancellationToken);
         }
     }

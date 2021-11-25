@@ -72,7 +72,7 @@ namespace backend.Tests.Core.Domain.Games
             game.Guess(new GuessDto() { User = user, Guess = "test" });
             Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
 
-            Assert.Contains(game.Events, x => x is GameOverEvent);
+            Assert.True(game.State == GameState.Ended);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace backend.Tests.Core.Domain.Games
             Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 3);
 
             // No more tiles to propose. Game ends.
-            Assert.Contains(game.Events, x => x is GameOverEvent);
+            Assert.True(game.State == GameState.Ended);
         }
 
         [Fact]
@@ -150,7 +150,7 @@ namespace backend.Tests.Core.Domain.Games
             game.Guess(new GuessDto() { User = user1, Guess = "test1" });
             Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 1);
 
-            Assert.Contains(game.Events, x => x is GameOverEvent);
+            Assert.True(game.State == GameState.Ended);
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace backend.Tests.Core.Domain.Games
             game.Guess(new GuessDto() { User = user1, Guess = "test2" });
             Assert.True(game.Events.FindAll(x => x is BroadcastGuessEvent).ToArray().Length == 2);
 
-            Assert.DoesNotContain(game.Events, x => x is GameOverEvent);
+            Assert.False(game.State == GameState.Ended);
 
             // Propose tile 1 of image3
             game.Propose(1);
@@ -212,7 +212,7 @@ namespace backend.Tests.Core.Domain.Games
 
             // No more tiles to propose. Game ends.
             Assert.True(game.Propose(1) is null);
-            Assert.Contains(game.Events, x => x is GameOverEvent);
+            Assert.True(game.State == GameState.Ended);
         }
     }
 }

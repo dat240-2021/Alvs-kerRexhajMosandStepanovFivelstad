@@ -50,7 +50,7 @@ namespace backend.Core.Domain.Games.Pipelines
                     images,
                     request.Game.SlotInfo.GuessersIds.Select(g => new Guesser(
                         g,
-                        _db.Users.Where( u => u.Id==g).FirstOrDefault().UserName
+                        _db.Users.Where( u => u.Id == g).FirstOrDefault().UserName
                     )).ToList(),
                     proposer
                     ) {
