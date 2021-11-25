@@ -135,12 +135,11 @@ export const unsubscribeToCorrectGuess = (
 };
 
 export const unsubscribeToGameOver = (
-  cb: (
-    guessersScores: Map<string, number>,
-    proposerScore: number | null
-  ) => void
+  cb: () => void
 ) => {
-  gameOverHandlers = gameOverHandlers.filter((handler) => handler !== cb);
+  gameOverHandlers = gameOverHandlers.filter(
+    (handler) => handler !== cb
+  );
 };
 
 export const unsubscribeToNoneGuessedCorrectly = (
