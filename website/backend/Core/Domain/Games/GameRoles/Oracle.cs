@@ -10,6 +10,9 @@ namespace backend.Core.Domain.Games
     {
 
         public Guid GameId;
+
+        public int Score => 0;
+        public string Username => "";
         private Queue<int> _proposals;
         public int Proposal { get
             {
@@ -22,12 +25,13 @@ namespace backend.Core.Domain.Games
             GameId = id;
         }
 
-        public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices, int nGuessers){}
+        public int CalculateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices) => -1;
 
         public void NotifyTurn(){
         }
 
         public string GetId() => null;
+        public string GetUsername() => "";
 
         public void HandleNewImage(List<int> slices)
         {

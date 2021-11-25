@@ -7,23 +7,28 @@ namespace backend.Core.Domain.Games
     public class Guesser : BaseEntity
     {
         public Guid Id { get; set; }
+        public int Score { get; set; }
+        public string Username { get; set; }
         public bool Guessed { get; set; }
         public bool Connected { get; set; } = false;
 
-        public Guesser(Guid id)
+        public Guesser(Guid id, string username)
         {
             Id = id;
+            Username = username;
         }
-        public void UpdateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices){
+        public int CalculateScore(TimeSpan RoundTime, TimeSpan timeDelta,int slicesShown, int totalSlices){
 
 
             int timeScore = (int)Math.Round(RoundTime.TotalSeconds - timeDelta.TotalSeconds);
             int sliceScore = totalSlices - slicesShown;
 
-            // do something with the score.
-            int Score = timeScore * timeScore;
 
-            Events.Add( new PlayerScoredEvent{UserId = Id, Score = Score});
+            var newScore = timeScore * sliceScore;
+            Score += newScore;
+
+            return newScore;
+
         }
 
         public string GetId() => Id.ToString();

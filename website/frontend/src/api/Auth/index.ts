@@ -2,22 +2,26 @@ import axios from "axios";
 import { User } from "@/typings";
 
 const authUser = async (userName: string, password: string): Promise<User> => {
-  const { data }: { data: User } = await axios.post("/api/login", {
+  const {
+    data: { data },
+  } = await axios.post("/api/login", {
     userName,
     password,
   });
-  return { ...data, isAuth: true };
+  return { ...(data as User), isAuth: true };
 };
 
 const registrateUser = async (
   userName: string,
   password: string
 ): Promise<User> => {
-  const { data }: { data: User } = await axios.post("/api/register", {
+  const {
+    data: { data },
+  } = await axios.post("/api/register", {
     userName,
     password,
   });
-  return { ...data, isAuth: true };
+  return { ...(data as User), isAuth: true };
 };
 
 export const getCurrentUser = async (): Promise<User> => {

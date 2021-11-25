@@ -15,10 +15,10 @@ namespace backend.Core.Domain.Games.Pipelines
 
         public class Handler: IRequestHandler<Request,Unit>
         {
-
             private IMediator _mediator;
             private IGameService _service;
-            public Handler(IMediator mediator, IGameService service, IHubContext<GameHub> hub)
+
+            public Handler(IMediator mediator, IGameService service)
             {
                 _mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
                 _service = service ?? throw new System.ArgumentNullException(nameof(service));
@@ -26,10 +26,12 @@ namespace backend.Core.Domain.Games.Pipelines
 
             async public Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
-                Console.WriteLine(request.User);
-                var game = _service.GetByUserId(request.User) ?? throw new System.ArgumentException(nameof(IGameService));
+                var game = _service.GetByUserId(request.User);
 
-                await _mediator.Send(new Propose.Request(game.Id,request.SliceNumber));
+                if (game is not null)
+                {
+                    await _mediator.Send(new Propose.Request(game.Id, request.SliceNumber));
+                }
 
                 return Unit.Value;
             }

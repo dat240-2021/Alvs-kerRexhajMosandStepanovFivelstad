@@ -18,6 +18,7 @@ namespace backend.Core.Domain.Games.Pipelines
 
             private IGameService _service;
             private IHubContext<GameHub> _hub;
+
             public Handler(IGameService service, IHubContext<GameHub> hub)
             {
                 _service = service ?? throw new System.ArgumentNullException(nameof(service));
@@ -27,13 +28,14 @@ namespace backend.Core.Domain.Games.Pipelines
             public Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
 
-            var game =  _service.Get(request.GameId);
+                var game =  _service.Get(request.GameId);
+                var result = game.Propose(request.SliceNumber);
 
-            var result = game.Propose(request.SliceNumber);
-            if (result is not null)
-            {
-                _hub.Clients.Users(game.GuesserIds).SendAsync("Proposal", result, cancellationToken);
-            }
+                if (result is not null)
+                {
+                   _hub.Clients.Users(game.GuesserIds).SendAsync("Proposal", result, cancellationToken);
+                }
+
                 return Task.FromResult(Unit.Value);
             }
         }

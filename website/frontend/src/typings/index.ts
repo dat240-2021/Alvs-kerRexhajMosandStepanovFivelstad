@@ -1,6 +1,6 @@
 export interface User {
   id: string;
-  userName: string;
+  username: string;
   isAuth: boolean;
 }
 
@@ -76,30 +76,35 @@ export interface Image {
   slices: ImageSlice[];
 }
 
-export type subscribeToNewImageCb = (
-  data: Image
-) => void;
+export type subscribeToNewImageCb = (data: Image) => void;
 
-export type subscribeToProposalCb = (
-  data: ImageSlice
-) => void;
-
+export type subscribeToProposalCb = (data: ImageSlice) => void;
 
 export interface Guess {
-  userId: string;
+  user: string;
   guess: string;
 }
 
 export interface Score {
-  userId: string;
+  PlayerName: string;
   score: number;
 }
 
 export interface Player {
   Name: string;
   Score: number;
-  PlayerId: string;
+  // PlayerId: string;
+}
 
+export interface CorrectGuess {
+  newGuesserScore: number;
+  newProposerScore: number;
+  guesser: string;
+  proposer: string;
+  image: Image;
+  guess: string;
+  hasMoreRounds: boolean;
+  willAutoContinue: boolean;
 }
 
 export type Proposal = ImageSlice;
@@ -109,7 +114,6 @@ export type subscribeToGuessCb = (data: Guess) => void;
 export type sendProposalCb = () => number;
 
 export type sendGuessCb = () => string;
-
 
 export enum HttpStatus {
   Unathorized = 401,

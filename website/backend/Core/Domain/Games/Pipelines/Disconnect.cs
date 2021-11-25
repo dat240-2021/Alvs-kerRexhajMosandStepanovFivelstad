@@ -24,6 +24,7 @@ namespace backend.Core.Domain.Games.Pipelines
             public Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
                 _service.RemoveUser(request.User);
+  
                 return Task.FromResult(Unit.Value);
             }
         }
