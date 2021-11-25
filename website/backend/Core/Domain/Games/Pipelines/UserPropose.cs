@@ -26,9 +26,12 @@ namespace backend.Core.Domain.Games.Pipelines
 
             async public Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
-                var game = _service.GetByUserId(request.User) ?? throw new System.ArgumentException(nameof(IGameService));
+                var game = _service.GetByUserId(request.User);
 
-                await _mediator.Send(new Propose.Request(game.Id,request.SliceNumber));
+                if (game is not null)
+                {
+                    await _mediator.Send(new Propose.Request(game.Id, request.SliceNumber));
+                }
 
                 return Unit.Value;
             }
