@@ -418,6 +418,10 @@ export default defineComponent({
       this.isOver = true;
       let highestScore = this.sortedPlayers[0];
 
+      if (!highestScore){
+        highestScore = {Name: "No One", Score: 0} as Player;
+      };
+
       if (this.isProposer) {
         this.inlineAlert = {
           type: getAlertType.info,
