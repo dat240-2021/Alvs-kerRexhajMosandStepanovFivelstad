@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Category, Game, GameSlotUpdateNotification } from "@/typings";
+import { Category, Game, GameSlotUpdateNotification, Score } from "@/typings";
 import * as signalR from "@microsoft/signalr";
 import {
   createGameHandlers,
@@ -41,6 +41,13 @@ export const fetchWaitingRooms = async (): Promise<Game[]> => {
     data: { data },
   } = await axios.get("/api/games");
   return data as Game[];
+};
+
+export const fetchLeaderBoard = async (): Promise<Score[]> => {
+  const {
+    data: { data },
+  } = await axios.get("/api/leaderboard");
+  return data as Score[];
 };
 
 export const joinGameRoom = async (id: string) => {

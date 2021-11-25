@@ -86,7 +86,7 @@ export interface Guess {
 }
 
 export interface Score {
-  PlayerName: string;
+  playername: string;
   score: number;
 }
 
