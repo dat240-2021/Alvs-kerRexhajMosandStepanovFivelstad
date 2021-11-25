@@ -419,7 +419,7 @@ export default defineComponent({
       let highestScore = this.sortedPlayers[0];
 
       if (!highestScore){
-        highestScore = {Name: "noone", Score: 0} as Player;
+        highestScore = {Name: "No One", Score: 0} as Player;
       };
 
       if (this.isProposer) {
