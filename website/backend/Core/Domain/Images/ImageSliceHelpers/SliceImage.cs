@@ -10,6 +10,15 @@ namespace backend.Core.Domain.Images.ImageSliceHelpers
         public List<byte[]> Slice(byte[] image)
         {
             var img = SixLabors.ImageSharp.Image.Load(image);
+            
+            if (img.Height > 1000)
+            {
+                double factor = (double)img.Height/(double)1000;
+                var newHeight = (img.Height / factor);
+                var newWidth = (img.Width / factor);
+                img.Mutate(i => i.Resize((int)newWidth,(int)newHeight));
+            }
+            
             var sliceSize = (img.Width/7,img.Height/7);
             var sliceList = new List<byte[]>();
 

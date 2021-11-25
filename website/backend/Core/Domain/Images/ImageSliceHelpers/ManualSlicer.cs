@@ -32,6 +32,15 @@ namespace backend.Core.Domain.Images.ImageSliceHelpers
         public List<byte[]> ManualSlice(byte[] image,byte[] sliceFile,string[] colors)
         {
             var img = SixLabors.ImageSharp.Image.Load(image);
+            
+            if (img.Height > 1000)
+            {
+                double factor = (double)img.Height/(double)1000;
+                var newHeight = (img.Height / factor);
+                var newWidth = (img.Width / factor);
+                img.Mutate(i => i.Resize((int)newWidth,(int)newHeight));
+            }
+            
             var imgSlc = SixLabors.ImageSharp.Image.Load(sliceFile);
             imgSlc.Mutate(x => x.Resize(img.Width, img.Height));
 
