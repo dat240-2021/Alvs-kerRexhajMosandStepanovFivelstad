@@ -127,6 +127,7 @@ namespace backend.Core.Domain.Games
             if (State == GameState.Active && Guessers.All(g => !g.Connected))
             {
                 GameOver();
+                return;
             }
 
             if (!ProposersTurn && State == GameState.Active)
