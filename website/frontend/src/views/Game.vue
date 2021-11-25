@@ -56,8 +56,8 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-1">
-          <table>
+        <div class="col-2">
+          <table class="table table-hover">
             <thead>
               <tr>
                 <th>Guesses:</th>
@@ -71,7 +71,7 @@
           </table>
         </div>
         <div class="col position-relative d-flex" id="canvas-div">
-          <div class="position-relative w-50 mx-auto">
+          <div class="position-relative mx-auto" style="width:60%">
             <div v-if="!started" class="d-flex justify-content-center m-5">
               <div>
                 <div
@@ -102,22 +102,22 @@
               :src="'data:image/png;base64,' + im.imageData"
               style="object-fit: cover"
               :id="im.id"
-              class="position-absolute top-0 start-0 images w-100"
+              class="position-absolute top-0 start-0 w-100"
             />
           </div>
-          <!-- <canvas id="image-canvas" width="1000" height="1000"></canvas> -->
         </div>
-        <div class="col-2">
-          <table>
+        <div class="col-3">
+          <table class="table table-hover">
             <thead>
               <tr>
-                <th>Players:</th>
+                <th class="text-start">Player</th>
+                <th class="text-end">Score</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="p in sortedPlayers" :key="p.Name">
-                <td>{{ p.Name }}</td>
-                <td>{{ p.Score }}</td>
+                <td class="text-start">{{ p.Name }}</td>
+                <td class="text-end">{{ p.Score }}</td>
               </tr>
             </tbody>
           </table>
@@ -351,7 +351,7 @@ export default defineComponent({
       this.guesses = [...this.guesses, guess];
     },
     updateScores(score: Score) {
-      let player = this.players.find((x) => x.Name == score.PlayerName);
+      let player = this.players.find((x) => x.Name == score.playername);
       if (player) {
         player.Score = score.score;
       }
