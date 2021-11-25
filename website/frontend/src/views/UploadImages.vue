@@ -49,8 +49,8 @@
       </p>
       <p v-if="error.length > 2" class="text-danger">{{ error }}</p>
     </div>
-    <div>
-      <table class="table table-hover">
+    <div class="overflow-auto">
+      <table class="table table-hover table-responsive">
         <thead>
           <tr class="text-center">
             <th scope="col">Delete</th>

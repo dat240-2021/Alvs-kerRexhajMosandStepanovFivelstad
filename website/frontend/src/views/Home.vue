@@ -1,14 +1,15 @@
 <template>
   <div class="container vh-100 py-2">
     <div class="d-flex justify-content-end">
-      <button class="btn btn-primary mx-2 mt-2" @click="handleLogout">
-        Logout
-      </button>
+      <button class="btn btn-primary m-2" @click="handleLogout">Logout</button>
     </div>
-    <div class="row justify-content-center overflow-hidden" style="height: 40%">
+    <div
+      class="row justify-content-center overflow-hidden px-2"
+      style="height: 40%"
+    >
       <h3 class="w-100 text-center" style="height: 10%">Leaderboard Top 10</h3>
       <div
-        class="col-8 d-flex overflow-auto border border-2 rounded"
+        class="d-flex flex-column overflow-auto border border-2 rounded"
         style="height: 80%"
       >
         <div class="table-responsive w-100">
@@ -34,7 +35,7 @@
         <router-link class="btn btn-primary" to="/uploadImages">
           Upload Images
         </router-link>
-        <h4>Available games</h4>
+        <h5 class="text-center">Available games</h5>
         <router-link class="btn btn-primary" to="/game">
           Create game
         </router-link>
