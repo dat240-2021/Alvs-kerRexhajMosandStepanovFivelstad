@@ -185,13 +185,8 @@ namespace backend.Core.Domain.Games
 
             guesser.Guessed = true;
 
-<<<<<<< HEAD
-            //Add the guess event even if its correct or not.
             Events.Add(new BroadcastGuessEvent()
             {
-=======
-            Events.Add(new BroadcastGuessEvent(){
->>>>>>> 16e4444 (Remove comments)
                 PlayerIds = PlayerIds,
                 Guess = guess.Guess,
                 Username = guesser.Username,
