@@ -16,7 +16,7 @@ namespace backend.Controllers.Lobby
     [Authorize]
     [ApiController]
     [Route("api/games")]
-    public class GamesController: ApiBaseController
+    public class GamesController : ApiBaseController
     {
         private readonly IMediator _mediator;
         private readonly UserManager<User> _userManager;
@@ -27,26 +27,26 @@ namespace backend.Controllers.Lobby
             _userManager = userManager;
         }
 
-        
+
         [HttpPost]
         public async Task<IActionResult> Create(GameSettingsDto settings)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
             var game = await _mediator.Send(new CreateGame.Request(new GameSettings
-                {
-                    Duration = settings.RoundDuration,
-                    ImagesCount = settings.ImagesCount,
-                    GuessersCount = settings.GuessersCount,
-                    CategoryIds = settings.CategoryIds,
-                    ProposerType = settings.ProposerType
-                },
+            {
+                Duration = settings.RoundDuration,
+                ImagesCount = settings.ImagesCount,
+                GuessersCount = settings.GuessersCount,
+                CategoryIds = settings.CategoryIds,
+                ProposerType = settings.ProposerType
+            },
                 user
             ));
-            
+
             return Ok(new GameDto(game));
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -54,7 +54,7 @@ namespace backend.Controllers.Lobby
             var gamesDto = games.Select(g => new GameDto(g)).ToList();
             return Ok(gamesDto);
         }
-        
+
         [HttpPost("{id:guid}/join")]
         public async Task<IActionResult> Join(Guid id)
         {
@@ -62,7 +62,7 @@ namespace backend.Controllers.Lobby
             await _mediator.Send(new JoinGame.Request(user, id, SlotRole.Guesser));
             return Ok();
         }
-        
+
         [HttpPost("{id:guid}/leave")]
         public async Task<IActionResult> Leave(Guid id)
         {
@@ -70,7 +70,7 @@ namespace backend.Controllers.Lobby
             await _mediator.Send(new LeaveGame.Request(new Guid(userId), id));
             return Ok();
         }
-        
+
         [HttpPost("{id:guid}/start")]
         public async Task<IActionResult> Start(Guid id)
         {

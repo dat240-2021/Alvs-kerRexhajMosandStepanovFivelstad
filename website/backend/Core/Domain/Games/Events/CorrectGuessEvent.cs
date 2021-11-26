@@ -4,7 +4,7 @@ using backend.Core.Domain.Images;
 
 namespace backend.Core.Domain.Games.Events
 {
-    public record CorrectGuessEvent: BaseDomainEvent
+    public record CorrectGuessEvent : BaseDomainEvent
     {
         public string[] PlayerIds { get; set; }
         public Guesser Guesser { get; set; }

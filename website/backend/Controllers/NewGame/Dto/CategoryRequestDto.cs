@@ -6,7 +6,7 @@ namespace backend.Controllers.NewGame.Dto
     public record CategoryRequestDto
     {
         [Required]
-        public List<string> CategoryList { get; set;}
+        public List<string> CategoryList { get; set; }
     }
 
 }

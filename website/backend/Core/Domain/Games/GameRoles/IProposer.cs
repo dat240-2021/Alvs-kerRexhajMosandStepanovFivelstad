@@ -9,9 +9,9 @@ namespace backend.Core.Domain.Games
     {
         int Score { get; }
         string Username { get; }
-        int CalculateScore(TimeSpan RoundTime,TimeSpan timeDelta, int slicesShown, int totalSlices);
+        int CalculateScore(TimeSpan RoundTime, TimeSpan timeDelta, int slicesShown, int totalSlices);
         void NotifyTurn();
-        void HandleNewImage() {}
+        void HandleNewImage() { }
         string GetId();
 
     }

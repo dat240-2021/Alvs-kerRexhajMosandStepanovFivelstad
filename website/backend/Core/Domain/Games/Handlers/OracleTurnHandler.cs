@@ -12,7 +12,7 @@ using backend.Core.Domain.Games.Pipelines;
 
 namespace backend.Core.Domain.Games.Handlers
 {
-    public class OracleTurnHandler: INotificationHandler<OracleTurnEvent>
+    public class OracleTurnHandler : INotificationHandler<OracleTurnEvent>
     {
         private readonly IGameService _service;
         private readonly IMediator _mediator;

@@ -9,6 +9,6 @@ namespace backend.Controllers.Lobby.Dto
         public string Playername { get; set; }
 
         [Required]
-        public int Score { get; set;}
+        public int Score { get; set; }
     }
 }

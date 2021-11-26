@@ -24,10 +24,12 @@ namespace backend.Controllers.Authentication
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(UserRequestDto user){
-            var result = await _mediator.Send(new RegisterUser.Request(user.Username,user.Password));
+        public async Task<IActionResult> Post(UserRequestDto user)
+        {
+            var result = await _mediator.Send(new RegisterUser.Request(user.Username, user.Password));
 
-            if (result.Success){
+            if (result.Success)
+            {
                 return Ok(new UserResponseDto(user.Username));
             }
 

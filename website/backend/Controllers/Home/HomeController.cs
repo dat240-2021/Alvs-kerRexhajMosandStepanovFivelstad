@@ -19,9 +19,10 @@ namespace Controllers.Home
         }
 
         [HttpGet]
-        public string Get(){
+        public string Get()
+        {
 
             return "Success";
         }
     }
-    }
+}

@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace backend.Hubs.Handlers
 {
-    public class NewImageHandler: INotificationHandler<NewImageEvent>
+    public class NewImageHandler : INotificationHandler<NewImageEvent>
     {
         private readonly IHubContext<GameHub> _hub;
         private IServiceScopeFactory _scopeFactory;

@@ -8,7 +8,7 @@ namespace backend.Core.Domain.Lobby.Services
 {
     public class LobbyService : ILobbyService
     {
-        private readonly ConcurrentDictionary<Guid, GameSlotInfo> _games = new ();
+        private readonly ConcurrentDictionary<Guid, GameSlotInfo> _games = new();
 
         public void StoreGame(Game game)
         {
@@ -16,14 +16,14 @@ namespace backend.Core.Domain.Lobby.Services
             {
                 throw new Exception($"Game with id {game.Id} already exists.");
             }
-            
+
             _games.TryAdd(game.Id, new GameSlotInfo
             {
                 MaxSlotsCount = game.Settings.ProposerType == "AI" ? game.Settings.GuessersCount : game.Settings.GuessersCount + 1,
                 ProposerType = game.Settings.ProposerType == "AI" ? ProposerType.AI : ProposerType.Player
             });
         }
-        
+
         public GameSlotInfo GetSlotInfo(Guid gameId)
         {
             if (_games.TryGetValue(gameId, out var gameSlotInfo))
@@ -33,10 +33,10 @@ namespace backend.Core.Domain.Lobby.Services
 
             throw new Exception($"Game room with id { gameId } is not stored");
         }
-        
+
         public bool HasAvailableSlots(Guid gameId)
         {
-            return _games.TryGetValue(gameId, out var gameSlotInfo) ? 
+            return _games.TryGetValue(gameId, out var gameSlotInfo) ?
                 gameSlotInfo.PlayerSlots.Count < gameSlotInfo.MaxSlotsCount :
                 throw new Exception($"Game with id {gameId} not found");
         }
@@ -87,12 +87,12 @@ namespace backend.Core.Domain.Lobby.Services
             }
 
             if (!_games.TryGetValue(gameId, out var gameSlotInfo)) return;
-            
+
             if (!gameSlotInfo.PlayerIds.Contains(userId))
             {
                 throw new Exception($"User with id { userId } is not found in room { gameId }");
             }
-                
+
             var slot = gameSlotInfo.PlayerSlots.Find(s => s.Id.Equals(userId));
             gameSlotInfo.PlayerSlots.Remove(slot);
         }

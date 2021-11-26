@@ -2,8 +2,8 @@
 
 namespace SharedKernel
 {
-	public abstract class BaseEntity
-	{
-		public List<BaseDomainEvent> Events = new();
-	}
+    public abstract class BaseEntity
+    {
+        public List<BaseDomainEvent> Events = new();
+    }
 }

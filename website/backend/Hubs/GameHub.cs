@@ -6,12 +6,12 @@ using System;
 
 namespace backend.Hubs
 {
-    public class GameHub: Hub
+    public class GameHub : Hub
     {
         private readonly IMediator _mediator;
 
         public GameHub(IMediator mediator) => _mediator = mediator ?? throw new System.ArgumentNullException(nameof(mediator));
-        
+
         public override async Task OnDisconnectedAsync(Exception e)
         {
             string user = Context.UserIdentifier;

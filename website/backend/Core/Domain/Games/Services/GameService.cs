@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using System.Timers;
 using MediatR;
 
-namespace backend.Core.Domain.Games {
-    public interface IGameService {
+namespace backend.Core.Domain.Games
+{
+    public interface IGameService
+    {
         Game Get(Guid gameId);
         Game GetByUserId(Guid userId);
         void RemoveUser(Guid userId);
@@ -16,20 +18,23 @@ namespace backend.Core.Domain.Games {
         Game Remove(Guid gameId);
     }
 
-    public class GameService : IGameService{
+    public class GameService : IGameService
+    {
         private ConcurrentDictionary<Guid, Game> Games = new();
         private ConcurrentDictionary<Guid, Guid> GameIdsByUsers = new();
         private readonly IMediator _mediator;
 
         private System.Timers.Timer Timer;
 
-        public GameService(IMediator mediator){
+        public GameService(IMediator mediator)
+        {
             _mediator = mediator;
             StartTicker();
         }
 
         //This is run when an event for a new game is handled...
-        public Game Get(Guid gameId){
+        public Game Get(Guid gameId)
+        {
             Game active_game = null;
 
             Games.TryGetValue(gameId, out active_game);
@@ -52,11 +57,12 @@ namespace backend.Core.Domain.Games {
             }
         }
 
-        private void StartTicker() {
-                Timer = new System.Timers.Timer(500);
-                Timer.Elapsed += UpdateGames;
-                Timer.Enabled = true;
-            }
+        private void StartTicker()
+        {
+            Timer = new System.Timers.Timer(500);
+            Timer.Elapsed += UpdateGames;
+            Timer.Enabled = true;
+        }
 
         public Game GetByUserId(Guid userId)
         {
@@ -75,7 +81,8 @@ namespace backend.Core.Domain.Games {
             }
         }
 
-        public bool Add(Game game){
+        public bool Add(Game game)
+        {
             foreach (Guesser guesser in game.Guessers)
             {
                 /// Test that a user cannot already exist here.
@@ -86,11 +93,12 @@ namespace backend.Core.Domain.Games {
             {
                 GameIdsByUsers.TryAdd(((Proposer)game.Proposer).Id, game.Id);
             }
-            return Games.TryAdd(game.Id,game);
+            return Games.TryAdd(game.Id, game);
         }
 
 
-        public Game Remove(Guid gameId){
+        public Game Remove(Guid gameId)
+        {
             foreach (Guid guesser in GameIdsByUsers.Where(g => g.Value == gameId).Select(g => g.Key))
             {
                 GameIdsByUsers.TryRemove(guesser, out _);

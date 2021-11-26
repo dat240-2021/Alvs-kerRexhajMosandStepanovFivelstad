@@ -2,8 +2,8 @@
 
 namespace SharedKernel
 {
-	public interface IValidator<T>
-	{
-		(bool IsValid, string Error) IsValid(T item);
-	}
+    public interface IValidator<T>
+    {
+        (bool IsValid, string Error) IsValid(T item);
+    }
 }

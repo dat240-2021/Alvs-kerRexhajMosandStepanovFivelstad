@@ -8,22 +8,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Authentication.Pipelines
 {
-        public class LogoutUser
+    public class LogoutUser
+    {
+        public record Request() : IRequest<Unit>;
+
+        public class Handler : IRequestHandler<Request>
         {
-                public record Request() : IRequest<Unit>;
+            private readonly IAuthenticationService _authServ;
 
-                public class Handler : IRequestHandler<Request>
-                {
-                        private readonly IAuthenticationService _authServ;
-
-                        public Handler(IAuthenticationService authServ) => _authServ = authServ ?? throw new ArgumentNullException(nameof(authServ));
+            public Handler(IAuthenticationService authServ) => _authServ = authServ ?? throw new ArgumentNullException(nameof(authServ));
 
 
-                        public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
-                        {
-                                await _authServ.LogoutUser();
-                                return Unit.Value;
-                        }
-                }
+            public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
+            {
+                await _authServ.LogoutUser();
+                return Unit.Value;
+            }
         }
+    }
 }

@@ -11,10 +11,11 @@ namespace backend.Core.Domain.Lobby.Models
         public int UserScore { get; set; }
         public DateTime Date { get; set; }
 
-        public  Score(){}
+        public Score() { }
 
 
-        public Score(Guid usr,int score){
+        public Score(Guid usr, int score)
+        {
             User = usr;
             UserScore = score;
             Date = DateTime.Now;

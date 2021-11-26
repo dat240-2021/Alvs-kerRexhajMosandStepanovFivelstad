@@ -11,9 +11,9 @@ namespace backend.Core.Domain.Games.Pipelines
 {
     public class Connect
     {
-        public record Request(Guid User): IRequest<Unit> {}
+        public record Request(Guid User) : IRequest<Unit> { }
 
-        public class Handler: IRequestHandler<Request, Unit>
+        public class Handler : IRequestHandler<Request, Unit>
         {
 
             private IGameService _service;

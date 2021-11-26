@@ -11,9 +11,9 @@ namespace backend.Core.Domain.Games.Pipelines
 {
     public class Guess
     {
-        public record Request(Guid User, string Guess): IRequest<Unit> {}
+        public record Request(Guid User, string Guess) : IRequest<Unit> { }
 
-        public class Handler: IRequestHandler<Request, Unit>
+        public class Handler : IRequestHandler<Request, Unit>
         {
             private GameContext _db;
             private IGameService _service;

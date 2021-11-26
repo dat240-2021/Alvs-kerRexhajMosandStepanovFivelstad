@@ -7,7 +7,7 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get -y update && apt-get -y upgrade && apt-get install nodejs && apt-get -y install unzip
 
 WORKDIR /data/frontend
-RUN npm install -g npm@latest
+RUN npm install -g npm@6.14
 RUN npm install
 RUN npm run build
 
@@ -21,4 +21,4 @@ RUN dotnet ef migrations add init
 RUN mkdir -p ./Infrastructure/Data
 RUN dotnet ef database update
 
-ENTRYPOINT ["dotnet","run","--launch-profile","deployment"]
+ENTRYPOINT ["dotnet", "run", "--launch-profile", "deployment"]

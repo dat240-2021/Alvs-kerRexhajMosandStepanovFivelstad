@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace backend.Core.Domain.Games.Events
 {
-    public record NewImageEvent: BaseDomainEvent
+    public record NewImageEvent : BaseDomainEvent
     {
         public int ImageId;
         public List<string> GuesserIds;

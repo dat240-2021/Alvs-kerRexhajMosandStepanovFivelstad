@@ -13,9 +13,9 @@ namespace backend.Core.Domain.Lobby.Pipelines
 {
     public class JoinGame
     {
-        public record Request(User User, Guid GameId, SlotRole Role): IRequest<Unit> {}
-        
-        public class Handler: IRequestHandler<Request, Unit>
+        public record Request(User User, Guid GameId, SlotRole Role) : IRequest<Unit> { }
+
+        public class Handler : IRequestHandler<Request, Unit>
         {
 
             private readonly GameContext _db;
@@ -29,7 +29,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
                 _mediator = mediator;
             }
 
-            
+
             public async Task<Unit> Handle(Request request, CancellationToken cancellationToken)
             {
                 var game = await _db.Games.FirstOrDefaultAsync(g => g.Id.Equals(request.GameId), cancellationToken) ?? throw new Exception($"Game with id {request.GameId} not found");

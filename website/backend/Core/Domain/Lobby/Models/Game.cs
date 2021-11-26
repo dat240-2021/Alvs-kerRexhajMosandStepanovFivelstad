@@ -11,7 +11,7 @@ namespace backend.Core.Domain.Lobby.Models
         public GameState State { get; set; } = GameState.Created;
 
         public User Creator { get; set; }
-        
+
 
         public Game()
         {

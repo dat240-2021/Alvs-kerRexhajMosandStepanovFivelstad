@@ -4,7 +4,7 @@ using backend.Core.Domain.Lobby.Models;
 
 namespace backend.Hubs
 {
-    public class GamesHub: Hub
+    public class LobbyHub : Hub
     {
         public async Task SendMessage(Game game)
         {

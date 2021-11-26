@@ -6,11 +6,11 @@ namespace backend.Core.Domain.Images
     public class ImageSlice : BaseEntity
     {
         [Key]
-        public int Id {get; protected set;}
+        public int Id { get; protected set; }
         public int SequenceNumber { get; protected set; }
         public byte[] ImageData { get; protected set; }
 
-        public ImageSlice() {}
+        public ImageSlice() { }
 
         public ImageSlice(byte[] imagedata, int sequenceNumber)
         {

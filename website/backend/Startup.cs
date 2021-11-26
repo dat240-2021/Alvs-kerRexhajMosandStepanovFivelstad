@@ -37,24 +37,20 @@ namespace backend
         {
             services.AddDbContext<GameContext>(options =>
             {
-                //The folders specified here must exist, otherwise the database is never created
-                //It does not create the folder, nor does it return an error.
-                options.UseSqlite($"Data Source={Path.Combine("Infrastructure","Data", "game.db")}");
+                // The folders specified here must exist, otherwise the database is never created
+                // It does not create the folder, nor does it return an error.
+                options.UseSqlite($"Data Source={Path.Combine("Infrastructure", "Data", "game.db")}");
             });
 
-            services.AddScoped<IAuthenticationService,AuthenticationService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IRandomNumberGenerator, RandomNumberGenerator>();
             services.AddSingleton<ILobbyService, LobbyService>();
             services.AddSingleton<IGameService, GameService>();
-            
 
-
-
-            // services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddIdentity<User,IdentityRole<Guid>>()
+            services.AddIdentity<User, IdentityRole<Guid>>()
             .AddEntityFrameworkStores<GameContext>()
             .AddUserManager<UserManager<User>>();
-            
+
             services.ConfigureApplicationCookie(options =>
             {
                 options.Events.OnRedirectToLogin = context =>
@@ -63,9 +59,6 @@ namespace backend
                     return Task.CompletedTask;
                 };
             });
-            
-
-            // services.AddAuthentication().AddIdentityServerJwt();
 
             services.AddMediatR(typeof(Startup));
 
@@ -77,15 +70,14 @@ namespace backend
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,GameContext db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, GameContext db)
         {
-            // db.SaveChanges();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            //Initialize db with data if nessairy.
+            // Initialize db with data if necessary.
             if (!db.Images.Any())
             {
                 var ImagePreprocessor = new ImagePreprocessor();
@@ -96,27 +88,19 @@ namespace backend
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
 
-
-            //Needed for login
             app.UseCookiePolicy();
-
             app.UseAuthentication();
-
             app.UseAuthorization();
 
-
-
             app.UseDefaultFiles();
-
             app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<GamesHub>("/hub/games");
+                endpoints.MapHub<LobbyHub>("/hub/games");
                 endpoints.MapHub<GameHub>("/hub/game");
             });
         }

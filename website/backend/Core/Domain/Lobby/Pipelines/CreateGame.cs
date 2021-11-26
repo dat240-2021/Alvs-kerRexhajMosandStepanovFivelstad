@@ -12,9 +12,9 @@ namespace backend.Core.Domain.Lobby.Pipelines
 {
     public class CreateGame
     {
-        public record Request(GameSettings GameSettings, User User): IRequest<GameWithSlotInfo> {}
+        public record Request(GameSettings GameSettings, User User) : IRequest<GameWithSlotInfo> { }
 
-        public class Handler: IRequestHandler<Request, GameWithSlotInfo>
+        public class Handler : IRequestHandler<Request, GameWithSlotInfo>
         {
 
             private GameContext _db;
@@ -28,14 +28,14 @@ namespace backend.Core.Domain.Lobby.Pipelines
                 _LobbyService = LobbyService;
             }
 
-            
+
             public async Task<GameWithSlotInfo> Handle(Request request, CancellationToken cancellationToken)
             {
                 var game = new Game(Guid.NewGuid(), request.GameSettings, request.User);
                 var creatorRole = request.GameSettings.ProposerType == "AI" ? SlotRole.Guesser : SlotRole.Proposer;
-                
+
                 _db.Games.Add(game);
-                
+
                 await _db.SaveChangesAsync(cancellationToken);
                 _LobbyService.StoreGame(game);
                 await _mediator.Publish(new GameCreated(game), cancellationToken);

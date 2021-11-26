@@ -11,9 +11,9 @@ namespace backend.Core.Domain.Lobby.Pipelines
 {
     public class DeleteGame
     {
-        public record Request(Game Game): IRequest<Unit> {}
-        
-        public class Handler: IRequestHandler<Request, Unit>
+        public record Request(Game Game) : IRequest<Unit> { }
+
+        public class Handler : IRequestHandler<Request, Unit>
         {
             private readonly GameContext _db;
             private readonly IMediator _mediator;

@@ -14,20 +14,24 @@ namespace backend.Core.Domain.Games
         public int Score => 0;
         public string Username => "";
         private Queue<int> _proposals;
-        public int Proposal { get
+        public int Proposal
+        {
+            get
             {
                 return _proposals.Dequeue();
             }
         }
         // never used
         // private int _index;
-        public Oracle(Guid id) {
+        public Oracle(Guid id)
+        {
             GameId = id;
         }
 
-        public int CalculateScore(TimeSpan RoundTime,TimeSpan timeDelta,int slicesShown, int totalSlices) => -1;
+        public int CalculateScore(TimeSpan RoundTime, TimeSpan timeDelta, int slicesShown, int totalSlices) => -1;
 
-        public void NotifyTurn(){
+        public void NotifyTurn()
+        {
         }
 
         public string GetId() => null;

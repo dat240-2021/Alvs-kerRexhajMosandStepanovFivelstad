@@ -22,7 +22,7 @@ namespace Domain.Authentication.Services
 
         public async Task<(bool Success, string[] errors)> RegisterUser(string username, string password)
         {
-            var result = await _userManager.CreateAsync(new User {UserName = username}, password);
+            var result = await _userManager.CreateAsync(new User { UserName = username }, password);
             return (result.Succeeded, result.Errors.Select(err => err.Description).ToArray());
         }
 
@@ -45,7 +45,7 @@ namespace Domain.Authentication.Services
         public async Task<User> GetCurrentUser()
         {
             var claimsPrincipal = _signInManager.Context.User;
-            var userId =  _userManager.GetUserId(claimsPrincipal);
+            var userId = _userManager.GetUserId(claimsPrincipal);
             return await _userManager.FindByIdAsync(userId);
         }
     }

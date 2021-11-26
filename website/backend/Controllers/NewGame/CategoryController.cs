@@ -15,7 +15,7 @@ namespace backend.Controllers.NewGame
     public class CategoryController : ApiBaseController
     {
         private readonly ILogger<CategoryController> _logger;
-		private readonly IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public CategoryController(ILogger<CategoryController> logger, IMediator mediator)
         {
@@ -24,14 +24,16 @@ namespace backend.Controllers.NewGame
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(){
+        public async Task<IActionResult> Get()
+        {
             var result = await _mediator.Send(new GetCategoryList.Request());
 
-            if (result != null){
+            if (result != null)
+            {
                 return Ok(result);
             }
 
             return UnprocessableEntity();
         }
     }
-    }
+}

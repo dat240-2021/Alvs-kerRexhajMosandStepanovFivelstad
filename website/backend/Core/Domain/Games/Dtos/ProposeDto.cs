@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace backend.Core.Domain.Games {
-    public record ProposeDto {
+namespace backend.Core.Domain.Games
+{
+    public record ProposeDto
+    {
 
-        public Guid ProposerId {get; set;}
-        public int SliceNumber {get; set;}
+        public Guid ProposerId { get; set; }
+        public int SliceNumber { get; set; }
 
     }
 }
