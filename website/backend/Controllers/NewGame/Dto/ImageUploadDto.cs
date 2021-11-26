@@ -11,7 +11,8 @@ namespace backend.Controllers.NewGame.Dto
     }
 
 
-    public record ImageFile {
+    public record ImageFile
+    {
         [Required]
         public int Id { get; set; }
         [Required]

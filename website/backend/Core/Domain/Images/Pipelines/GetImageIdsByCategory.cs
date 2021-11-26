@@ -11,7 +11,7 @@ namespace backend.Core.Domain.Images.Pipelines
 {
     public class GetImageIdsByCategory
     {
-        public record Request(List<int> Categories,Guid UserId) : IRequest<List<int>>;
+        public record Request(List<int> Categories, Guid UserId) : IRequest<List<int>>;
 
         public class Handler : IRequestHandler<Request, List<int>>
         {

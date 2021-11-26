@@ -17,7 +17,8 @@ namespace backend.Core.Domain.Games
             Id = id;
             Username = username;
         }
-        public int CalculateScore(TimeSpan RoundTime, TimeSpan timeDelta,int slicesShown, int totalSlices){
+        public int CalculateScore(TimeSpan RoundTime, TimeSpan timeDelta, int slicesShown, int totalSlices)
+        {
 
 
             int timeScore = (int)Math.Round(RoundTime.TotalSeconds - timeDelta.TotalSeconds);

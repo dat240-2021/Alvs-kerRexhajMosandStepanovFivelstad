@@ -7,13 +7,13 @@ namespace backend.Core.Domain.Lobby.Models
     public record GameSettings
     {
         public string ProposerType { get; set; }
-        
+
         public List<int> CategoryIds { get; set; }
-        
-        public int GuessersCount { get; set;}
-        
-        public int ImagesCount { get; set;}
-        
-        public int Duration { get; set;}
+
+        public int GuessersCount { get; set; }
+
+        public int ImagesCount { get; set; }
+
+        public int Duration { get; set; }
     }
 }

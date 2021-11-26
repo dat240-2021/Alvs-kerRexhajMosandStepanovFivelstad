@@ -13,9 +13,9 @@ namespace backend.Core.Domain.Lobby.Pipelines
 {
     public class LeaveGame
     {
-        public record Request(Guid UserId, Guid GameId): IRequest<Unit> {}
-        
-        public class Handler: IRequestHandler<Request, Unit>
+        public record Request(Guid UserId, Guid GameId) : IRequest<Unit> { }
+
+        public class Handler : IRequestHandler<Request, Unit>
         {
 
             private readonly GameContext _db;

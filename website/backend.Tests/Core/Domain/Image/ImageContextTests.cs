@@ -101,7 +101,7 @@ namespace backend.Tests.Core.Domain.Image
                 Assert.False(result[2].Name.Equals(cat1));
             }
         }
-        
+
         //Test GetImageIdsByCategory pipeline by adding 2 Images and retrieving list. 
         [Fact]
         public void GetImageIdsByCategory()
@@ -115,12 +115,12 @@ namespace backend.Tests.Core.Domain.Image
             using (var context = new GameContext(ContextOptions, null))
             {
                 context.Database.Migrate();
-                
+
                 var Category1 = new ImageCategory(1, "Test Category 1");
                 var Category2 = new ImageCategory(2, "Test Category 2");
-                var Label1 = new ImageLabel("Test Label 1",Category1);
-                var Label2 = new ImageLabel("Test Label 2",Category1);
-                var Label3 = new ImageLabel("Test Label 3",Category2);
+                var Label1 = new ImageLabel("Test Label 1", Category1);
+                var Label2 = new ImageLabel("Test Label 2", Category1);
+                var Label3 = new ImageLabel("Test Label 3", Category2);
                 var Image1 = new backend.Core.Domain.Images.Image();
                 var Image2 = new backend.Core.Domain.Images.Image();
                 var Image3 = new backend.Core.Domain.Images.Image();
@@ -131,15 +131,15 @@ namespace backend.Tests.Core.Domain.Image
                 context.Images.Add(Image2);
                 context.Images.Add(Image3);
                 context.SaveChanges();
- 
+
 
                 var handler = new GetImageIdsByCategory.Handler(context);
 
                 var result = handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
 
                 context.ImageCategories.Count().ShouldBe(2);
-                Assert.Equal(1,result.First());
-                Assert.Equal(2,result.Last());
+                Assert.Equal(1, result.First());
+                Assert.Equal(2, result.Last());
             }
         }
     }

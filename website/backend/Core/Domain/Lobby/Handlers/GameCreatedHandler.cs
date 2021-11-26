@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Core.Domain.Lobby.Handlers
 {
-    public class GameCreatedHandler: INotificationHandler<GameCreated>
+    public class GameCreatedHandler : INotificationHandler<GameCreated>
     {
         private readonly GameContext _db;
-        private readonly IHubContext<GamesHub> _hubContext;
+        private readonly IHubContext<LobbyHub> _hubContext;
 
-        public GameCreatedHandler(GameContext db, IHubContext<GamesHub> hubContext)
+        public GameCreatedHandler(GameContext db, IHubContext<LobbyHub> hubContext)
         {
             _db = db ?? throw new System.ArgumentException(nameof(db));
             _hubContext = hubContext;

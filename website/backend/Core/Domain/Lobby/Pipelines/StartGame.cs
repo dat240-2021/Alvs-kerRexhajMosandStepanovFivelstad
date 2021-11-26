@@ -13,11 +13,11 @@ namespace backend.Core.Domain.Lobby.Pipelines
 {
     public class StartGame
     {
-        public record Request(Guid GameId, Guid? UserId = null): IRequest<Response> {}
-        
+        public record Request(Guid GameId, Guid? UserId = null) : IRequest<Response> { }
+
         public record Response(bool Success);
 
-        public class Handler: IRequestHandler<Request, Response>
+        public class Handler : IRequestHandler<Request, Response>
         {
 
             private readonly GameContext _db;

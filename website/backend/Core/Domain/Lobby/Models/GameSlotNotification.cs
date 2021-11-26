@@ -11,7 +11,7 @@ namespace backend.Core.Domain.Lobby.Models
         }
 
         public Guid GameId { get; set; }
-        
+
         public int OccupiedSlotsCount { get; set; }
     }
 }

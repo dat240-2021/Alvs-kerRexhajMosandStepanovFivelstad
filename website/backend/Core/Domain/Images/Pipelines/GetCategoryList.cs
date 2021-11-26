@@ -9,21 +9,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Core.Domain.Images.Pipelines
 {
-	public class GetCategoryList
-	{
-		public record Request() : IRequest<List<ImageCategory>>;
+    public class GetCategoryList
+    {
+        public record Request() : IRequest<List<ImageCategory>>;
 
-		public class Handler : IRequestHandler<Request, List<ImageCategory>>
-		{
-			private readonly GameContext _db;
+        public class Handler : IRequestHandler<Request, List<ImageCategory>>
+        {
+            private readonly GameContext _db;
 
-			public Handler(GameContext db) => _db = db ?? throw new ArgumentNullException(nameof(db));
+            public Handler(GameContext db) => _db = db ?? throw new ArgumentNullException(nameof(db));
 
-			public async Task<List<ImageCategory>> Handle(Request request, CancellationToken cancellationToken)
-			{
-				var categoryList = await _db.ImageCategories.ToListAsync(cancellationToken);
-				return categoryList;
-			}
-		}
-	}
+            public async Task<List<ImageCategory>> Handle(Request request, CancellationToken cancellationToken)
+            {
+                var categoryList = await _db.ImageCategories.ToListAsync(cancellationToken);
+                return categoryList;
+            }
+        }
+    }
 }

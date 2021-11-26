@@ -4,7 +4,7 @@ using MediatR;
 
 namespace backend.Core.Domain.Lobby.Events
 {
-    public record UserLeftGame: INotification
+    public record UserLeftGame : INotification
     {
         public UserLeftGame(GameSlotNotification notification, Guid userId)
         {

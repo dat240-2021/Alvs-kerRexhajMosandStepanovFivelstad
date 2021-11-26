@@ -11,9 +11,9 @@ namespace backend.Core.Domain.Games.Pipelines
 {
     public class UserPropose
     {
-        public record Request(Guid User, int SliceNumber): IRequest<Unit> {}
+        public record Request(Guid User, int SliceNumber) : IRequest<Unit> { }
 
-        public class Handler: IRequestHandler<Request,Unit>
+        public class Handler : IRequestHandler<Request, Unit>
         {
             private IMediator _mediator;
             private IGameService _service;

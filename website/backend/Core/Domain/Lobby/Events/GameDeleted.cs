@@ -3,7 +3,7 @@ using SharedKernel;
 
 namespace backend.Core.Domain.Lobby.Events
 {
-    public record GameDeleted: BaseDomainEvent
+    public record GameDeleted : BaseDomainEvent
     {
         public Game Game { get; }
 

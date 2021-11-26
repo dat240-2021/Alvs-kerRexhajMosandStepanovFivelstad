@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Core.Domain.Games.Handlers
 {
-    public class BroadcastGuessHandler: INotificationHandler<BroadcastGuessEvent>
+    public class BroadcastGuessHandler : INotificationHandler<BroadcastGuessEvent>
     {
         private IHubContext<GameHub> _hub;
 
@@ -18,7 +18,8 @@ namespace backend.Core.Domain.Games.Handlers
 
         public async Task Handle(BroadcastGuessEvent notification, CancellationToken cancellationToken)
         {
-            var guess = new GuessResponseDto(){
+            var guess = new GuessResponseDto()
+            {
                 Guess = notification.Guess,
                 User = notification.Username,
             };

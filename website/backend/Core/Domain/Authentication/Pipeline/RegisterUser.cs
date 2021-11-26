@@ -8,29 +8,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Authentication.Pipelines
 {
-        public class RegisterUser
+    public class RegisterUser
+    {
+        public record Request(string Username, string Password) : IRequest<RegisterUser.Response>;
+
+        public record Response(bool Success, string[] errors);
+
+        public class Handler : IRequestHandler<Request, Response>
         {
-                public record Request(string Username, string Password) : IRequest<RegisterUser.Response>;
+            private readonly IAuthenticationService _authServ;
 
-                public record Response(bool Success,string[] errors);
+            public Handler(IAuthenticationService authServ) => _authServ = authServ ?? throw new ArgumentNullException(nameof(authServ));
 
-                public class Handler : IRequestHandler<Request,Response>
+            public async Task<RegisterUser.Response> Handle(Request request, CancellationToken cancellationToken)
+            {
+                var (success, errors) = await _authServ.RegisterUser(request.Username, request.Password);
+                if (success)
                 {
-                        private readonly IAuthenticationService _authServ;
-
-                        public Handler(IAuthenticationService authServ) => _authServ = authServ ?? throw new ArgumentNullException(nameof(authServ));
-
-                        public async Task<RegisterUser.Response> Handle(Request request, CancellationToken cancellationToken)
-                        {
-                                var (success, errors) = await _authServ.RegisterUser(request.Username,request.Password);
-                                if (success)
-                                {
-                                        await _authServ.LoginUser(request.Username, request.Password);
-                                }
-                                return new Response(success,errors);
-
-                        }
-
+                    await _authServ.LoginUser(request.Username, request.Password);
                 }
+                return new Response(success, errors);
+
+            }
+
         }
+    }
 }

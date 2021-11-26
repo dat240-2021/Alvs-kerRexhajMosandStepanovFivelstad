@@ -22,7 +22,7 @@ namespace backend.Tests.Core.Domain.Games
             var user = Guid.NewGuid();
             var game = new Game(
                 Guid.NewGuid(),
-                new List<backend.Core.Domain.Images.Image>() { new (Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test"))) },
+                new List<backend.Core.Domain.Images.Image>() { new(Guid.NewGuid(), new ImageLabel("test", new ImageCategory(2, "test"))) },
                 new List<Guesser>() { new Guesser(user, "") { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
@@ -43,7 +43,7 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image },
-                new List<Guesser>() { new Guesser(user,"") { Connected = true } },
+                new List<Guesser>() { new Guesser(user, "") { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
             game.Update();
@@ -63,7 +63,7 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image },
-                new List<Guesser>() { new Guesser(user,"") { Connected = true } },
+                new List<Guesser>() { new Guesser(user, "") { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
             game.Update();
@@ -89,7 +89,7 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image1, image2, image3 },
-                new List<Guesser>() { new Guesser(user,"") { Connected = true } },
+                new List<Guesser>() { new Guesser(user, "") { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
             game.Update();
@@ -133,7 +133,7 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image },
-                new List<Guesser>() { new Guesser(user1,"") { Connected = true }, new Guesser(user2,"") { Connected = true } },
+                new List<Guesser>() { new Guesser(user1, "") { Connected = true }, new Guesser(user2, "") { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
             game.Update();
@@ -169,7 +169,7 @@ namespace backend.Tests.Core.Domain.Games
             var game = new Game(
                 Guid.NewGuid(),
                 new() { image1, image2, image3 },
-                new List<Guesser>() { new Guesser(user1,"") { Connected = true }, new (user2,"") { Connected = true }, new (user3,"") { Connected = true } },
+                new List<Guesser>() { new Guesser(user1, "") { Connected = true }, new(user2, "") { Connected = true }, new(user3, "") { Connected = true } },
                 new Proposer(Guid.NewGuid())
             );
             game.Update();

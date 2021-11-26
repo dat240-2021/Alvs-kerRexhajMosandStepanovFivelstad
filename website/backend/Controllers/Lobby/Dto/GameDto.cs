@@ -10,7 +10,7 @@ namespace backend.Controllers.Lobby.Dto
         public GameSettings Settings { get; protected set; }
         public GameState State { get; protected set; }
         public int OccupiedSlotsCount { get; set; }
-        
+
         public GameDto(GameWithSlotInfo data)
         {
             Id = data.Game.Id;

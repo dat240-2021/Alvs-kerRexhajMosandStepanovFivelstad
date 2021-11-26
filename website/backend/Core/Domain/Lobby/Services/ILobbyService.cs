@@ -11,7 +11,7 @@ namespace backend.Core.Domain.Lobby.Services
         void LeaveGame(Guid gameId, Guid userId);
         GameSlotInfo GetSlotInfo(Guid gameId);
         bool HasAvailableSlots(Guid gameId);
-        
+
         bool DeleteGame(Guid gameId);
 
     }

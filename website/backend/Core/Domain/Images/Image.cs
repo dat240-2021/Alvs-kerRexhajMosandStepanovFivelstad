@@ -15,7 +15,7 @@ namespace backend.Core.Domain.Images
         public ImageLabel Label { get; protected set; }
         // public string Label { get=> _lbl.Label; protected set {} }
 
-        public string Category { get=> Label.Category.Name; }
+        public string Category { get => Label.Category.Name; }
 
 
         public List<ImageSlice> Slices { get; protected set; } = new List<ImageSlice>();
@@ -23,7 +23,7 @@ namespace backend.Core.Domain.Images
 
 
 
-        public Image(){}
+        public Image() { }
 
         public Image(Guid user, ImageLabel label)
         {
@@ -42,7 +42,7 @@ namespace backend.Core.Domain.Images
 
         public void AddImageSlice(byte[] data, int number)
         {
-            Slices.Add(new ImageSlice(data,number));
+            Slices.Add(new ImageSlice(data, number));
         }
         public void SetLabel(ImageLabel item)
         {

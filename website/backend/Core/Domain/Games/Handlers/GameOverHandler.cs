@@ -11,13 +11,13 @@ using backend.Hubs;
 
 namespace backend.Core.Domain.Games.Handlers
 {
-    public class GameOverHandler: INotificationHandler<GameOverEvent>
+    public class GameOverHandler : INotificationHandler<GameOverEvent>
     {
         private readonly IGameService _service;
         private IHubContext<GameHub> _hub;
 
 
-        public GameOverHandler(IGameService service,IHubContext<GameHub> hub )
+        public GameOverHandler(IGameService service, IHubContext<GameHub> hub)
         {
             _service = service ?? throw new System.ArgumentException(nameof(service));
             _hub = hub ?? throw new System.ArgumentException(nameof(hub));

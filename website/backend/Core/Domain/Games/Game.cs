@@ -174,7 +174,6 @@ namespace backend.Core.Domain.Games
         }
 
 
-        //returns bool, which implies this guess should be broadcast to all players
         public void Guess(GuessDto guess)
         {
             Guesser guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
@@ -184,11 +183,10 @@ namespace backend.Core.Domain.Games
                 return;
             }
 
-            //implies the guessers guess was valid, therefore we can add the event right after it.
             guesser.Guessed = true;
 
-            //Add the guess event even if its correct or not.
-            Events.Add(new BroadcastGuessEvent(){
+            Events.Add(new BroadcastGuessEvent()
+            {
                 PlayerIds = PlayerIds,
                 Guess = guess.Guess,
                 Username = guesser.Username,
@@ -200,44 +198,47 @@ namespace backend.Core.Domain.Games
             {
                 var proposerScore = 0;
 
-                if (Proposer is Proposer){
+                if (Proposer is Proposer)
+                {
                     proposerScore = Proposer.CalculateScore(RoundTime, DateTime.Now - _startTime, _proposals.Count, CurrentImage.Slices.Count);
                 }
 
                 var guesserScore = guesser.CalculateScore(RoundTime, DateTime.Now - _startTime, _proposals.Count, CurrentImage.Slices.Count);
 
-                    Events.Add(new CorrectGuessEvent(){
-                        PlayerIds = PlayerIds.ToArray(),
-                        Guesser = guesser,
-                        GuesserScored = guesserScore,
-                        Proposer = Proposer,
-                        ProposerScored = proposerScore,
-                        Guess = guess.Guess,
-                        HasMoreRounds = _images.Count > 0,
-                        WillAutoContinue = _images.Count > 0 && Proposer is Oracle,
-                        Image = CurrentImage,
-                    });
-
-
-                    NextImage();
-                    return;
-                }
-
-                if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
+                Events.Add(new CorrectGuessEvent()
                 {
-                    if (CurrentImage.Slices.Count == _proposals.Count)
+                    PlayerIds = PlayerIds.ToArray(),
+                    Guesser = guesser,
+                    GuesserScored = guesserScore,
+                    Proposer = Proposer,
+                    ProposerScored = proposerScore,
+                    Guess = guess.Guess,
+                    HasMoreRounds = _images.Count > 0,
+                    WillAutoContinue = _images.Count > 0 && Proposer is Oracle,
+                    Image = CurrentImage,
+                });
+
+
+                NextImage();
+                return;
+            }
+
+            if (Guessers.Where(g => g.Connected).All(x => x.Guessed))
+            {
+                if (CurrentImage.Slices.Count == _proposals.Count)
+                {
+                    Events.Add(new FullyVisibleImageWithoutCorrectGuessesEvent()
                     {
-                        Events.Add(new FullyVisibleImageWithoutCorrectGuessesEvent(){
-                            PlayerIds = PlayerIds.ToArray(),
-                            Guess = CurrentImage.Label.Label
-                        });
-                        NextImage();
-                    }
-                    else
-                    {
-                        ProposersTurn = true;
-                    }
+                        PlayerIds = PlayerIds.ToArray(),
+                        Guess = CurrentImage.Label.Label
+                    });
+                    NextImage();
                 }
+                else
+                {
+                    ProposersTurn = true;
+                }
+            }
         }
 
 

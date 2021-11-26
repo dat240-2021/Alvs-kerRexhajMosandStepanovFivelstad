@@ -14,7 +14,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
     {
         public record Request() : IRequest<List<LeaderboardScoreDto>>;
 
-        public class Handler: IRequestHandler<Request, List<LeaderboardScoreDto>>
+        public class Handler : IRequestHandler<Request, List<LeaderboardScoreDto>>
         {
 
             private GameContext _db;
@@ -32,9 +32,11 @@ namespace backend.Core.Domain.Lobby.Pipelines
                     .ToArrayAsync(cancellationToken: cancellationToken);
 
                 var leaderboard = new List<LeaderboardScoreDto>();
-                foreach( var s in scores){
-                    leaderboard.Add(new LeaderboardScoreDto(){
-                        Playername = _db.Users.Where( u => u.Id == s.User ).Select( u => u.UserName).FirstOrDefault(),
+                foreach (var s in scores)
+                {
+                    leaderboard.Add(new LeaderboardScoreDto()
+                    {
+                        Playername = _db.Users.Where(u => u.Id == s.User).Select(u => u.UserName).FirstOrDefault(),
                         Score = s.UserScore,
                     });
                 }

@@ -13,9 +13,9 @@ namespace backend.Core.Domain.Lobby.Pipelines
 {
     public class GetAvailableGames
     {
-        public record Request(): IRequest<List<GameWithSlotInfo>> {}
+        public record Request() : IRequest<List<GameWithSlotInfo>> { }
 
-        public class Handler: IRequestHandler<Request, List<GameWithSlotInfo>>
+        public class Handler : IRequestHandler<Request, List<GameWithSlotInfo>>
         {
 
             private readonly GameContext _db;
@@ -27,7 +27,7 @@ namespace backend.Core.Domain.Lobby.Pipelines
                 _LobbyService = LobbyService;
             }
 
-            
+
             public async Task<List<GameWithSlotInfo>> Handle(Request request, CancellationToken cancellationToken)
             {
                 var games = await _db.Games

@@ -18,6 +18,6 @@ namespace Controllers.Generics
 
         [Required]
         public T Data { get; set; }
-        public string[] Errors {get; set;}
+        public string[] Errors { get; set; }
     }
 }

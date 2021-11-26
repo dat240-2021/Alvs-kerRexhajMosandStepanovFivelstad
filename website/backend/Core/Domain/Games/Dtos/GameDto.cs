@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using backend.Core.Domain.Images;
 
-namespace backend.Core.Domain.Games {
-    public record GameDto {
+namespace backend.Core.Domain.Games
+{
+    public record GameDto
+    {
         public int GameId { get; protected set; }
         public Proposer Proposer { get; protected set; }
 

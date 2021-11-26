@@ -30,7 +30,8 @@ namespace backend.Core.Domain.Games
             return newScore;
         }
 
-        public void NotifyTurn(){
+        public void NotifyTurn()
+        {
         }
 
         public string GetId() => Id.ToString();

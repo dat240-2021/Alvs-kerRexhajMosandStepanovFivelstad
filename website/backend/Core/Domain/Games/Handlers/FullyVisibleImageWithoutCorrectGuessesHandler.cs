@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Core.Domain.Games.Handlers
 {
-    public class FullyVisibleImageWithoutCorrectGuessesHandler: INotificationHandler<FullyVisibleImageWithoutCorrectGuessesEvent>
+    public class FullyVisibleImageWithoutCorrectGuessesHandler : INotificationHandler<FullyVisibleImageWithoutCorrectGuessesEvent>
     {
         private readonly IGameService _service;
         private IHubContext<GameHub> _hub;

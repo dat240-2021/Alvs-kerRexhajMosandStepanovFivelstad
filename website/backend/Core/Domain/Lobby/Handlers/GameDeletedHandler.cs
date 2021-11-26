@@ -9,9 +9,9 @@ namespace backend.Core.Domain.Lobby.Handlers
 {
     public class GameDeletedHandler : INotificationHandler<GameDeleted>
     {
-        private readonly IHubContext<GamesHub> _hubContext;
+        private readonly IHubContext<LobbyHub> _hubContext;
 
-        public GameDeletedHandler(IHubContext<GamesHub> hubContext)
+        public GameDeletedHandler(IHubContext<LobbyHub> hubContext)
         {
             _hubContext = hubContext;
         }

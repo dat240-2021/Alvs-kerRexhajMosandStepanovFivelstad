@@ -7,18 +7,18 @@ namespace backend.Controllers.Lobby.Dto
     {
         [Required]
         public string ProposerType { get; set; }
-        
+
         [Required]
         [MinLength(1)]
         public List<int> CategoryIds { get; set; }
-        
-        [Required]
-        public int GuessersCount { get; set;}
 
         [Required]
-        public int ImagesCount { get; set;}
-        
+        public int GuessersCount { get; set; }
+
         [Required]
-        public int RoundDuration { get; set;}
+        public int ImagesCount { get; set; }
+
+        [Required]
+        public int RoundDuration { get; set; }
     }
 }

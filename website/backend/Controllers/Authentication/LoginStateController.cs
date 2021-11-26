@@ -13,7 +13,7 @@ namespace Controllers.Authentication
     public class LoginStateController : ApiBaseController
     {
         private readonly ILogger<LoginStateController> _logger;
-		private readonly IMediator _mediator;
+        private readonly IMediator _mediator;
         private readonly IAuthenticationService _authenticationService;
 
         public LoginStateController(ILogger<LoginStateController> logger, IMediator mediator, IAuthenticationService authenticationService)

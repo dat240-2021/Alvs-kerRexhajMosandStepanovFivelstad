@@ -25,7 +25,7 @@
         correctly.
       </h6>
       <h6>
-        The game supports single player mode, two-player mode and multi-player
+        The game supports single player mode and multi-player
         mode.
       </h6>
     </div>

@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace backend.Tests.Core.Domain.Lobby
 {
-    public class LobbyServiceTest: DbTest
+    public class LobbyServiceTest : DbTest
     {
         public LobbyServiceTest(ITestOutputHelper output) : base(output)
         {
@@ -18,32 +18,32 @@ namespace backend.Tests.Core.Domain.Lobby
         [Fact]
         public void UserJoinsNotStoredGameWillFailTest()
         {
-            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "AI");
+            var settings = GetGameSettings(new List<int> { 1, 2, 3 }, 10, 1, 1, "AI");
             var user = new User();
 
             var game = GetGame(settings, user);
-            
+
             var service = new LobbyService();
 
             void Act() => service.JoinGame(game.Id, user.Id, SlotRole.Guesser);
             Assert.Throws<Exception>(Act);
         }
-        
+
         [Fact]
         public void UserJoinsGameTest()
         {
-            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "AI");
+            var settings = GetGameSettings(new List<int> { 1, 2, 3 }, 10, 1, 1, "AI");
             var userId = Guid.NewGuid();
             var user = new User()
             {
                 Id = userId
             };
-            
+
             var game = GetGame(settings, user);
 
             var service = new LobbyService();
             service.StoreGame(game);
-            
+
             Assert.True(service.HasAvailableSlots(game.Id));
 
             service.JoinGame(game.Id, user.Id, SlotRole.Guesser);
@@ -52,87 +52,87 @@ namespace backend.Tests.Core.Domain.Lobby
             var slotInfo = service.GetSlotInfo(game.Id);
             Assert.Contains(userId, slotInfo.GuessersIds);
         }
-        
-        
+
+
         [Fact]
         public void UserLeavesNotJoinedGameWillFailTest()
         {
-            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "AI");
+            var settings = GetGameSettings(new List<int> { 1, 2, 3 }, 10, 1, 1, "AI");
             var user = new User();
             var game = GetGame(settings, user);
-            
+
             var service = new LobbyService();
             service.StoreGame(game);
 
             void Act() => service.LeaveGame(game.Id, user.Id);
             Assert.Throws<Exception>(Act);
         }
-        
+
         [Fact]
         public void UserLeavesGameTest()
         {
-            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "AI");
+            var settings = GetGameSettings(new List<int> { 1, 2, 3 }, 10, 1, 1, "AI");
             var user = new User();
             var game = GetGame(settings, user);
-            
+
             var service = new LobbyService();
             service.StoreGame(game);
-            
+
             service.JoinGame(game.Id, user.Id, SlotRole.Guesser);
             Assert.False(service.HasAvailableSlots(game.Id));
 
             service.LeaveGame(game.Id, user.Id);
             Assert.True(service.HasAvailableSlots(game.Id));
         }
-        
-        
+
+
         [Fact]
         public void UserJoinsGameAsProposerLeavesAvailableSlotTest()
         {
-            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "Player");
+            var settings = GetGameSettings(new List<int> { 1, 2, 3 }, 10, 1, 1, "Player");
             var user = new User();
             var game = GetGame(settings, user);
-            
-            
+
+
             var service = new LobbyService();
             service.StoreGame(game);
             service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
-            
+
             Assert.True(service.HasAvailableSlots(game.Id));
         }
-        
-        
+
+
         [Fact]
         public void UserJoinsGameAsProposerWithAiProposerTypeWillFailTest()
         {
-            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "AI");
+            var settings = GetGameSettings(new List<int> { 1, 2, 3 }, 10, 1, 1, "AI");
             var user = new User();
             var game = GetGame(settings, user);
-            
-            
+
+
             var service = new LobbyService();
             service.StoreGame(game);
-            
+
             void Act() => service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
             Assert.Throws<Exception>(Act);
         }
-        
+
         [Fact]
         public void TwoUserJoinsGameAsProposerWillFailTest()
         {
-            var settings = GetGameSettings(new List<int>{1, 2, 3}, 10, 1, 1, "Player");
+            var settings = GetGameSettings(new List<int> { 1, 2, 3 }, 10, 1, 1, "Player");
             var user = new User()
             {
                 Id = Guid.NewGuid()
             };
             var game = GetGame(settings, user);
-            
+
             var service = new LobbyService();
             service.StoreGame(game);
-            
+
             service.JoinGame(game.Id, user.Id, SlotRole.Proposer);
-            
-            var user2 = new  User()
+
+            var user2 = new User()
             {
                 Id = Guid.NewGuid()
             };

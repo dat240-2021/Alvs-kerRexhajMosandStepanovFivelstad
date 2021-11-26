@@ -16,12 +16,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace backend.Core.Domain.Games.Handlers
 {
-    public class CorrectGuessHandler: INotificationHandler<CorrectGuessEvent>
+    public class CorrectGuessHandler : INotificationHandler<CorrectGuessEvent>
     {
         private readonly IServiceScopeFactory _scope;
         private readonly IHubContext<GameHub> _hubContext;
 
-        public CorrectGuessHandler(IHubContext<GameHub> hubContext, IServiceScopeFactory scope )
+        public CorrectGuessHandler(IHubContext<GameHub> hubContext, IServiceScopeFactory scope)
         {
             _scope = scope ?? throw new System.ArgumentException(nameof(scope));
             _hubContext = hubContext;
@@ -33,7 +33,8 @@ namespace backend.Core.Domain.Games.Handlers
             var playersToScore = new List<(Guid id, int score)>();
             playersToScore.Add((notification.Guesser.Id, notification.GuesserScored));
 
-            if (notification.Proposer is Proposer){
+            if (notification.Proposer is Proposer)
+            {
                 playersToScore.Add((Guid.Parse(notification.Proposer.GetId()), notification.ProposerScored));
             }
 
@@ -47,9 +48,10 @@ namespace backend.Core.Domain.Games.Handlers
                         .Where(x => x.User == player.id)
                         .FirstOrDefaultAsync();
 
-                    if (score is null){
-                    score = new Score(player.id, 0);
-                    db.Add(score);
+                    if (score is null)
+                    {
+                        score = new Score(player.id, 0);
+                        db.Add(score);
                     }
 
                     score.UserScore += player.score;

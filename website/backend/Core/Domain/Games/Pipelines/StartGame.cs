@@ -13,7 +13,7 @@ namespace backend.Core.Domain.Games.Pipelines
 {
     public class StartGame
     {
-        public record Request(GameWithSlotInfo Game, List<int> ImageIds): IRequest<Unit> {}
+        public record Request(GameWithSlotInfo Game, List<int> ImageIds) : IRequest<Unit> { }
         public class Handler : IRequestHandler<Request, Unit>
         {
             private readonly GameContext _db;
@@ -34,7 +34,7 @@ namespace backend.Core.Domain.Games.Pipelines
                 {
                     proposer = new Proposer(
                         (Guid)proposerId,
-                        _db.Users.Where( u => u.Id==proposerId).FirstOrDefault().UserName
+                        _db.Users.Where(u => u.Id == proposerId).FirstOrDefault().UserName
                         );
                 }
 
@@ -50,10 +50,11 @@ namespace backend.Core.Domain.Games.Pipelines
                     images,
                     request.Game.SlotInfo.GuessersIds.Select(g => new Guesser(
                         g,
-                        _db.Users.Where( u => u.Id == g).FirstOrDefault().UserName
+                        _db.Users.Where(u => u.Id == g).FirstOrDefault().UserName
                     )).ToList(),
                     proposer
-                    ) {
+                    )
+                {
                     RoundTime = TimeSpan.FromSeconds(request.Game.Game.Settings.Duration)
                 };
 

@@ -15,7 +15,7 @@ namespace backend.Controllers.Authentication
     public class LogoutController : ApiBaseController
     {
         private readonly ILogger<LogoutController> _logger;
-		private readonly IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public LogoutController(ILogger<LogoutController> logger, IMediator mediator)
         {
@@ -33,4 +33,4 @@ namespace backend.Controllers.Authentication
 
         }
     }
-    }
+}

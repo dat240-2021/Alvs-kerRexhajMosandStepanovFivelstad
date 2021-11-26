@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Hubs.Handlers
 {
-    public class GuessersTurnHandler: INotificationHandler<GuessersTurnEvent>
+    public class GuessersTurnHandler : INotificationHandler<GuessersTurnEvent>
     {
         private readonly IHubContext<GameHub> _hub;
 
