@@ -174,7 +174,6 @@ namespace backend.Core.Domain.Games
         }
 
 
-        //returns bool, which implies this guess should be broadcast to all players
         public void Guess(GuessDto guess)
         {
             Guesser guesser = Guessers.Find(g => g.Id == guess.User && g.Connected);
@@ -184,12 +183,15 @@ namespace backend.Core.Domain.Games
                 return;
             }
 
-            //implies the guessers guess was valid, therefore we can add the event right after it.
             guesser.Guessed = true;
 
+<<<<<<< HEAD
             //Add the guess event even if its correct or not.
             Events.Add(new BroadcastGuessEvent()
             {
+=======
+            Events.Add(new BroadcastGuessEvent(){
+>>>>>>> 16e4444 (Remove comments)
                 PlayerIds = PlayerIds,
                 Guess = guess.Guess,
                 Username = guesser.Username,
