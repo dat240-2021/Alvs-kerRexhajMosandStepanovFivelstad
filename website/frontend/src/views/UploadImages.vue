@@ -28,29 +28,29 @@
               UploadFiles
             </button>
           </div>
-          <div v-if="!loading">
-            <p v-if="images.length > 1">{{ images.length }} Files selected</p>
-          </div>
-          <div v-else class="d-flex">
-            <div
-              class="spinner-border text-primary align-self-center"
-              role="status"
-            ></div>
-            <div class="align-self-center">
-              <p class="m-2">Processing {{ images.length }} files</p>
-            </div>
-          </div>
         </div>
       </form>
     </div>
     <div>
+      <div v-if="!loading">
+        <p v-if="images.length > 0">{{ images.length }} Files selected</p>
+      </div>
+      <div v-else class="d-flex">
+        <div
+          class="spinner-border text-primary align-self-center"
+          role="status"
+        ></div>
+        <div class="align-self-center">
+          <p class="m-2">Processing {{ images.length }} files</p>
+        </div>
+      </div>
       <p v-if="successText.length > 2" class="text-success">
         {{ successText }}
       </p>
       <p v-if="error.length > 2" class="text-danger">{{ error }}</p>
     </div>
-    <div>
-      <table class="table table-hover">
+    <div class="overflow-auto">
+      <table class="table table-hover table-responsive">
         <thead>
           <tr class="text-center">
             <th scope="col">Delete</th>
@@ -190,11 +190,12 @@ export default defineComponent({
       reader.readAsDataURL(file);
     },
     async onUploadImage() {
+      this.successText="";
       if (this.images.length < 1) {
         this.error = "Upload at least one file!";
       }
       let imagesContainEmptyfields = this.images.find(
-        (x) => x.label == "" && x.category == ""
+        (x) => x.label == "" || x.category == ""
       );
       if (imagesContainEmptyfields != undefined) {
         this.error = "Please fill in all fields!";
