@@ -6,22 +6,23 @@
     aria-hidden="true"
     id="manSlicingModal"
   >
-    <div class="modal-dialog" id="slicingModal" style="display: table">
+    <div class="modal-dialog" id="slicingModal" style="display: table;">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title text-center w-100" id="exampleModalLabel">
+          <h5 class="modal-title text-center w-90" id="exampleModalLabel">
             Manual Slicing
           </h5>
           <h5 class="modal-title" id="exampleModalLabel"></h5>
           <button type="button" class="btn-close" @click="closeModal"></button>
         </div>
-        <div class="modal-body" id="slicingModalBody">
+        <div class="modal-body p-1" id="slicingModalBody">
           <div class="position-relative w-100 h-100">
             <img
               :src="modalImage.file"
               id="original_image"
               zindex-dropdown
               :onload="imageLoaded"
+              style="width:100%"
             />
             <canvas
               id="canvas_modal"
@@ -42,6 +43,7 @@
             id="customRange1"
           />
           <div class="d-flex justify-content-between h-100">
+
             <button
               type="button"
               class="btn btn-outline-primary"
@@ -54,16 +56,16 @@
               Color Picker
             </button>
             <div v-if="!colorPicker">
-              <p>Color Picker Disabled</p>
+              <p class="text-center">Color Picker Disabled</p>
             </div>
 
             <div
-              class="mx-5 bg col-md-3 col-sm-3 col-xs-3"
+              class="col-2 col-md-3 col-sm-3 mx-1"
               :style="'background-color:' + pickedColor"
             ></div>
 
             <button
-              class="btn btn-primary"
+              class="btn btn-primary  mx-1"
               @click="selectAnotherColor = true"
               v-if="colorPicker"
             >
@@ -128,20 +130,64 @@ export default defineComponent({
     this.canvas = document.getElementById("canvas_modal");
     this.modal = document.getElementById("manSlicingModal");
     this.ctx = this.canvas.getContext("2d");
-    this.modal.addEventListener("mousedown", this.start);
-    this.modal.addEventListener("mouseup", this.stop);
+    this.canvas.addEventListener("mousedown", this.start);
+    this.canvas.addEventListener("mouseup", this.stop);
     window.addEventListener("resize", this.resize);
+
+    // Set up touch events for mobile, etc
+    this.canvas.addEventListener(
+      "touchstart",
+      function (e: any) {
+        let canvas = document.getElementById("canvas_modal");
+        if (canvas == null) {
+          return;
+        }
+        let mousePos = getTouchPos(canvas, e);
+        var touch = e.touches[0];
+        var mouseEvent = new MouseEvent("mousedown", {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+
+        canvas.dispatchEvent(mouseEvent);
+      },
+      false
+    );
+
+    this.canvas.addEventListener(
+      "touchend",
+      function (e: any) {
+        var mouseEvent = new MouseEvent("mouseup", {});
+        document.getElementById("canvas_modal")?.dispatchEvent(mouseEvent);
+      },
+      false
+    );
+
+    this.canvas.addEventListener(
+      "touchmove",
+      function (e: any) {
+        var touch = e.touches[0];
+        var mouseEvent = new MouseEvent("mousemove", {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+        document.getElementById("canvas_modal")?.dispatchEvent(mouseEvent);
+      },
+      false
+    );
+
+    // Get the position of a touch relative to the canvas
+    function getTouchPos(canvasDom: any, touchEvent: any) {
+      var rect = canvasDom.getBoundingClientRect();
+      return {
+        x: touchEvent.touches[0].clientX - rect.left,
+        y: touchEvent.touches[0].clientY - rect.top,
+      };
+    }
   },
   methods: {
     imageLoaded(event: any) {
-      // document.getElementById("canvas_modal").style();
-      if (event.target.width > event.target.height) {
-        // if the image is wider than its tall,
-        // 80 vh should ensure it won't exceed window height
-        event.target.style = "width:80vh;";
-      } else {
-        event.target.style = "height:50vh;";
-      }
+
       if (this.modalImage.sliceFile != "") {
         this.reloadData(this.modalImage.sliceFile);
       }
@@ -167,9 +213,10 @@ export default defineComponent({
       if (rel == null || rel2 == null) {
         return;
       }
-      this.coord.x = event.clientX - (rel.offsetLeft + rel2.offsetLeft + 16);
-      this.coord.y = event.clientY - (rel.offsetTop + rel2.offsetTop + 16);
+      this.coord.x = event.clientX - (rel.offsetLeft + rel2.offsetLeft + 4);
+      this.coord.y = event.clientY - (rel.offsetTop + rel2.offsetTop + 4);
     },
+
     start(event: any) {
       let color = "";
       if (
@@ -192,13 +239,13 @@ export default defineComponent({
       } else {
         color = this.pickedColor;
       }
-      this.modal.addEventListener("mousemove", this.draw);
+      this.canvas.addEventListener("mousemove", this.draw);
       this.currentColor = color;
       this.ctx.strokeStyle = color;
       this.reposition(event);
     },
     stop() {
-      this.modal.removeEventListener("mousemove", this.draw);
+      this.canvas.removeEventListener("mousemove", this.draw);
     },
     draw(event: any) {
       this.ctx.beginPath();
@@ -245,10 +292,10 @@ export default defineComponent({
       this.$emit("closeModal");
     },
     clearEventListeners() {
-      this.modal.removeEventListener("mousedown", this.start);
-      this.modal.removeEventListener("mouseup", this.stop);
+      this.canvas.removeEventListener("mousedown", this.start);
+      this.canvas.removeEventListener("mouseup", this.stop);
       window.removeEventListener("resize", this.resize);
-      this.modal.removeEventListener("mousemove", this.draw);
+      this.canvas.removeEventListener("mousemove", this.draw);
     },
     rgbToHex(r: number, g: number, b: number) {
       const componentToHex = (c: number) => {

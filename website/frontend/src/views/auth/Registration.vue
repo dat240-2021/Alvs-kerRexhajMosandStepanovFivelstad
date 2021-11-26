@@ -54,7 +54,7 @@ const ERROR_LABEL_BY_CODE: { [index: string]: any } = {
 const VALIDATION_ERRORS = {
   passwordMismatch: "Passwords must match",
   weakPassword:
-    "Password must have length 8, be alphanumeric with special chars and have both letter cases.",
+    "Password be at least 6 characters long, contain at least one letter and number",
   emptyUsername: "Username can't be empty",
 };
 

@@ -1,13 +1,19 @@
 <template>
   <div class="d-flex">
+    <div class="ms-auto mt-3" v-if="!isProposer">
+      <p>
+        <b>Playing as: </b>
+        <i>Guesser</i>
+      </p>
+    </div>
     <div class="ms-auto m-2">
       <button class="btn btn-outline-primary" type="button" @click="leaveGame">
         Leave Game
       </button>
     </div>
   </div>
-  <div class="container min-vh-100">
-    <div class="row mt-3">
+  <div class="container">
+    <div class="row mt-3 ">
       <div
         v-if="!isOver"
         class="text-center turn-label rounded mb-4"
@@ -16,12 +22,7 @@
         {{ turnLabel }}
       </div>
       <div class="d-flex" v-if="!isProposer && started">
-        <div class="ms-auto">
-          <p>
-            <b>Playing as: </b>
-            <i>Guesser</i>
-          </p>
-        </div>
+
 
         <form @submit.prevent="sendGuess" class="form-control border-0">
           <div class="input-group mb-3">
@@ -48,80 +49,75 @@
       </div>
       <div v-else class="d-flex ms-auto" />
       <div class="row">
-        <div class="col d-flex flex-column pb-3">
+        <div class="col pb-3">
           <h2 v-if="isProposer" class="text-center">{{ this.label }}</h2>
           <div v-if="inlineAlert" class="alert" :class="inlineAlert.type">
             {{ this.inlineAlert.message }}
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-2">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Guesses:</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(guess, i) in latestValidGuesses" :key="'guess_' + i">
-                <td>{{ guess.user }} : {{ guess.guess }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col position-relative d-flex" id="canvas-div">
-          <div class="position-relative mx-auto" style="width:60%">
-            <div v-if="!started" class="d-flex justify-content-center m-5">
-              <div>
-                <div
-                  class="spinner-border"
-                  role="status"
-                  style="width: 3rem; height: 3rem"
-                />
-              </div>
-              <span class="ms-5">Waiting for game to start...</span>
-            </div>
-            <div
-              v-if="isResetGuesser"
-              class="d-flex justify-content-center m-5"
-            >
-              <div>
-                <div
-                  class="spinner-border"
-                  role="status"
-                  style="width: 3rem; height: 3rem"
-                />
-              </div>
-              <span class="ms-5">Waiting for proposer...</span>
-            </div>
-            <img
-              v-on:click="proposerSelectedSlice"
-              v-for="im in imageSlices"
-              :key="im.id"
-              :src="'data:image/png;base64,' + im.imageData"
-              style="object-fit: cover"
-              :id="im.id"
-              class="position-absolute top-0 start-0 w-100"
-            />
+    </div>
+    <div class="row justify-content-center">
+      <!-- HERE -->
+      <div class="col-md-6 col-sm-12 d-flex " >
+        <div v-if="!started" class="d-flex justify-content-center m-5">
+          <div>
+            <div class="spinner-border" role="status" />
           </div>
+          <span class="ms-5">Waiting for game to start...</span>
         </div>
-        <div class="col-3">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th class="text-start">Player</th>
-                <th class="text-end">Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="p in sortedPlayers" :key="p.Name">
-                <td class="text-start">{{ p.Name }}</td>
-                <td class="text-end">{{ p.Score }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div v-if="isResetGuesser" class="d-flex justify-content-center m-5">
+          <div>
+            <div class="spinner-border" role="status" />
+          </div>
+          <span class="ms-5">Waiting for proposer...</span>
         </div>
+        <div class="position-relative mx-auto" id="canvas-div">
+          <img v-if="imageSlices.length!=0"
+            :src="'data:image/png;base64,' + imageSlices[0].imageData"
+            class="img-fluid"
+          />
+          <img
+            v-on:click="proposerSelectedSlice"
+            v-for="im in imageSlices"
+            :key="im.id"
+            :src="'data:image/png;base64,' + im.imageData"
+            :id="im.id"
+            class="position-absolute top-0 start-0 img-fluid"
+          />
+      </div>
+      </div>
+      <!-- HERE -->
+      <div class="col-md-2 col-sm-12">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th class="text-start">Player</th>
+              <th class="text-end">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="p in sortedPlayers" :key="p.Name">
+              <td class="text-start">{{ p.Name }}</td>
+              <td class="text-end">{{ p.Score }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- HERE -->
+      <div class="col-md-4 col-sm-12">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Guesses:</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(guess, i) in latestValidGuesses" :key="'guess_' + i">
+              <td>{{ guess.user }} : {{ guess.guess }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -399,11 +395,11 @@ export default defineComponent({
         ];
       }
 
-      if (this.isProposer){
+      if (this.isProposer) {
         this.myScore = guess.newProposerScore;
       }
 
-      if (this.currentPlayer.username == guess.guesser){
+      if (this.currentPlayer.username == guess.guesser) {
         this.myScore = guess.newGuesserScore;
       }
     },
@@ -418,14 +414,17 @@ export default defineComponent({
       this.isOver = true;
       let highestScore = this.sortedPlayers[0];
 
-      if (!highestScore){
-        highestScore = {Name: "No One", Score: 0} as Player;
-      };
+      if (!highestScore) {
+        highestScore = { Name: "No One", Score: 0 } as Player;
+      }
 
       if (this.isProposer) {
         this.inlineAlert = {
           type: getAlertType.info,
-          message: getGameAlertMessage.proposer(highestScore.Score, highestScore.Name),
+          message: getGameAlertMessage.proposer(
+            highestScore.Score,
+            highestScore.Name
+          ),
           imageSlices: null,
         };
         return;
